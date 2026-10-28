@@ -29,7 +29,7 @@ See [Architecture](docs/ARCHITECTURE.md), [Workstreams](docs/WORKSTREAMS.md), [R
 
 ## Experimental compositional world research
 
-[RFC-007](docs/rfcs/RFC-007-COMPOSITIONAL-WORLD-FOUNDATION.md) proposes a layered mathematical foundation combining typed composition, stochastic games and world dynamics. See the [mathematical notes](docs/math/COMPOSITIONAL-WORLD-NOTES.md) and [dependency-free example](examples/composable_world.py). These are **research prototypes**, not approved OWP/OCP protocol standards or the production SuperKernel.
+[RFC-007: Mathematical Foundations](docs/math/RFC-007-OPENWORLD-MATHEMATICAL-FOUNDATIONS.md) is the existing proposed W2 research architecture. The independent [EXPR-001 fixture](docs/experiments/COMPOSABLE-WORLD-FIXTURE.md), [mathematical notes](docs/math/COMPOSITIONAL-WORLD-NOTES.md), and [dependency-free example](examples/composable_world.py) explore only pure typed composition, agent blueprints and resource transfer/replay. They do **not** constitute approved OWP/OCP standards or production SuperKernel code.
 
 ```bash
 python -m unittest discover -s tests -p 'test_composable_world_experiment.py' -v
@@ -49,4 +49,4 @@ English is the canonical language for code, comments, issues, RFCs and pull requ
 
 ## Project continuity and previous sessions
 
-Start new work sessions with the [canonical project continuity](docs/project/PROJECT-CONTINUITY.md), [decision ledger](docs/project/DECISION-LEDGER.md), [source register](docs/project/SESSION-SOURCE-REGISTER.md), and [execution handoff](docs/project/EXECUTION-HANDOFF.md). Two externally shared ChatGPT session URLs are logged as **pending access**, not represented as imported transcripts. Research findings and merged-source statuses are clearly distinguished from independently reproduced measurements.
+Start new work sessions with the [canonical project continuity](docs/project/PROJECT-CONTINUITY.md), [decision ledger](docs/project/DECISION-LEDGER.md), [source register](docs/project/SESSION-SOURCE-REGISTER.md), and [execution handoff](docs/project/EXECUTION-HANDOFF.md). Externally shared ChatGPT transcripts remain **pending access** where indicated; design discussion and independently reproducible evidence have different statuses.
