@@ -5,38 +5,40 @@
 
 ## A. External conversation URLs supplied by the project owner
 
-The first request supplied two **unique** URLs, with the first repeated. A later request supplied a **third distinct** share URL. Attempts to read these shared ChatGPT URLs via the available page reader were unsuccessful; none of the complete transcripts was verified.
+The first request supplied two **unique** URLs, with the first repeated. Subsequent requests supplied two further **distinct** share URLs. Attempts to read their full transcripts via the available reader were unsuccessful. No complete transcript was independently verified.
 
 | Source ID | Shared link | Status | Eligible for transcript-derived claims? |
 |---|---|---|---|
 | CHAT-SHARE-001 | https://chatgpt.com/s/t_6ae211da5b6481918229efe3a872998c | **PENDING_ACCESS** — content not retrievable | **No** |
 | CHAT-SHARE-002 | https://chatgpt.com/s/t_6ae2123fe370819195aff2f1f75b60ff | **PENDING_ACCESS** — content not retrievable | **No** |
 | CHAT-SHARE-003 | https://chatgpt.com/share/6ae21436-a858-83ec-b90e-c55e0f507b06 | **PENDING_ACCESS** — full transcript unreadable; owner-supplied mathematical excerpt available separately | **No** |
+| CHAT-SHARE-004 | https://chatgpt.com/share/6ae214d5-8860-83ec-b076-f7834ec8a002 | **PENDING_ACCESS** — full transcript unreadable; active OpenWorld discussion visible independently | **No** |
 
-The repeated occurrence of CHAT-SHARE-001 is not an independent source. Do not infer unseen topics, participants, decisions or progress from any of the three share URLs. The verified owner-selected excerpt relevant to CHAT-SHARE-003 has been processed as an excerpt, not as a complete transcript.
+A duplicate occurrence of CHAT-SHARE-001 is not a third source. The owner's visible selected mathematical excerpt for CHAT-SHARE-003 and the visible OpenWorld discussion relevant to CHAT-SHARE-004 are **not verified full transcript exports**. Do not infer unseen topics, participants, decisions or progress from any URL.
 
 ## B. Sources actually used in this synthesis
 
 | Source ID | Source | Coverage and evidence strength |
 |---|---|---|
-| OPENWORLD-CURRENT-CONVERSATION | OpenWorld project working conversation visible in the current task | Historical design discussion and previously *reported* prototype results; not automatically independent evidence |
-| GITHUB-MAIN | https://github.com/CocAgent/OpenWorld | Current repository identity, tracked files, contracts and written code |
-| GITHUB-PR-007 | https://github.com/CocAgent/OpenWorld/pull/7 | Initial public repository bootstrap |
-| GITHUB-PR-008 | https://github.com/CocAgent/OpenWorld/pull/8 | RFC-006 proposed contracts |
+| OPENWORLD-CURRENT-CONVERSATION | OpenWorld project working conversation visible in the active task | Design discussions and reported prototype results; not independent evidence |
+| GITHUB-MAIN | https://github.com/CocAgent/OpenWorld | Tracked source, contracts and repository history |
+| GITHUB-PR-007 | https://github.com/CocAgent/OpenWorld/pull/7 | Initial public bootstrap |
+| GITHUB-PR-008 | https://github.com/CocAgent/OpenWorld/pull/8 | Proposed RFC-006 contracts |
 | GITHUB-PR-009 | https://github.com/CocAgent/OpenWorld/pull/9 | HM-P1e code and authored tests |
-| GITHUB-PR-010 | https://github.com/CocAgent/OpenWorld/pull/10 | Independent W5 benchmark and authored tests |
+| GITHUB-PR-010 | https://github.com/CocAgent/OpenWorld/pull/10 | W5 benchmark and authored tests |
 | GITHUB-GATE-011 | https://github.com/CocAgent/OpenWorld/issues/11 | Pending independent merged-main verification |
-| GITHUB-PR-014 | https://github.com/CocAgent/OpenWorld/pull/14 | RFC-007: selective mathematical foundation derived from visible excerpt, local prior RFC-004 and canonical documents |
-| GITHUB-W2-P0-015 | https://github.com/CocAgent/OpenWorld/issues/15 | Next bounded executable MathKernel implementation |
+| GITHUB-PR-014 | https://github.com/CocAgent/OpenWorld/pull/14 | RFC-007 mathematical research |
+| GITHUB-W2-P0-015 | https://github.com/CocAgent/OpenWorld/issues/15 | Bounded MathKernel P0 implementation |
+| GITHUB-PR-017 | https://github.com/CocAgent/OpenWorld/pull/17 | Experimental compositional fixture, merged separately from acceptance gates |
 
 ## C. Safe import procedure for an unavailable shared transcript
 
-1. Obtain an authorized export/text of the exact conversation from the owner, or a genuinely accessible shared page.
-2. Verify title, authorship/source identity, date and that the export is complete.
-3. Exclude credentials, personally identifying information, hidden system/tool content and unrelated projects from public artifacts.
-4. Extract decisions into the [Decision Ledger](DECISION-LEDGER.md) with exact source identifiers and status.
-5. Deduplicate against existing OpenWorld decisions and GitHub Issues. Resolve contradictions explicitly instead of silently choosing one.
-6. Preserve unresolved claims with `UNVERIFIED` status; do not fabricate test passes or deployment records.
-7. Submit an English PR with a clear change log and owner review before merge.
+1. Obtain an authorized export/text of the exact conversation or a genuinely accessible shared page.
+2. Verify title, authorship/source identity, date and completeness.
+3. Screen private or proprietary data, credentials, tool/system content and third-party rights.
+4. Extract decisions into the [Decision Ledger](DECISION-LEDGER.md) with exact source IDs.
+5. Deduplicate and resolve contradictions instead of silently choosing a newer statement.
+6. Preserve unverified claims and negative results with explicit limitations.
+7. Submit a reviewed English PR before incorporating any additional transcript-derived claims.
 
-**Current result:** The repository now records all **three distinct** shared URLs. The full transcripts have **not been ingested**. Only the owner-visible mathematical excerpt associated with the third request, the earlier local RFC-004, and reviewed GitHub documents informed RFC-007.
+**Current result:** Four distinct shared URLs are recorded as pending-access; their complete transcripts have **not** been ingested. Only actually visible excerpts, discussions, and checked repository files informed the corresponding proposals and research fixture.
