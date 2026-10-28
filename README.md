@@ -2,7 +2,7 @@
 
 **An open ecosystem for adaptive, collaborative, and evolving AI agents.**
 
-OpenWorld is an independent, experimental open-source project exploring persistent agent identity, auditable memory, online adaptation, resource-aware reasoning, and collaboration. It is **not production ready**. OpenWorld is not affiliated with AHappy.
+OpenWorld is an independent, experimental open-source project exploring persistent agent identity, auditable memory, online adaptation, resource-aware reasoning, and collaboration. It is **not production ready**.
 
 ## Core components
 
