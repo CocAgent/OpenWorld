@@ -20,6 +20,7 @@ This ledger is a **living summary**. It does not supersede normative ADRs in [do
 | OW-D14 | Apache-2.0 applies to new OpenWorld-authored content; historical prototypes need audit before release | **Accepted publication boundary** | ADR-005; repository LICENSE |
 | OW-D15 | OpenWorld Companion and Civilization are possible future products, not current released features | **Product hypotheses** | Needs validated user value, consent, security and operational cost |
 | OW-D16 | Billion-scale populations are aspirational research goals, not benchmark results | **Explicit non-claim** | Issue #11 / research status |
+| OW-D17 | The first five mathematical pillars form the **proposed P0 MathKernel**; sparse graph processes follow, category-theoretic formalization is not a runtime P0 dependency | **Proposed staged architecture** | RFC-007 (PR #14), Issue #3, executable P0 Issue #15; owner/math review pending |
 
 ## Acceptance distinctions
 
