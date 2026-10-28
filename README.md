@@ -38,3 +38,7 @@ See [Architecture](docs/ARCHITECTURE.md), [Workstreams](docs/WORKSTREAMS.md), [R
 ## Language and license
 
 English is the canonical language for code, comments, issues, RFCs and pull requests. New source and documentation are available under [Apache-2.0](LICENSE).
+
+## Project continuity and previous sessions
+
+Start new work sessions with the [canonical project continuity](docs/project/PROJECT-CONTINUITY.md), [decision ledger](docs/project/DECISION-LEDGER.md), [source register](docs/project/SESSION-SOURCE-REGISTER.md), and [execution handoff](docs/project/EXECUTION-HANDOFF.md). Two externally shared ChatGPT session URLs are logged as **pending access**, not represented as imported transcripts. Research findings and merged-source statuses are clearly distinguished from independently reproduced measurements.

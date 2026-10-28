@@ -18,3 +18,7 @@ You contribute to **OpenWorld**. Read `README.md`, `docs/ARCHITECTURE.md`, `docs
 ## Parallel work
 
 Use the workstream ownership policy in `docs/WORKSTREAMS.md`. Changes to shared contracts require an ADR and compatibility review. Every PR reports its commit SHA, tests, benchmark assumptions, limitations and rollback plan.
+
+## Cross-session continuity
+
+Before starting a new task, read `docs/project/PROJECT-CONTINUITY.md`, `docs/project/DECISION-LEDGER.md`, `docs/project/SESSION-SOURCE-REGISTER.md`, and `docs/project/EXECUTION-HANDOFF.md`. Never present an inaccessible chat share link as an imported source or a historical performance claim as an independently reproduced result. Keep all repository-facing text in English.
