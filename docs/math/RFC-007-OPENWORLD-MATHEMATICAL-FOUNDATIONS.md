@@ -197,6 +197,12 @@ Interfaces MUST be reconciled with RFC-006's proposed envelope before freezing s
 
 **Open:** how to choose predictive tests; what distortion is acceptable per use case; which cost is optimized per agent; how to calibrate uncertainty under drift; proof of protocol composition and revocation; retention/erasure guarantees across replicas.
 
+## Related compositional and multi-agent research
+
+A separately reviewed [research and prior-art catalogue](../research/RELATED-RESEARCH-AND-PROJECTS.md) links **16 primary studies** across category theory, Markov kernels, game semantics, POSG planning, agent-based social simulation, open-ended learning, and quality-diversity. It provides specific, falsifiable OpenWorld experiments, limits and reuse checks. This catalogue **does not** upgrade the categorical P2 extension to a P0 runtime dependency, claim originality of cited mathematics, or confer a formal correctness guarantee on OpenWorld.
+
+See also the [session-design reconciliation](../project/SESSION-SYNTHESIS-20261028.md) for the distinction between historical OpenWorld/OCP proposals and the accepted repository architecture.
+
 ## Prior literature
 
 - Littman, Sutton & Singh (2001), *Predictive Representations of State*: https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf
