@@ -31,3 +31,19 @@ The first isolated W3 test run in the authoring environment passed **13/13** on 
 5. W5 should run independent workloads across sparse/hub graphs, adversarial inputs, multi-seed holdouts, CPU, RAM, event throughput and replay mismatches before W3 acceptance.
 
 **Rollback:** Remove only the new W3 fixture, tests, demo and this research document. No schema migration, deployment or paid resources.
+
+## W3-H1 hardening extension (research branch; not yet accepted)
+
+The follow-up **W3-H1** experiment records the trusted per-tick action budget alongside each journal entry. The replay reducer reuses the recorded budget; conflicting actions that reuse a request ID with different payloads are all rejected. Identical same-tick retries still yield one accepted effect.
+
+An **optional SQLite checkpoint adapter** in `src/openworld_superkernel/world_persistence.py` stores the genesis plus complete input journal and expected state digest, then *recomputes* state on load. Saves use a SQLite transaction with `synchronous=FULL` and reject overwriting a different genesis or an unrelated journal fork. It is a research checkpoint, not an immutable ledger or an independently validated power-loss recovery mechanism.
+
+Commands for reviewer verification:
+
+~~~sh
+python -m unittest discover -s tests -p 'test_world_hardening.py' -v
+python -m unittest discover -s tests -v
+python scripts/check_repository.py
+~~~
+
+The existing in-memory behavior is retained. SQLite does not authenticate principals, establish external evidence, solve privacy, remove the O(history) journal cost, or secure an untrusted filesystem. W0/W4 must approve authentication/capability semantics, W5 must reproduce crash/fork/replay scenarios on pinned code, and Gate #11 remains separate.

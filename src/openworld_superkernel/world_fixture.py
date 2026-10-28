@@ -45,6 +45,7 @@ class TickInput:
     tick: int
     actions: tuple[Action, ...]
     external: tuple[Weather, ...] | None
+    action_budget: int | None = None  # trusted execution setting recorded for replay
 
 
 @dataclass(frozen=True)
@@ -104,7 +105,7 @@ def _input_record(batch: TickInput) -> object:
             [(c.request_id, c.tick, c.principal, c.actor, c.target, c.kind, c.amount)
              for c in batch.actions],
             None if batch.external is None else
-            [(w.region, w.condition) for w in batch.external]]
+            [(w.region, w.condition) for w in batch.external], batch.action_budget]
 
 
 def create_world(agents: tuple[Agent, ...], edges: tuple[tuple[str, str], ...],
@@ -162,6 +163,8 @@ def advance(world: World, batch: TickInput, *, max_actions: int = 256) -> StepRe
         raise TypeError("tick inputs must be tuples")
     if type(max_actions) is not int or max_actions < 0 or len(batch.actions) > max_actions:
         raise ValueError("action budget exceeded")
+    if batch.action_budget is not None and batch.action_budget != max_actions:
+        raise ValueError("replay action budget does not match trusted execution")
     if any(not isinstance(c, Action) for c in batch.actions):
         raise TypeError("invalid action type")
     if any(not isinstance(c.request_id, str) or type(c.tick) is not int
@@ -198,9 +201,20 @@ def advance(world: World, batch: TickInput, *, max_actions: int = 256) -> StepRe
 
     # A canonical order avoids nondeterminism from arrival order (not a fair scheduler).
     order = sorted(batch.actions, key=lambda c: (c.request_id, _hash(vars(c))))
+    # Reusing an ID with a different payload is ambiguous: reject *every* variant.
+    # An identical retry in the same tick retains the first accepted result.
+    seen_payloads: dict[str, Action] = {}
+    conflicting_ids: set[str] = set()
+    for c in order:
+        previous = seen_payloads.setdefault(c.request_id, c)
+        if previous != c:
+            conflicting_ids.add(c.request_id)
     for c in order:
         reason = None
-        if not c.request_id or len(c.request_id) > 128 or c.request_id in processed:
+        if c.request_id in conflicting_ids:
+            processed.add(c.request_id)
+            reason = "conflicting_request_id"
+        elif not c.request_id or len(c.request_id) > 128 or c.request_id in processed:
             reason = "duplicate_or_invalid_id"
         else:
             processed.add(c.request_id)
@@ -235,7 +249,7 @@ def advance(world: World, batch: TickInput, *, max_actions: int = 256) -> StepRe
     if sum(balances.values()) != sum(dict(world.balances).values()):
         raise AssertionError("conservation invariant broken")
     canonical_batch = TickInput(batch.tick, tuple(order), tuple(sorted(batch.external,
-                                                        key=lambda w: w.region)))
+                                                        key=lambda w: w.region)), max_actions)
     updated = World(world.tick + 1, world.seed, world.agents, world.graph,
                     tuple(sorted(balances.items())), tuple(sorted(regions.items())),
                     tuple(sorted(processed)), tuple(events), world.journal + (canonical_batch,))
@@ -260,7 +274,9 @@ def verify_replay(genesis: World, state: World) -> bool:
         raise ValueError("genesis must be a fresh world")
     rebuilt = genesis
     for batch in state.journal:
-        rebuilt = advance(rebuilt, batch).world
+        if batch.action_budget is None:
+            raise ValueError("replay missing trusted action budget")
+        rebuilt = advance(rebuilt, batch, max_actions=batch.action_budget).world
     if rebuilt.fingerprint() != state.fingerprint():
         raise ValueError("replay diverged")
     return True
