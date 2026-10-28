@@ -41,3 +41,7 @@ A_t\sim\pi_\psi(\cdot\mid Z_t,G_t,C_t).
 ## Architecture choices
 
 Start with dependency-free Python contract tests and a local SQLite research baseline. Build protocols and distributed infrastructure only when an independently measured workload justifies the complexity. All public interfaces are versioned.
+
+## Mathematical foundations
+
+The formal W2 MathKernel research specification is [RFC-007](math/RFC-007-OPENWORLD-MATHEMATICAL-FOUNDATIONS.md). Its implementation gates are documented in [MathKernel P0](math/MATHKERNEL-P0-IMPLEMENTATION-GATES.md). These are **proposed mathematical contracts**, not production proofs or completed implementation.
