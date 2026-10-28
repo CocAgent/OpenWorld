@@ -54,6 +54,9 @@ def save_checkpoint(path: str | Path, genesis: World, state: World) -> None:
     """
     document = _manifest(genesis, state)
     payload = _canonical(document)
+    # Round-trip through JSON before comparing the old journal prefix: Python
+    # tuple records become JSON arrays (lists) when read back from SQLite.
+    document = json.loads(payload)
     connection = sqlite3.connect(str(path), timeout=10)
     try:
         connection.execute("PRAGMA journal_mode=WAL")
