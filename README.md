@@ -27,6 +27,14 @@ python scripts/check_repository.py
 
 See [Architecture](docs/ARCHITECTURE.md), [Workstreams](docs/WORKSTREAMS.md), [Roadmap](docs/ROADMAP.md), [Research limitations](research/RESEARCH-STATUS.md), and [Contributing](CONTRIBUTING.md).
 
+## Experimental compositional world research
+
+[RFC-007](docs/rfcs/RFC-007-COMPOSITIONAL-WORLD-FOUNDATION.md) proposes a layered mathematical foundation combining typed composition, stochastic games and world dynamics. See the [mathematical notes](docs/math/COMPOSITIONAL-WORLD-NOTES.md) and [dependency-free example](examples/composable_world.py). These are **research prototypes**, not approved OWP/OCP protocol standards or the production SuperKernel.
+
+```bash
+python -m unittest discover -s tests -p 'test_composable_world_experiment.py' -v
+```
+
 ## Scientific and safety boundaries
 
 - No claim of billion-agent scalability, universal compression, or human-level intelligence.
