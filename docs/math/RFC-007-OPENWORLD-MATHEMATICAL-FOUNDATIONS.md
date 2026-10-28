@@ -27,34 +27,34 @@ This is an **architectural synthesis of known mathematical frameworks**, not a c
 
 ## 2. A minimal stochastic agent model
 
-Define measurable spaces for environment/world states \\(\\mathcal X\\), observations \\(\\mathcal O\\), actions \\(\\mathcal A\\), goals \\(\\mathcal G\\) and exogenous inputs \\(\\mathcal E\\). A controlled transition kernel is
+Define measurable spaces for environment/world states \(\mathcal X\), observations \(\mathcal O\), actions \(\mathcal A\), goals \(\mathcal G\) and exogenous inputs \(\mathcal E\). A controlled transition kernel is
 
-\\[
-K_\\theta(B\\mid x,a,e)=\\Pr(X_{t+1}\\in B\\mid X_t=x,A_t=a,E_t=e).
-\\]
+\[
+K_\theta(B\mid x,a,e)=\Pr(X_{t+1}\in B\mid X_t=x,A_t=a,E_t=e).
+\]
 
-For every fixed \\(x,a,e\\), \\(K_\\theta(\\cdot\\mid x,a,e)\\) is a probability measure; for each measurable \\(B\\), \\(K_\\theta(B\\mid\\cdot)\\) is measurable. The observation kernel is \\(Q_\\theta(o\\mid x',a)\\) (density or mass where appropriate).
+For every fixed \(x,a,e\), \(K_\theta(\cdot\mid x,a,e)\) is a probability measure; for each measurable \(B\), \(K_\theta(B\mid\cdot)\) is measurable. The observation kernel is \(Q_\theta(o\mid x',a)\) (density or mass where appropriate).
 
 A full proposed agent loop is
 
-\\[
-\\begin{aligned}
-X_{t+1}&\\sim K_\\theta(\\cdot\\mid X_t,A_t,E_t),\\\\
-O_{t+1}&\\sim Q_\\theta(\\cdot\\mid X_{t+1},A_t),\\\\
-Z_{t+1}&=F_\\phi(Z_t,A_t,O_{t+1}),\\\\
-A_t&\\sim\\pi_\\psi(\\cdot\\mid Z_t,G_t,C_t).
-\\end{aligned}
-\\]
+\[
+\begin{aligned}
+X_{t+1}&\sim K_\theta(\cdot\mid X_t,A_t,E_t),\\
+O_{t+1}&\sim Q_\theta(\cdot\mid X_{t+1},A_t),\\
+Z_{t+1}&=F_\phi(Z_t,A_t,O_{t+1}),\\
+A_t&\sim\pi_\psi(\cdot\mid Z_t,G_t,C_t).
+\end{aligned}
+\]
 
-The prediction \\(\\hat p_t\\) for an observed outcome MUST be recorded **before** receiving that outcome when evaluating prequential loss; otherwise results have leakage.
+The prediction \(\hat p_t\) for an observed outcome MUST be recorded **before** receiving that outcome when evaluating prequential loss; otherwise results have leakage.
 
 ### Kernel composition
 
-For compatible kernels \\(K: X\\rightsquigarrow Y\\) and \\(L:Y\\rightsquigarrow Z\\),
+For compatible kernels \(K: X\rightsquigarrow Y\) and \(L:Y\rightsquigarrow Z\),
 
-\\[
-(L\\circ K)(x,C)=\\int_Y L(y,C)K(x,dy).
-\\]
+\[
+(L\circ K)(x,C)=\int_Y L(y,C)K(x,dy).
+\]
 
 This composition is associative when the kernels and measurable spaces are appropriately defined. For finite state spaces the integral becomes a sum; P0 should implement that finite case with strict probability validation. Composition does **not** by itself provide causal identification, trust boundaries, or efficient inference.
 
@@ -62,82 +62,82 @@ This composition is associative when the kernels and measurable spaces are appro
 
 For a finite POMDP with known kernels, the filtering update is
 
-\\[
+\[
 b_{t+1}(x')=
-\\frac{Q(o_{t+1}\\mid x',a_t)\\sum_x K(x'\\mid x,a_t)b_t(x)}
-{\\sum_{u}Q(o_{t+1}\\mid u,a_t)\\sum_x K(u\\mid x,a_t)b_t(x)}.
-\\]
+\frac{Q(o_{t+1}\mid x',a_t)\sum_x K(x'\mid x,a_t)b_t(x)}
+{\sum_{u}Q(o_{t+1}\mid u,a_t)\sum_x K(u\mid x,a_t)b_t(x)}.
+\]
 
 Zero-likelihood evidence MUST raise an explicit impossible-observation condition; no silent uniform fallback. A full belief state may be exponentially large and is not generally cheap in open-ended worlds.
 
 A predictive-state representation keeps a vector of prescribed future-test probabilities,
 
-\\[
-Z_t=(\\Pr(\\tau_1\\mid H_t),\\ldots,\\Pr(\\tau_m\\mid H_t)),
-\\]
+\[
+Z_t=(\Pr(\tau_1\mid H_t),\ldots,\Pr(\tau_m\mid H_t)),
+\]
 
-where tests specify future action/observation sequences, \\(H_t\\) is past history, and \\(m\\) is a *chosen* test family rather than a universal bound.
+where tests specify future action/observation sequences, \(H_t\) is past history, and \(m\) is a *chosen* test family rather than a universal bound.
 
-A compressed memory \\(f(H)\\) is **task-sufficient** for a declared query/action family \\(\\mathcal Q\\), horizon \\(h\\), loss and environment only when future decision-relevant conditional distributions are equal for histories sharing \\(f(H)\\), or approximately equal under a specified metric. For example, an \\(\\epsilon\\)-TV condition is:
+A compressed memory \(f(H)\) is **task-sufficient** for a declared query/action family \(\mathcal Q\), horizon \(h\), loss and environment only when future decision-relevant conditional distributions are equal for histories sharing \(f(H)\), or approximately equal under a specified metric. For example, an \(\epsilon\)-TV condition is:
 
-\\[
-\\sup_{q\\in\\mathcal Q}\\;
-\\left\\|P(q\\mid H=h_1)-P(q\\mid H=h_2)\\right\\|_{TV}
-\\leq\\epsilon
-\\quad\\text{if }f(h_1)=f(h_2).
-\\]
+\[
+\sup_{q\in\mathcal Q}\;
+\left\|P(q\mid H=h_1)-P(q\mid H=h_2)\right\|_{TV}
+\leq\epsilon
+\quad\text{if }f(h_1)=f(h_2).
+\]
 
-For any bounded single-outcome reward in \\([0,R]\\), the difference in its expected value is then bounded by \\(R\\epsilon\\) **provided the TV bound applies to that outcome law**. This is not a generic guarantee for all actions, rewards or histories.
+For any bounded single-outcome reward in \([0,R]\), the difference in its expected value is then bounded by \(R\epsilon\) **provided the TV bound applies to that outcome law**. This is not a generic guarantee for all actions, rewards or histories.
 
 **Acceptance requirement:** Each claimed compact memory must publish the task family, horizon, observed information, distortion/loss metric, and negative controls. Never call a fixed number of bytes universally sufficient.
 
 ## 4. Digital genome, epigenome and characteristic functions
 
-The **genome** \\(\\Gamma_i\\) selects a *versioned stochastic model family*, initial prior/archetype, simulation parameters, and (where authorized) lineage metadata. It does NOT carry arbitrary external observations or encode a person's protected traits. The **epigenome** \\(\\Omega_i(t)\\) contains acquired estimators, policy settings and drift state.
+The **genome** \(\Gamma_i\) selects a *versioned stochastic model family*, initial prior/archetype, simulation parameters, and (where authorized) lineage metadata. It does NOT carry arbitrary external observations or encode a person's protected traits. The **epigenome** \(\Omega_i(t)\) contains acquired estimators, policy settings and drift state.
 
 A marginal characteristic function
 
-\\[
-\\varphi_t(u)=\\mathbb E[e^{iuX_t}]
-\\]
+\[
+\varphi_t(u)=\mathbb E[e^{iuX_t}]
+\]
 
 identifies the law of a single random variable under standard assumptions, **not the temporal dependence of a process**. Full finite-dimensional distributions require joint functions such as
 
-\\[
-\\Phi_{t_1,\\ldots,t_n}(u_1,\\ldots,u_n)
-=\\mathbb E\\left[e^{i\\sum_j u_jX_{t_j}}\\right].
-\\]
+\[
+\Phi_{t_1,\ldots,t_n}(u_1,\ldots,u_n)
+=\mathbb E\left[e^{i\sum_j u_jX_{t_j}}\right].
+\]
 
 ### Mandatory counterexample
 
-Let \\(X_0\\in\\{-1,+1\\}\\) be uniform. At each step keep its sign with probability \\(q\\) and flip it otherwise. **For every** \\(q\\in[0,1]\\), each \\(X_t\\) is uniform on \\(\\{-1,+1\\}\\) with marginal characteristic function \\(\\cos(u)\\). Yet
+Let \(X_0\in\{-1,+1\}\) be uniform. At each step keep its sign with probability \(q\) and flip it otherwise. **For every** \(q\in[0,1]\), each \(X_t\) is uniform on \(\{-1,+1\}\) with marginal characteristic function \(\cos(u)\). Yet
 
-\\[
-\\mathbb E[X_tX_{t+1}]=2q-1.
-\\]
+\[
+\mathbb E[X_tX_{t+1}]=2q-1.
+\]
 
-Thus \\(q=0.9\\) and \\(q=0.1\\) have identical one-time marginals but different temporal dependencies. A seed plus marginal distribution cannot reconstruct the process. Replay requires versioned dynamics, a pinned PRNG algorithm/seed/counter, checkpoint and all exogenous inputs. Real-world unrecorded observations remain unavailable.
+Thus \(q=0.9\) and \(q=0.1\) have identical one-time marginals but different temporal dependencies. A seed plus marginal distribution cannot reconstruct the process. Replay requires versioned dynamics, a pinned PRNG algorithm/seed/counter, checkpoint and all exogenous inputs. Real-world unrecorded observations remain unavailable.
 
 ## 5. Decision-focused compression and hard evidence constraints
 
 A conceptual information-bottleneck objective is
 
-\\[
-\\min_{f} I(H;Z)-\\beta I(Z;Y^{A}),
-\\]
+\[
+\min_{f} I(H;Z)-\beta I(Z;Y^{A}),
+\]
 
-where \\(Y^A\\) is the future task outcome under specified actions. Information-theoretic mutual information is not directly equal to SQLite disk bytes, and an estimated low-dimensional vector does not imply a storage guarantee.
+where \(Y^A\) is the future task outcome under specified actions. Information-theoretic mutual information is not directly equal to SQLite disk bytes, and an estimated low-dimensional vector does not imply a storage guarantee.
 
 An operational objective is
 
-\\[
-\\min_{M,\\pi}\;
-B(M)+\\lambda L_{\\mathcal Q}(M,\\pi)
-+\\mu C_{\\mathrm{CPU}}(M,\\pi)
-+\\nu T_{p95}(M,\\pi)
-\\]
+\[
+\min_{M,\pi}\;
+B(M)+\lambda L_{\mathcal Q}(M,\pi)
++\mu C_{\mathrm{CPU}}(M,\pi)
++\nu T_{p95}(M,\pi)
+\]
 
-**subject to** exact retention for designated protected events, authorization, deletion/retention rules, memory and latency budgets, and explicit error tolerance. \\(L_{\\mathcal Q}\\) measures task-specific prediction/decision loss or regret relative to a declared baseline; \\(B\\) counts total online bytes including WAL/SHM/indexing, not just compacted DB size.
+**subject to** exact retention for designated protected events, authorization, deletion/retention rules, memory and latency budgets, and explicit error tolerance. \(L_{\mathcal Q}\) measures task-specific prediction/decision loss or regret relative to a declared baseline; \(B\) counts total online bytes including WAL/SHM/indexing, not just compacted DB size.
 
 No fixed-size lossless encoding exists for arbitrary unbounded histories. Do not compare a full-history store with a predictive estimator as if both answered the same exact-history queries.
 
@@ -147,20 +147,20 @@ A practical Bernoulli P0 baseline uses: long-horizon beta-smoothed counts; a fas
 
 A proposed future alternative is exponential-weighted mixtures:
 
-\\[
-\\hat p_t=\\sum_k w_{k,t}p_{k,t},\\quad
+\[
+\hat p_t=\sum_k w_{k,t}p_{k,t},\quad
 w_{k,t+1}=
-\\frac{w_{k,t}e^{-\\eta(p_{k,t}-y_t)^2}}
-{\\sum_j w_{j,t}e^{-\\eta(p_{j,t}-y_t)^2}}.
-\\]
+\frac{w_{k,t}e^{-\eta(p_{k,t}-y_t)^2}}
+{\sum_j w_{j,t}e^{-\eta(p_{j,t}-y_t)^2}}.
+\]
 
-For bounded Brier losses in \\([0,1]\\), classical exponential weights yields a regret bound against the **best fixed predictor in the supplied pool** of order \\(\\log K/\\eta+\\eta T/8\\); it does not ensure superiority on every scenario, and does not prove adaptation of the agent's whole behavior.
+For bounded Brier losses in \([0,1]\), classical exponential weights yields a regret bound against the **best fixed predictor in the supplied pool** of order \(\log K/\eta+\eta T/8\); it does not ensure superiority on every scenario, and does not prove adaptation of the agent's whole behavior.
 
 Consider BOCPD only with bounded runtime and documented approximation error; full run-length tracking can grow with observation count.
 
 ## 7. Multi-agent and compositional mathematics: deferred layers
 
-For a graph \\(G=(V,E)\\), interaction scheduling should scale with **active nodes and active edges**, rather than all-pairs interactions, when the workload permits. Graph dynamics require tests for sparse vs hub-heavy vs adversarial topologies. Mean-field approximations need explicit exchangeability/interaction assumptions and empirical error checks.
+For a graph \(G=(V,E)\), interaction scheduling should scale with **active nodes and active edges**, rather than all-pairs interactions, when the workload permits. Graph dynamics require tests for sparse vs hub-heavy vs adversarial topologies. Mean-field approximations need explicit exchangeability/interaction assumptions and empirical error checks.
 
 Markov categories can give a compositional language for stochastic processes and conditional independence. They should be introduced at a formal-contract stage if they clarify proofs and interfaces, not as a dependency that delays P0.
 
