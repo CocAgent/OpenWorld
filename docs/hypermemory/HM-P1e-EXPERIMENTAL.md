@@ -8,7 +8,7 @@ The runtime keeps three bounded-state Bernoulli predictors: a long-horizon beta-
 
 - Not a Bayesian posterior for a nonstationary process. The gate is a heuristic, not a proved online-regret minimizer.
 - Predictions are for binary synthetic outcomes; no language-based memory, multi-agent cognition, general-purpose adaptation, or production access control is implemented.
-- `MemoryEvent` in the bootstrap lacks `agent_id`. Temporary convention: `event_id='<agent_id>:<local_event_id>'`. W0 RFC-006 proposes an explicit field. Migration is required before a stable public API.
+- `MemoryEvent` in the bootstrap lacks `agent_id`. The `Observation` wrapper carries an explicit `agent_id`; RFC-006 will require it in a versioned event envelope. Migration is required before a stable public API.
 - SQLite transactionality is **local**. No cross-shard distributed correctness or authenticated provenance is claimed.
 - Retains latest idempotency receipt only for ordinary updates. An old retry fails closed with `StaleRetryError`; no arbitrary-history exactly-once guarantee.
 - All `OBSERVED_RECORDED`, `VERIFIED`, protected and contract-relevant events are exact. Our compact synthetic benchmark uses `SIMULATED` reconstructable telemetry. Real-world observations cannot be silently discarded.

@@ -30,10 +30,13 @@ class EvidenceIntegrityError(ValueError):
 @dataclass(frozen=True, slots=True)
 class Observation:
     event: MemoryEvent
+    agent_id: str
     sequence_number: int
     outcome: int
 
     def __post_init__(self) -> None:
+        if not self.agent_id:
+            raise ValueError("agent_id required")
         if type(self.sequence_number) is not int or self.sequence_number < 1:
             raise ValueError("sequence_number must be a positive integer")
         if type(self.outcome) is not int or self.outcome not in (0, 1):
@@ -73,7 +76,7 @@ def _choose(s: dict, penalty: float) -> str:
 def _receipt(item: Observation) -> str:
     e = item.event
     body = (
-        e.event_id, e.owner_id, e.event_type, e.provenance.value,
+        e.event_id, e.owner_id, item.agent_id, e.event_type, e.provenance.value,
         e.payload.hex(), e.reconstructable, e.protected,
         item.sequence_number, item.outcome,
     )
@@ -176,11 +179,8 @@ class HyperMemoryP1e:
                 e = item.event
                 row = self.db.execute(
                     "SELECT state_json FROM agent_state WHERE owner_id=? AND agent_id=?",
-                    (e.owner_id, e.event_id.split(":", 1)[0] if False else e.owner_id + "::" + self._agent_id(item)),
+                    (e.owner_id, item.agent_id),
                 ).fetchone()
-                # Agent identity is distinct from event identity; see _agent_id.
-                # The event data type does not have an agent_id in bootstrap v0.
-                # A stable explicit agent ID is derived from the Observation wrapper.
                 s = json.loads(row[0]) if row else _initial_state()
                 digest = _receipt(item)
                 if item.sequence_number == s["seq"]:
@@ -205,7 +205,7 @@ class HyperMemoryP1e:
                 s["seq"] = item.sequence_number
                 s["receipt"] = digest
                 s["selected"] = _choose(s, self.gate_penalty)
-                aid = self._agent_id(item)
+                aid = item.agent_id
                 self.db.execute(
                     "INSERT INTO agent_state(owner_id,agent_id,state_json) VALUES(?,?,?) "
                     "ON CONFLICT(owner_id,agent_id) DO UPDATE SET state_json=excluded.state_json",
@@ -227,18 +227,6 @@ class HyperMemoryP1e:
             self.db.execute("ROLLBACK")
             raise
         return applied
-
-    @staticmethod
-    def _agent_id(item: Observation) -> str:
-        """Temporary contract: the caller encodes agent_id as event_id prefix.
-
-        Example: agent-7:day-20. W0 RFC-006 will add agent_id to the envelope;
-        until then event_id without a colon is invalid.
-        """
-        pieces = item.event.event_id.split(":", 1)
-        if len(pieces) != 2 or not pieces[0] or not pieces[1]:
-            raise ValueError("event_id must be '<agent_id>:<event_sequence_id>'")
-        return pieces[0]
 
     def checkpoint(self) -> tuple[int, int, int]:
         """WAL checkpoint; busy readers can prevent truncation."""
