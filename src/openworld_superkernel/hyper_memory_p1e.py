@@ -192,6 +192,7 @@ class HyperMemoryP1e:
                 if item.sequence_number != s["seq"] + 1:
                     raise ValueError("out-of-order update")
                 prior = _probabilities(s)
+                self._before_observation(item, prior, s)
                 value = item.outcome
                 for name, p in prior.items():
                     key = "loss_" + name
@@ -227,6 +228,15 @@ class HyperMemoryP1e:
             self.db.execute("ROLLBACK")
             raise
         return applied
+
+    def _before_observation(self, item: Observation, prior: dict[str, float],
+                            previous_state: dict) -> None:
+        """Optional in-transaction estimator hook, before seeing the outcome.
+
+        Implementations must not carry external side effects: an exception rolls
+        back the predictive state and exact ledger together.
+        """
+        return None
 
     def checkpoint(self) -> tuple[int, int, int]:
         """WAL checkpoint; busy readers can prevent truncation."""
