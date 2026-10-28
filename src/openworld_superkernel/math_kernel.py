@@ -70,6 +70,32 @@ class FiniteKernel:
         return FiniteKernel(self.source, after.target, rows)
 
 
+
+@dataclass(frozen=True)
+class ControlledKernel:
+    """Action-indexed finite transition kernels with a shared ordered support."""
+    actions: tuple[str, ...]
+    kernels: tuple[FiniteKernel, ...]
+
+    def __post_init__(self) -> None:
+        if (not self.actions or len(self.actions) != len(self.kernels)
+                or any(not isinstance(a, str) or not a for a in self.actions)
+                or len(set(self.actions)) != len(self.actions)):
+            raise ValueError("unique action names and matching kernels required")
+        first = self.kernels[0]
+        if any(k.source != first.source or k.target != first.target
+               for k in self.kernels):
+            raise ValueError("all actions must share ordered source/target support")
+
+    def for_action(self, action: str) -> FiniteKernel:
+        """Fail closed on an unknown action rather than selecting a default."""
+        try:
+            return self.kernels[self.actions.index(action)]
+        except ValueError as exc:
+            raise ValueError(f"unknown action: {action}") from exc
+
+
+
 def predict_belief(prior: Sequence[float], transition: FiniteKernel) -> tuple[float, ...]:
     """Push forward a belief through the transition matrix."""
     if len(prior) != len(transition.source):

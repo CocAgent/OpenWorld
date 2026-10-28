@@ -6,7 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from openworld_superkernel.math_kernel import (
-    FiniteKernel, ImpossibleObservation, bayes_filter, condition_on_observation,
+    FiniteKernel, ControlledKernel, ImpossibleObservation, bayes_filter, condition_on_observation,
     predict_belief, task_relative_equivalence, total_variation, two_sign_process,
     exact_outcome_from_counts,
 )
@@ -41,6 +41,22 @@ class KernelTests(unittest.TestCase):
         b = FiniteKernel(self.states, self.states, ((0.7, 0.3), (0.9, 0.1)))
         c = FiniteKernel(self.states, self.states, ((0.1, 0.9), (0.4, 0.6)))
         self.assertRowsClose(self.k.compose(b).compose(c), self.k.compose(b.compose(c)))
+
+    def test_controlled_kernel_actions(self):
+        stay = FiniteKernel.identity(self.states)
+        controlled = ControlledKernel(("evolve", "stay"), (self.k, stay))
+        self.assertEqual(controlled.for_action("stay"), stay)
+        self.assertEqual(controlled.for_action("evolve"), self.k)
+
+    def test_unknown_controlled_action_rejected(self):
+        controlled = ControlledKernel(("evolve",), (self.k,))
+        with self.assertRaises(ValueError):
+            controlled.for_action("unknown")
+
+    def test_controlled_kernel_support_mismatch_rejected(self):
+        other = FiniteKernel(("other",), ("other",), ((1.0,),))
+        with self.assertRaises(ValueError):
+            ControlledKernel(("evolve", "other"), (self.k, other))
 
     def test_mismatched_support_rejected(self):
         x = FiniteKernel(("a",), ("b",), ((1.0,),))

@@ -5,6 +5,7 @@
 
 ## Implemented in this PR
 
+- `ControlledKernel`: an action-indexed finite kernel family with common ordered supports and strict rejection of unknown actions.
 - `FiniteKernel`: finite, row-stochastic Markov kernels with ordered, explicit source/target supports. `first.compose(after)` applies the first kernel followed by the second. Validation rejects negative, NaN, infinite, non-normalized and incompatible rows. Matrix multiplication and identity are exercised in unit tests.
 - `predict_belief`, `condition_on_observation`, and `bayes_filter`: finite-state POMDP-style filtering. The observation likelihood is an emission probability conditional on state, not a distribution over states. Impossible observations raise an explicit error.
 - `two_sign_process`: a closed-form example where q=0.9 and q=0.1 give the same one-time marginal characteristic function `cos(u)` but distinct lag-one correlations (+0.8 versus -0.8). Neither a marginal nor a random seed is sufficient to replay actual missing external observations.
