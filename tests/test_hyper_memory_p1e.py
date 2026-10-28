@@ -128,7 +128,7 @@ class HyperMemoryP1eTests(unittest.TestCase):
 
     def test_gate_stays_in_range(self):
         for seq in range(1, 121):
-            self.db.apply_batch([observation(seq, outcome=seq % 3 != 0)],
+            self.db.apply_batch([observation(seq, outcome=int(seq % 3 != 0))],
                                 requester_owner_id="owner-a")
         p, mode = self.db.predict(owner_id="owner-a", agent_id="agent-a",
                                   requester_owner_id="owner-a")
