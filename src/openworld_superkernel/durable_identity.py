@@ -420,4 +420,15 @@ class AuthenticatedMemoryReader:
                    event_id: str, purpose: str) -> bytes | None:
         self.authority.authorize(session, grant, owner=owner, agent=agent,
                                  resource=event_id, action="read_event", purpose=purpose)
+        # The underlying W1 API checks owner only. Verify agent binding here,
+        # otherwise a grant nominally scoped to agent A could fetch agent B's
+        # event under the same owner. This is NOT an atomic cross-DB read.
+        row = self._store.db.execute(
+            "SELECT agent_id FROM exact_events WHERE owner_id=? AND event_id=?",
+            (owner, event_id),
+        ).fetchone()
+        if row is None:
+            return None
+        if row[0] != agent:
+            raise AuthorizationError("event lies outside granted agent")
         return self._store.exact_event(event_id, requester_owner_id=owner)

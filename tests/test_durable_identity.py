@@ -251,6 +251,22 @@ class IdentityGateTests(unittest.TestCase):
             memory.close()
 
     @unittest.skipUnless(HAS_HM_P1E, "requires integrated HM-P1e repository")
+    def test_same_owner_different_agent_event_is_denied(self):
+        memory = HyperMemoryP1e(Path(self.tmp.name) / "memory.sqlite")
+        try:
+            event = MemoryEvent("event-b", "alice", "consent",
+                                Provenance.OBSERVED_RECORDED, b"agent-b secret")
+            memory.apply_batch([Observation(event, "agent-b", 1, 1)],
+                               requester_owner_id="alice")
+            gateway = AuthenticatedMemoryReader(self.db, memory)
+            scoped = self.grant(action="read_event", resource="event-b")
+            with self.assertRaises(AuthorizationError):
+                gateway.read_event(self.bob, scoped, owner="alice", agent="agent-a",
+                                   event_id="event-b", purpose="simulation")
+        finally:
+            memory.close()
+
+    @unittest.skipUnless(HAS_HM_P1E, "requires integrated HM-P1e repository")
     def test_unauthorized_memory_read_does_not_consume(self):
         memory = HyperMemoryP1e(Path(self.tmp.name) / "memory.sqlite")
         try:
