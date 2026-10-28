@@ -39,3 +39,14 @@ The memory compiler is not an automatic truth detector. A compressed summary can
 ## What not to infer
 
 The presence of RFCs, issue tickets, unit tests, or GitHub merges does not establish user consent enforcement, identity key management, globally distributed correctness, algorithm novelty, published research, or production reliability.
+
+## October 2026 design synthesis — proposals, not new approved interfaces
+
+| ID | Design decision or hypothesis | State | Evidence / gate |
+|---|---|---|---|
+| OW-D18 | Retain **OpenWorld** as the project and repository identity; OCP/OWP are working protocol ideas | **Confirmed name / proposed protocol** | [Naming](../PROJECT-NAMING.md); [session synthesis](SESSION-SYNTHESIS-20261028.md); W0 review needed |
+| OW-D19 | Model composition through applied category theory where useful, *without* replacing stochastic P0 | **Research proposal** | RFC-007; [research map](../research/RELATED-RESEARCH-AND-PROJECTS.md); compare vs simple typed pipelines |
+| OW-D20 | Plan an authoritative, offline living-world fixture with scoped agent intents and replay | **Future W3 hypothesis** | Issue #4; replay, unauthorized/stale/duplicate and accounting controls |
+| OW-D21 | Separate online trusted execution from offline policy/world-genome evolution | **Proposed trust boundary** | Admission, benchmark, solvability and resource quotas; W0/W5 review |
+| OW-D22 | Treat 30-agent social-world and 40-unit tactical arena as **separate** optional experiments | **Product/research hypotheses** | [Session synthesis](SESSION-SYNTHESIS-20261028.md); no current capacity or gameplay claim |
+| OW-D23 | Build evidence-grounded, cross-world exchange only after scoped owner and federation contracts | **Deferred proposal** | W4 issue #5; no unilateral transfer of authority/resources/evidence |
