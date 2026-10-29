@@ -105,7 +105,9 @@ def run_episode(router: PopulationRouter, tokens: dict[str, str],
                 world: World, method: str,
                 policies: dict[str, AgentBandit] | None, *,
                 seed: int, episode: int, rounds: int = 4,
-                training: bool = False) -> dict:
+                training: bool = False, receiver_override: str | None = None,
+                observation_mode: str = "full",
+                measure_timing: bool = False) -> dict:
     """Freeze each role's choices before its W3 tick; feedback after response tick.
 
     Donors are OPPORTUNITIES.actor and receivers are OPPORTUNITIES.recipient.
@@ -114,6 +116,14 @@ def run_episode(router: PopulationRouter, tokens: dict[str, str],
     """
     if method not in METHODS or type(rounds) is not int or not 2 <= rounds <= 8:
         raise ValueError("invalid episode config")
+    if (receiver_override not in (None, "fixed_hold", "fixed_reciprocate", "mixed")
+            or (training and receiver_override is not None)):
+        raise ValueError("partner override is holdout-only and must be supported")
+    if observation_mode not in ("full", "binary") or (
+            observation_mode == "binary" and method != "no_summary"):
+        raise ValueError("binary local observation applies only to no_summary")
+    if type(measure_timing) is not bool:
+        raise TypeError("measure_timing must be a boolean")
     if method in LEARNED and policies is None:
         raise ValueError("learned policy map required")
     genesis = world
@@ -128,6 +138,8 @@ def run_episode(router: PopulationRouter, tokens: dict[str, str],
     receiver_rewards = []
     offered_count = returned_count = accepted_count = 0
     fingerprints = []
+    tick_times = []
+    rejected_count = 0
     for round_index in range(rounds):
         # DONOR PHASE: all decide without within-phase reward access.
         offers = []
@@ -137,6 +149,8 @@ def run_episode(router: PopulationRouter, tokens: dict[str, str],
             context = (donor_context(world, op.actor, op.target_group, method,
                                      previous_return=last_return[op.actor])
                        if method in LEARNED else ())
+            if observation_mode == "binary":
+                context = (int(own_balance >= 2), last_return[op.actor])
             if method == "hold":
                 action = 0
             elif method == "always_reciprocate":
@@ -156,7 +170,11 @@ def run_episode(router: PopulationRouter, tokens: dict[str, str],
                     source=op.source_group, target=op.target_group,
                     round_index=round_index, label="give",
                 ))
+        started = time.perf_counter() if measure_timing else 0.0
         first = router.advance(world, exchanges=tuple(offers), max_actions=10)
+        if measure_timing:
+            tick_times.append(time.perf_counter() - started)
+        rejected_count += len(first.state.rejected)
         world = first.state.world
         accepted = set(first.state.accepted)
         offered_count += len(offers)
@@ -170,7 +188,17 @@ def run_episode(router: PopulationRouter, tokens: dict[str, str],
         for op in OPPORTUNITIES:
             got = f"p3-give-{round_index}-{op.actor}" in accepted
             context = receiver_context(world, op.recipient, got_offer=got)
-            if method == "hold":
+            if observation_mode == "binary":
+                context = (int(dict(world.balances)[op.recipient] >= 2), int(got))
+            if receiver_override == "fixed_hold":
+                action = 0
+            elif receiver_override == "fixed_reciprocate":
+                action = int(got)
+            elif receiver_override == "mixed":
+                action = int(bool(got) and
+                             deterministic_seed(seed, episode, round_index,
+                                                op.recipient, "partner-shift") % 2 == 0)
+            elif method == "hold":
                 action = 0
             elif method == "always_reciprocate":
                 action = int(got)
@@ -188,7 +216,11 @@ def run_episode(router: PopulationRouter, tokens: dict[str, str],
                     source=op.target_group, target=op.source_group,
                     round_index=round_index, label="back",
                 ))
+        started = time.perf_counter() if measure_timing else 0.0
         second = router.advance(world, exchanges=tuple(responses), max_actions=10)
+        if measure_timing:
+            tick_times.append(time.perf_counter() - started)
+        rejected_count += len(second.state.rejected)
         world = second.state.world
         back = set(second.state.accepted)
         returned_count += len(back)
@@ -231,6 +263,8 @@ def run_episode(router: PopulationRouter, tokens: dict[str, str],
         "receiver_reward_mean": statistics.fmean(receiver_rewards),
         "joint_reward_mean": statistics.fmean(donor_rewards + receiver_rewards),
         "per_round_fingerprints": tuple(fingerprints),
+        "rejected_actions": rejected_count,
+        **({"tick_router_wall_seconds": tuple(tick_times)} if measure_timing else {}),
     }
 
 
