@@ -221,5 +221,28 @@ class LocalPopulationLinksTests(unittest.TestCase):
             ))
 
 
+    def test_three_population_30_agent_demo_is_replayable(self):
+        import subprocess
+        script = Path(__file__).resolve().parents[1] / "examples" / "populations" / "local_three_groups.py"
+        result = subprocess.run(
+            [sys.executable, str(script)],
+            text=True, capture_output=True, check=False, timeout=15,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report["population_count"], 3)
+        self.assertEqual(report["registered_agents"], 30)
+        self.assertEqual(report["owners"], 1)
+        self.assertEqual(report["ticks"], 2)
+        self.assertEqual(report["replay"], "PASS")
+        self.assertEqual(report["total_resources"], 150)
+        self.assertEqual(len(report["accepted"]), 5)
+        self.assertEqual(len(report["event_kinds"]), 5)
+        self.assertEqual(report["rejected"], [])
+        self.assertEqual(report["selected_balances"], {
+            "a09": 3, "a10": 7, "a19": 4, "a20": 6,
+        })
+
+
 if __name__ == "__main__":
     unittest.main()
