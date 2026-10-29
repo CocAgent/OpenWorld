@@ -12,8 +12,8 @@ The agent population is simulated offline, independent of W3's protected state a
 ## Explicit environment and estimand
 
 - Default 30 toy agents with 3 roles (builder/explorer/trader), one private uninformative sensor and a fixed bounded genome trait each. 10 agents per role in balanced mode; *rare* mode has only two traders (an explicit privacy/variance negative control).
-- Each synthetic tick samples fresh, unobservable mode for each role and a role-dependent field \(x_j(t)\). The mode generates a **mean task** (role-group mean is informative) or a **spectral task** (two nearly mean-zero but differing \(E[\cos(\pi X)]\) groups).
-- Each toy agent chooses one action \(a_i\in\{0,1\}\). A hidden environment rule selects the better action by group signal plus a small fixed trait contribution. A correct action has expected reward 0.85, incorrect 0.15. These are *designed simulation probabilities*, not learned truths. The agent receives a **single Bernoulli reward for the chosen action**.
+- Each synthetic tick samples fresh, unobservable mode for each role and a role-dependent field $x_j(t)$. The mode generates a **mean task** (role-group mean is informative) or a **spectral task** (two nearly mean-zero but differing $E[\cos(\pi X)]$ groups).
+- Each toy agent chooses one action $a_i\in\{0,1\}$. A hidden environment rule selects the better action by group signal plus a small fixed trait contribution. A correct action has expected reward 0.85, incorrect 0.15. These are *designed simulation probabilities*, not learned truths. The agent receives a **single Bernoulli reward for the chosen action**.
 - Train with a deterministic role-shared, two-arm **logistic contextual bandit** using epsilon-greedy exploration and stochastic-gradient updates to the chosen action's predicted reward. **All actions for a tick are selected before any update**; no within-tick reward leakage.
 - On holdout, the model is frozen; evaluate accuracy against the simulated hidden better action, realized reward, and **expected regret per action** relative to the simulated optimum. All methods receive identical train/holdout scenes and deterministic potential outcomes, and comparable update budgets.
 
@@ -23,9 +23,9 @@ A P1 agent's context is:
 z_i(t) = \big[1,\, o_i(t),\, \tau_i,\, s_{r(i)}(t)\big]
 ```
 
-Here \(o_i\) is local synthetic noise (a deliberate negative control), \(\tau_i\) is an immutable trait, and \(s_r\) is an optional role-stratified summary of group state. The learner fits two reward predictions \(q_\theta(r,z,a)\) and chooses the higher value except during training exploration.
+Here $o_i$ is local synthetic noise (a deliberate negative control), $\tau_i$ is an immutable trait, and $s_r$ is an optional role-stratified summary of group state. The learner fits two reward predictions $q_\theta(r,z,a)$ and chooses the higher value except during training exploration.
 
-The **mean task** and **spectral task** are deliberately chosen positive controls. In particular, the ECF at frequency \(\pi\) contains the spectral target; this does **not** establish ECF superiority in general or mean-field sufficiency for real games. The histogram is retained as a simple stronger nonparametric baseline.
+The **mean task** and **spectral task** are deliberately chosen positive controls. In particular, the ECF at frequency $\pi$ contains the spectral target; this does **not** establish ECF superiority in general or mean-field sufficiency for real games. The histogram is retained as a simple stronger nonparametric baseline.
 
 ### Arm comparisons and metrics
 
@@ -60,6 +60,10 @@ The script limits N to 9–300, training to 10–500 ticks and held-out evaluati
 5. Holdout uses a separate world seed, **no weight updates**, and oracle regret is calculated from hidden simulated state. No scientific claim that performance generalizes to other economies, opponent strategies or regime shifts.
 6. A two-agent group exists in rare mode. Its released mean/ECF can reveal information; **none of these aggregates are privacy guarantees** and none may be exposed to untrusted owners.
 7. No improvement may be declared without reporting both tasks, all baselines, multiple seeds, negative results and per-method compute cost.
+
+## Measured three-seed CI checkpoint
+
+After initial CI, [this pinned synthetic benchmark report](P1-THREE-SEED-CI-REPORT.md) and its [raw machine-readable evidence](P1-THREE-SEED-CI-RESULTS.json) were extracted from GitHub Actions on commit `cc011d6c63d79a3512fe4540a483592e1cac19d3`: **30 agents, 100 train ticks, 40 holdout ticks, three seeds, two tasks**. No-summary was near chance; group mean, histogram and ECF passed the mean positive control; histogram and ECF both passed the spectral positive control. **ECF had no accuracy gain over histogram and was more expensive in this implementation.** These bounded positive controls cannot justify making ECF the default.
 
 ## Next design decisions — not implemented
 
