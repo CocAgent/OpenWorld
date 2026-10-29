@@ -277,6 +277,8 @@ def run_case(method: str, *, seed: int, train_episodes: int = 20,
         "holdout_offers": sum(x["offers"] for x in holdout),
         "holdout_accepted_offers": sum(x["accepted_offers"] for x in holdout),
         "holdout_returns": sum(x["returns"] for x in holdout),
+        "holdout_initial_fingerprints":
+            [x["initial_fingerprint"] for x in holdout],
         "holdout_final_fingerprints":
             [x["final_fingerprint"] for x in holdout],
     }
