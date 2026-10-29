@@ -47,19 +47,24 @@ jobs:
           OPENWORLD_PG_TEST_ISOLATED: YES_EPHEMERAL_DB
           OPENWORLD_PG_TEST_DSN: postgresql://openworld_research:disposable-ci-password-not-a-secret@localhost:5432/openworld_ephemeral_ci
         run: python benchmarks/w5_storage_parity.py --with-postgres > w5-parity-result.json
-      - name: Summarize verified differential result
+      - name: Attach GitHub workflow provenance (not cryptographic attestation)
         run: |
           python - <<'PY'
           import json
-          data = json.load(open("w5-parity-result.json", encoding="utf-8"))
-          assert data["postgres"]["status"] == "MATCH"
-          assert data["sqlite"]["logical"] == data["postgres"]["logical"]
-          assert data["sqlite"]["contention"]["committed"] == 1
-          assert data["postgres"]["contention"]["committed"] == 1
-          print("SQLite and disposable PostgreSQL agreed on the synthetic trace.")
-          print("Both two-connection tests allowed exactly one commit.")
-          print("No production/performance or real identity claims.")
+          import os
+          from pathlib import Path
+          path = Path("w5-parity-result.json")
+          report = json.loads(path.read_text(encoding="utf-8"))
+          report["execution"] = {
+              "git_sha": os.environ["GITHUB_SHA"],
+              "github_run_id": os.environ["GITHUB_RUN_ID"],
+          }
+          path.write_text(json.dumps(report, sort_keys=True, indent=2) + "\n", encoding="utf-8")
           PY
+      - name: Validate exact W5 invariants and source reference
+        run: |
+          python scripts/verify_w5_pg_report.py w5-parity-result.json \
+            --expected-sha "$GITHUB_SHA" --expected-run-id "$GITHUB_RUN_ID"
       - name: Upload synthetic benchmark report (no DSN)
         uses: actions/upload-artifact@v4
         with:
