@@ -20,7 +20,7 @@ The manual-only workflow `.github/workflows/w5-postgres-parity-manual.yml` retai
 
 1. Before spending hosted Actions minutes, review organizational/repository billing settings. Confirm the job and PostgreSQL service use only disposable data.
 2. Open [Actions — W5 PostgreSQL parity (manual research)](https://github.com/CocAgent/OpenWorld/actions/workflows/w5-postgres-parity-manual.yml).
-3. Select **Run workflow** on the reviewed `main` commit, once. Never select a production database.
+3. Select **Run workflow** on the reviewed `main` commit, once. Enter the exact acknowledgement `YES_BUDGET_CHECKED` **only after** checking Actions billing/quota. Never select a production database. Missing/incorrect acknowledgement or a branch other than `main` makes the job **SKIPPED**; a skipped job is **not** a successful PostgreSQL run.
 4. Open the resulting run; require all steps to succeed. Download its artifact `openworld-w5-sqlite-postgres-parity` (7-day retention) and compare artifact `execution.git_sha` and `execution.github_run_id` with the trusted run metadata.
 5. The artifact may also be checked offline:
    ```bash
