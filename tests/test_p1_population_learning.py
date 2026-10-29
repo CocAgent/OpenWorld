@@ -146,6 +146,51 @@ class P1PopulationBanditTests(unittest.TestCase):
         self.assertGreater(spectral_methods["ecf"]["holdout_action_accuracy"],
                            spectral_methods["no_summary"]["holdout_action_accuracy"] + 0.10)
 
+    def test_three_seed_measured_learning_benchmark(self):
+        # This is a bounded W5 evidence run, not a scaling or MARL claim.
+        # Print a machine-readable record to the exact-head CI logs, including
+        # every holdout result and measured encoding cost for review.
+        proc = subprocess.run(
+            [sys.executable, str(ROOT / "benchmarks" / "p1_population_learning.py"),
+             "--agents", "30", "--train-ticks", "100",
+             "--holdout-ticks", "40", "--seeds", "3",
+             "--seed-start", "4103",
+             "--tasks", "mean", "spectral", "--regimes", "balanced"],
+            capture_output=True, text=True, check=False, timeout=100,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        report = json.loads(proc.stdout)
+        self.assertEqual(len(report["cases"]), 6)
+        compact = {
+            "schema": report["schema"],
+            "environment": report["environment"],
+            "elapsed_wall_seconds": report["total_wall_seconds"],
+            "cases": [],
+        }
+        for case in report["cases"]:
+            self.assertEqual(case["agents"], 30)
+            self.assertNotEqual(case["world_seed"], case["holdout_world_seed"])
+            self.assertEqual(case["train_ticks"], 100)
+            self.assertEqual(case["holdout_ticks"], 40)
+            details = {}
+            for method, score in case["methods"].items():
+                self.assertEqual(score["train_updates"], 3000)
+                self.assertEqual(score["holdout_actions"], 1200)
+                details[method] = {
+                    "accuracy": score["holdout_action_accuracy"],
+                    "regret": score["holdout_expected_regret_per_action"],
+                    "reward": score["holdout_reward_rate"],
+                    "encode_p95_seconds": score["sketch_p95_seconds"],
+                }
+            compact["cases"].append({
+                "task": case["task"],
+                "seed": case["world_seed"],
+                "input_sha256": case["synthetic_data_sha256"],
+                "methods": details,
+            })
+        print("P1_BOUNDED_EVIDENCE_JSON=" + json.dumps(compact, sort_keys=True),
+              flush=True)
+
     def test_invalid_tasks_and_budget_bounds_fail_closed(self):
         with self.assertRaises(ValueError):
             population(5)
