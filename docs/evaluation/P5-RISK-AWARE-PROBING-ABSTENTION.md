@@ -40,6 +40,10 @@ Each scripted response is computed from an exogenous hash of **(world seed, roun
 
 A **five-seed** experiment, with four policies and five partner regimes, generates **100 independent case summaries**. Within a case, all 10 donors and their scripted receivers operate across 20 rounds. This is *not* 30 independently learning agents: there are 10 active donor policies, 10 scripted counterpart actors and 10 registered passive context agents.
 
+## Actual measured five-seed checkpoint
+
+The [CI-backed five-seed results report](P5-FIVE-SEED-RESULTS-REPORT.md) and [complete 100-case raw JSON](P5-FIVE-SEED-RESULTS.json) preserve every positive and negative outcome. On source commit `bfaf81a6dde1fbd4cf55aa5e4ec8ea6d892c5288`, GitHub Actions ran **425 tests with zero unexpected failures** (one skipped, two expected failures). Risk Window improves the *collapse* and *recovery* controlled cases relative to always-offer, but it is worse than all-history estimation under stable hostility, and less rewarding than always-offer under a mixed partner. **It is not a universally safe or optimal default.**
+
 ## Evaluation and nonclaims
 
 The test reports **actual W3-confirmed accepted transfers**, returned transfers, unreciprocated resource exposure, explicit probing attempts, total donor reward and **per-phase** reward (first vs second 10 rounds). It also reports the **worst phase** rather than concealing losses under a positive episode average, exact replay and resource conservation, host W3 router p50/p95 call time, process wall/CPU and process peak RSS (OS-dependent units).
