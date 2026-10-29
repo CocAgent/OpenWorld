@@ -76,6 +76,15 @@ python -m unittest discover -s tests -p 'test_p3_mutual_learning_w3.py' -v
 python benchmarks/p3_mutual_learning_w3.py --train-episodes 20 --holdout-episodes 8 --rounds 4 --seeds 3
 ~~~
 
+## P6 research — bounded exposure and missing feedback
+
+The [P6 exposure-cap experiment](docs/evaluation/P6-EXPOSURE-CAP-AND-CENSORED-FEEDBACK.md) tests a four-unit **per-donor** hard risk bound, seeded and fixed probing, simple change detection, a public-schedule-aware scripted partner, and delayed/censored policy notifications. The [complete 840-case measured results](docs/evaluation/P6-TEN-SEED-RESULTS-REPORT.md) include **negative** outcomes: probing costs money-like toy resources under hostile partners, and seeded probes are not universally better than fixed probes. W3 actions are SIMULATED, single-owner and authorized through the existing guarded router. **No production safety or trust claim.**
+
+```bash
+python -m unittest discover -s tests -p 'test_p6_risk_budget.py' -v
+python benchmarks/p6_risk_budget.py --seeds 10 --seed-start 10101 --out p6-cases.json
+```
+
 ## Experimental compositional world research
 
 [RFC-007: Mathematical Foundations](docs/math/RFC-007-OPENWORLD-MATHEMATICAL-FOUNDATIONS.md) is the existing proposed W2 research architecture. The independent [EXPR-001 fixture](docs/experiments/COMPOSABLE-WORLD-FIXTURE.md), [mathematical notes](docs/math/COMPOSITIONAL-WORLD-NOTES.md), and [dependency-free example](examples/composable_world.py) explore only pure typed composition, agent blueprints and resource transfer/replay. They do **not** constitute approved OWP/OCP standards or production SuperKernel code.

@@ -35,6 +35,10 @@ Partner schedules: always cooperate, always refuse, cooperate-then-collapse, ref
 
 The `immediate` mode delivers W3 outcome notifications in the same recipient phase. The `delayed_censored` mode delays the **policy notification** by 1–2 subsequent donor rounds, with deterministic notification losses. **The underlying W3 transfer happens immediately**; the delay simulates partial information, not a slow bank settlement, an asynchronous cross-world transaction or proof of delivery. The policy never sees a hidden partner type, a future outcome or a response to an unmade donation.
 
+## Pinned measured ten-seed checkpoint
+
+[Actual Python 3.11 CI evidence report](P6-TEN-SEED-RESULTS-REPORT.md) and [complete unrounded JSON](P6-TEN-SEED-840-CASES.json) were recorded from exact source commit `dacbb0d426ea298b8d9df1c13b843ec8d3b6f512`: **440 tests passed with no unexpected failures**, and 840 experiment cases covering ten seeds. Under immediate hostile partners, capped always-offer has reward **-0.0500**, compared with uncapped **-0.1000** and risk-free hold **0**. Every capped case has measured peak exposure **at most 4**, versus **up to 13** in the uncapped baseline across delayed/censored conditions. The seeded/randomized and change-point heuristics do **not** demonstrate universal partner-shift superiority. This is bounded simulation evidence, not a rollout decision.
+
 ## Measured fields and acceptance
 
 Record per-case synthetic donor reward, first/second-half reward, worst-half reward, accepted donations and returns, **per-donor peak exposure**, known non-returns, unresolved/censored observations, probe attempts, cap blocks, observed feedback count and W3 router p95. Verify all seven methods receive bit-identical *starting worlds* under the same seed. Store the **complete actual CI output and all unfavorable outcomes**, with exact commit SHA and environment.
