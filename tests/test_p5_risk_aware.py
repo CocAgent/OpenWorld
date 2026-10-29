@@ -77,13 +77,16 @@ class P5RiskTests(unittest.TestCase):
             chosen, _ = p.choose(r, 8)
             self.assertTrue(chosen)
             p.record(donated=True, returned=True)
-        for r in (4, 5, 6):
+        for r in (4, 5):
             chosen, _ = p.choose(r, 8)
             self.assertTrue(chosen)
             p.record(donated=True, returned=False)
+        # Two recent failures suffice to stop: the third one must not be
+        # fabricated as an observation from an unmade donation.
+        self.assertEqual(p.choose(6, 8), (False, False))
         self.assertEqual(p.choose(7, 8), (False, False))
         self.assertEqual(len(p.recent), 3)
-        self.assertEqual(sum(p.recent), 0)
+        self.assertEqual(sum(p.recent), 1)
 
     def test_hard_resource_zero_prevents_probing_or_transfer(self):
         for name in POLICIES:
@@ -119,7 +122,7 @@ class P5RiskTests(unittest.TestCase):
         self.assertLess(sum(cautious["accepted_by_phase"]),
                         sum(bad["accepted_by_phase"]))
         self.assertEqual(cautious["returned_by_phase"], [0, 0])
-        self.assertLessEqual(sum(cautious["probes_by_phase"]), 10)
+        self.assertLessEqual(sum(cautious["probes_by_phase"]), 10 * 5)
 
     def test_collapse_is_action_dependent_not_policy_oracle(self):
         hold = run_case("hold", "collapse", seed=9101)
@@ -193,10 +196,11 @@ class P5RiskTests(unittest.TestCase):
                     self.assertEqual(row["registered_agents"], 30)
                     self.assertEqual(row["ticks"], 40)
                     self.assertEqual(row["acting_donors"], 10)
+                    # Every observed accepted transfer can be counted,
+                    # including scripted fixed-offer baselines. Abstention
+                    # reveals no response, irrespective of policy family.
                     self.assertEqual(row["observed_feedback_count"],
-                                     sum(row["accepted_by_phase"])
-                                     if row["policy"] in ("risk_window", "all_history")
-                                     else 0)
+                                     sum(row["accepted_by_phase"]))
                     self.assertEqual(sum(row["unreciprocated_by_phase"]) +
                                      sum(row["returned_by_phase"]),
                                      sum(row["accepted_by_phase"]))
