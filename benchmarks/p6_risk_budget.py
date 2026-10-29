@@ -134,7 +134,7 @@ def run_case(policy: str, regime: str, feedback: str, *, seed: int) -> dict:
             if policy != "uncapped_offer" and ledger.exposure > CAP:
                 raise AssertionError("hard donor exposure cap breached")
         worst_resource_exposure = max(worst_resource_exposure,
-                                      max(x.exposure for x in budgets.values()))
+                                      max(x.peak_exposure for x in budgets.values()))
     if not verify_replay(genesis, world) or world.tick != 40:
         raise AssertionError("P6 world replay/tick failed")
     if sum(v for _,v in world.balances) != sum(v for _,v in genesis.balances):
