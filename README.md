@@ -67,6 +67,15 @@ python -m unittest discover -s tests -p 'test_population_links.py' -v
 python examples/populations/local_three_groups.py
 ```
 
+## P3 research — independently learning populations in a replayable world
+
+[P3 mutual learning](docs/evaluation/P3-MUTUAL-LEARNING-W3.md) tests **20 separate donor/recipient learners among 30 registered synthetic agents** over four repeated rounds (eight W3 ticks) per episode. All transfers are simulated under one owner and go through the existing guarded W3 population router; learned policies receive delayed feedback after the recipient's actual action. This is not production MARL, automated institutions or cross-owner federation.
+
+~~~sh
+python -m unittest discover -s tests -p 'test_p3_mutual_learning_w3.py' -v
+python benchmarks/p3_mutual_learning_w3.py --train-episodes 20 --holdout-episodes 8 --rounds 4 --seeds 3
+~~~
+
 ## Experimental compositional world research
 
 [RFC-007: Mathematical Foundations](docs/math/RFC-007-OPENWORLD-MATHEMATICAL-FOUNDATIONS.md) is the existing proposed W2 research architecture. The independent [EXPR-001 fixture](docs/experiments/COMPOSABLE-WORLD-FIXTURE.md), [mathematical notes](docs/math/COMPOSITIONAL-WORLD-NOTES.md), and [dependency-free example](examples/composable_world.py) explore only pure typed composition, agent blueprints and resource transfer/replay. They do **not** constitute approved OWP/OCP standards or production SuperKernel code.
