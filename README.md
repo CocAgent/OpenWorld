@@ -29,9 +29,17 @@ See [Architecture](docs/ARCHITECTURE.md), [Workstreams](docs/WORKSTREAMS.md), [R
 
 ## Research foundations and related projects
 
-The [curated research map](docs/research/RELATED-RESEARCH-AND-PROJECTS.md) covers **16 primary papers** on applied category theory, Markov categories, POSGs, multi-agent environments, generative societies, quality-diversity and co-evolution, plus candidate open-source implementations. It maps each publication to a falsifiable OpenWorld experiment and clearly distinguishes prior art from OpenWorld outcomes.
+The [curated research map](docs/research/RELATED-RESEARCH-AND-PROJECTS.md) includes **16 foundational papers** plus newer and specialized references on applied category theory, Markov categories, POSGs, multi-agent environments, generative societies, quality-diversity and co-evolution, plus candidate open-source implementations. It maps each publication to a falsifiable OpenWorld experiment and clearly distinguishes prior art from OpenWorld outcomes.
 
 The [October 2026 session synthesis](docs/project/SESSION-SYNTHESIS-20261028.md) reconciles the owner-supplied design iterations: an open strategic game, local-first community worlds, agent genesis, the trusted SuperKernel and optional compositional mathematics. **OpenWorld** is the canonical project name; "Open Civilization Protocol" (OCP) and "OpenWorld Protocol" (OWP) remain unratified design labels. Neither social evolution nor federation is a shipped feature.
+
+## Population learning and agent genome — research proposal
+
+The [population representation and typed agent-DNA design](docs/research/POPULATION-REPRESENTATION-AND-AGENT-DNA.md) assesses mean-field MARL, empirical characteristic functions, kernel mean embeddings, the owner's QID/FQID references, and why neither Riemann nor quantum computing is a prerequisite. The optional [Python research fixture](src/openworld_superkernel/population_repr.py) implements a **lossy group distribution sketch** and an **immutable content-addressed genome blueprint**, not learned intelligence, identity, permissions or a production protocol. See [session synthesis addendum](docs/project/SESSION-SYNTHESIS-20261028.md#7-october-29-2026--population-learning-and-mathematical-representation-refinement).
+
+~~~sh
+python -m unittest discover -s tests -p 'test_population_repr.py' -v
+~~~
 
 ## Experimental compositional world research
 

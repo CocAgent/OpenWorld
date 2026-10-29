@@ -75,3 +75,21 @@ Do **not** conflate the early tactical game proposal (two teams, eight commander
 5. OpenWorld reaches large populations, real-world social realism, human-level intelligence, or profitable gameplay.
 
 For each, require baselines, holdout seeds, negative results and resource accounting before announcing success.
+
+## Additional primary papers: population representations, quasi-infinite divisibility and quantum scope (2026-10-29)
+
+These additions answer a **new owner-proposed mathematical route**; they do not revise the scope or authorship of the 16 previously catalogued sources.
+
+| ID | Verified original source | Relationship to OpenWorld | Boundary |
+|---|---|---|---|
+| POP-01 | [Yang et al., *Mean Field Multi-Agent Reinforcement Learning*](https://proceedings.mlr.press/v80/yang18d.html), ICML 2018 | Approximate agent–agent interaction with mean or neighboring population effect | Approximation assumptions; large-N scalability must be measured |
+| POP-02 | [Makkar et al., *Towards Scaling Reinforcement Learning to Massive Populations: Learning Mean-Field Representations*](https://arxiv.org/abs/2609.02928), Aug 2026 preprint | Learn low-dimensional statistics sufficient for a specified offline mean-field task | Its guarantees require its assumptions; not proof all worlds admit a small summary |
+| POP-03 | [Muandet et al., *Kernel Mean Embedding of Distributions: A Review and Beyond*](https://doi.org/10.1561/2200000060), 2017 | Distribution embeddings and characteristic kernel theory | Finite empirical embeddings are approximate; no exact history recovered |
+| POP-04 | [Rahimi & Recht, *Random Features for Large-Scale Kernel Machines*](https://papers.nips.cc/paper_files/paper/2007/hash/013a006f03dbc5392effeb8f18fda755-Abstract.html), 2007 | Approximate shift-invariant kernels with finite randomized features | May be less useful than histograms or moments on discrete world states |
+| PROB-01 | [Lindner, Pan & Sato, *On quasi-infinitely divisible distributions*](https://arxiv.org/abs/1701.02400), 2017 | Characteristic-function QID representations with signed quasi-Lévy measure | Not a default general multi-agent training framework |
+| PROB-02 | [Berger, Kutlu & Lindner, *On multivariate quasi-infinitely divisible distributions*](https://arxiv.org/abs/2101.02544), 2021 | Multivariate QID support, weak convergence and moment properties | Does not establish a scalable agent genotype |
+| PROB-03 | [Hotta et al., *On freely quasi-infinitely divisible distributions*](https://alea.impa.br/articles/v20/20-34.pdf), ALEA 2023 | Free-probability / freely QID theory, Voiculescu transform | "Free" means noncommutative free probability, not agents' freedom |
+| QML-01 | [Gundlach et al., *Quantum Deep Learning Still Needs a Quantum Leap*](https://arxiv.org/abs/2511.01253), 2025 preprint | Grounding for classical-first compute decision | Not a blanket assertion no quantum algorithm can ever help |
+| NUM-01 | [Clay Mathematics Institute: *Riemann Hypothesis*](https://www.claymath.org/millennium/riemann-hypothesis/) | Explicitly document why RH is unrelated to current agent-learning problem | Unsolved mathematical conjecture, not an engineering prerequisite |
+
+See the complete [population and agent-genome design](POPULATION-REPRESENTATION-AND-AGENT-DNA.md) for equations, evidence and tests.

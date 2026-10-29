@@ -93,3 +93,27 @@ This diagram is **a target separation of concerns**, not a deployed architecture
 The uploads are owner-provided extracts of previous ChatGPT-style discussions, not independently fetched complete platform transcripts. Two uploads are byte-for-byte identical; only one source concept is counted. Earlier shared chat URLs remain `PENDING_ACCESS` in the [register](SESSION-SOURCE-REGISTER.md). This synthesis does not import entire raw discussions, embedded unrelated images, marketing quotes or suggested third-party code into the public repository.
 
 Public repository prose is intentionally English (ADR-001). The original Vietnamese texts remain the owner's source material and are not copied verbatim into this public document.
+
+## 7. October 29, 2026 — population learning and mathematical representation refinement
+
+This addendum records the owner's **new research question** about scaling agent training and encoding agent "DNA", rather than pretending it was fully specified in earlier sessions. Its [mathematical design](../research/POPULATION-REPRESENTATION-AND-AGENT-DNA.md) is **proposed**, not an accepted public protocol or demonstrated trained society.
+
+**Retained from earlier sessions:**
+
+1. Keep **OpenWorld** independent, local-first, game-capable and openly extensible. An autonomous civilization is a falsifiable long-term goal, not a shipped feature.
+2. Keep the **trusted world state** and replay contract separate from AI policy inference and evolving genome candidates. The identity, owner, grants and exact history are never reconstructed from a predictive vector.
+3. Allow **heterogeneous roles, private histories and multiobjective strategies**; neither a single universal agent policy nor a single maximizing winner is an architectural requirement.
+4. Use **applied category theory for typed composition**, W2 controlled stochastic kernels for transitions, **POSG and mean-field MARL** for decisions, and **sparse graphs** for local events and relationships.
+5. Use offline evolutionary candidate generation/quality-diversity, tests and human/W0-approved admission. Never auto-execute new agent code or mutate production rules.
+
+**New choices to evaluate (not frozen):**
+
+- A *stratified empirical population measure* per role/region, represented by an optional bounded empirical characteristic-function sketch, **alongside** local graph, individual observation and protected memory.
+- *Typed, content-addressed AgentGenome* with bounded trait parameters, role, policy artifact reference and lineage. Genome is not model weights, identity, owner permissions or proof of intelligence.
+- Shared role policies conditioned on individual traits and local context, with independent benchmark baselines. Count training steps, active policy calls and cost separately from number of stored agents.
+- Explicit counterexamples: finite-frequency aliasing, time-order information loss, rare-strategy flattening and privacy leakage from small aggregates. Quasi-infinite divisibility and free probability are **not** default game-state representations.
+- Riemann hypothesis and quantum computation are **out of P0 scope**, with reasons and primary sources documented in the design.
+
+**Operational status at this synthesis:** W3, W4, W5 and SEC-002 contain research code on the checked repository `main`. Their existence/green tests do not close independent Gate #11, establish actual two-party consent, or authorize untrusted multi-owner deployment. Earlier "W3 next" action descriptions in sections 2/5 were **time-specific proposals** and must not override the current GitHub tree.
+
+**Proposed next evaluation:** compare role-wise mean, role-wise histogram, ECF and learned embeddings under identical holdout seeds, while preserving exact critical interactions. The new Python source is a research fixture with 0 learning loops and 0 policy training runs.
