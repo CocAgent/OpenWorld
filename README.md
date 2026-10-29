@@ -47,6 +47,17 @@ python -m unittest discover -s tests -p 'test_population_repr.py' -v
 
 Run the bounded [W5 benchmark](benchmarks/w5_population_repr.py) on a local CPU to generate raw JSON evidence. Neither ECF nor Agent Genome is a privileged identity, trusted history or default world-state API.
 
+## P1 — Online population-agent learning (research)
+
+The [P1 learning study](docs/evaluation/P1-THIRTY-AGENT-ONLINE-LEARNING.md) extends the earlier [W5 distribution benchmark](docs/evaluation/W5-POPULATION-REPRESENTATION-BASELINES.md) from frozen supervised prediction into a **synthetic 30-agent contextual bandit**. Agents select binary actions and update a role-shared policy using only observed chosen-action rewards. No-summary, grouped mean, histogram and empirical characteristic-function summaries are assessed on disjoint world seeds.
+
+This is an **offline learning positive control**, not self-evolving agents, multi-agent world training, proof of societal emergence, trusted authentication or a shipped game.
+
+~~~sh
+python -m unittest discover -s tests -p 'test_p1_population_learning.py' -v
+python benchmarks/p1_population_learning.py --agents 30 --train-ticks 160 --holdout-ticks 60 --seeds 3
+~~~
+
 ## Experimental compositional world research
 
 [RFC-007: Mathematical Foundations](docs/math/RFC-007-OPENWORLD-MATHEMATICAL-FOUNDATIONS.md) is the existing proposed W2 research architecture. The independent [EXPR-001 fixture](docs/experiments/COMPOSABLE-WORLD-FIXTURE.md), [mathematical notes](docs/math/COMPOSITIONAL-WORLD-NOTES.md), and [dependency-free example](examples/composable_world.py) explore only pure typed composition, agent blueprints and resource transfer/replay. They do **not** constitute approved OWP/OCP standards or production SuperKernel code.
