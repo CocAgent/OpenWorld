@@ -76,3 +76,20 @@ mandated global migration.
 **Safety:** No real value transfer, user data, network messaging, model calls,
 payment integration, or cross-owner W3 gateway enablement. `authenticated_owner`
 is still a string asserted by the synthetic fixture, not independently verified.
+
+
+## Manual-only disposable PostgreSQL CI
+
+`.github/workflows/w5-postgres-parity-manual.yml` uses GitHub
+`workflow_dispatch` **only**. It does not run on push, pull request, or a
+schedule; it requires owner action once the workflow is available on the default
+branch. It starts one disposable `postgres:16` service, installs the optional
+Psycopg driver, runs this same logical trace plus a two-connection contention
+check, and retains the synthetic JSON artifact for seven days. It never connects
+to production or a user-provided database.
+
+**Cost warning:** The optional workflow uses GitHub-hosted runner minutes and
+package/container downloads. The repository owner must check Actions budget and
+availability before manually dispatching it. No paid service is activated by
+merely merging the file. Until a successful manual run is inspected, PostgreSQL
+parity and any performance claim remain **UNVERIFIED**.
