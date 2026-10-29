@@ -34,3 +34,9 @@ These proposals are drawn from the [session synthesis](project/SESSION-SYNTHESIS
 6. **Federation (later):** start with discovering worlds and transferring compatible blueprints/content, not external world currency, authority, inventory or historical truth.
 
 **Resource decision:** local CPU and existing hardware first, no new paid GPU/server commitment. Research references are not implementation evidence or product promises.
+
+## R6 — Stratified populations and genome experiments (PROPOSED, not a product milestone)
+
+Investigate [the W2/W3 population representation proposal](research/POPULATION-REPRESENTATION-AND-AGENT-DNA.md) as an opt-in offline branch. Compare aggregate mean, histogram, finite empirical characteristic sketch and learned embeddings on common seeds, matching inference budgets, held-out partner policies and adversarially heterogeneous populations. Typed agent-genome variation requires versioned lineage, bounded traits, admission/consent and clear separation from policy weights, identity, capabilities, immutable kernel rules and exact evidence.
+
+Gate: demonstrable task-relative benefit over simpler baselines, reproducible state transitions and no unauthorized sharing of per-agent memory. No claims of scalable learning arise from the standalone sketch implementation or counting agent blueprints.
