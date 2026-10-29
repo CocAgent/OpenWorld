@@ -65,6 +65,17 @@ class ParityProtocolTests(unittest.TestCase):
                 with self.assertRaises(RuntimeError):
                     run_trace(ledger)
 
+    def test_refuses_existing_prepared_intent(self):
+        from openworld_superkernel.transactional_world import TransferIntent
+        with tempfile.TemporaryDirectory() as path:
+            with AtomicWorldLedger(Path(path) / "world.db") as ledger:
+                ledger.prepare(TransferIntent(
+                    "stale", "a", "owner-a", "b", "owner-b",
+                    1, "synthetic", "nonce-stale", 0, 2000,
+                ))
+                with self.assertRaises(RuntimeError):
+                    run_trace(ledger)
+
     def test_nearest_rank_percentiles(self):
         samples = (1., 2., 3., 4., 5., 6.)
         self.assertEqual(percentile(samples, 0.5), 3.)

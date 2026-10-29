@@ -89,6 +89,18 @@ def run_trace(ledger: Any) -> TraceSummary:
     """
     if _snapshot(ledger) != ((), 0, 0, 0):
         raise RuntimeError("parity experiment requires a fresh empty ledger")
+    if hasattr(ledger, "conn"):
+        count = ledger.conn.execute(
+            "SELECT (SELECT count(*) FROM ow_p1_intents) + "
+            "(SELECT count(*) FROM ow_p1_approvals)"
+        ).fetchone()[0]
+    else:
+        count = ledger.db.execute(
+            "SELECT (SELECT count(*) FROM intents) + "
+            "(SELECT count(*) FROM approvals)"
+        ).fetchone()[0]
+    if count:
+        raise RuntimeError("parity experiment refuses pre-existing intents or approvals")
 
     steps: list[tuple[str, str]] = []
     latencies: list[float] = []
@@ -101,7 +113,8 @@ def run_trace(ledger: Any) -> TraceSummary:
             observed, result = "denied", None
         except RuntimeError as exc:
             # Fault injection uses a deliberately recognizable exception message.
-            if "synthetic" not in str(exc):
+            if str(exc) not in {"synthetic crash inside local transaction",
+                                "synthetic failure after debit before commit"}:
                 raise
             observed, result = "rolled_back", None
         finally:
