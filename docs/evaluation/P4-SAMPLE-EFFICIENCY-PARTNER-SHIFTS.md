@@ -44,6 +44,12 @@ python benchmarks/p4_sample_efficiency.py --seeds 5 --seed-start 8101 --budgets 
 
 The full W5 unit test launches the five-seed matrix on GitHub Actions and writes a **complete structured case per log line**. Acceptance and scientific interpretation require the exact commit SHA and actual CI output; **no numerical winner is asserted in advance**. A later evidence-only commit may save those machine-readable cases and a summary, preserving negative results.
 
+## Actual five-seed measurement checkpoint
+
+The [CI-backed P4 evaluation report](P4-FIVE-SEED-RESULTS-REPORT.md) and its [complete raw case JSON](P4-FIVE-SEED-RESULTS.json) are preserved on this branch. The measured test ran five seeds, **120 training configurations** across three budgets, and eight partner/world conditions per configuration. **406 repository tests passed** on the pre-report source commit `e9906b230c48ff85240c1f8ae528caf82ca9881e` (one skipped, two expected failures).
+
+For the original-world/native-partner case at **8 training episodes**, role-shared/full and role-shared/compact both score **0.5750** (matching the engineered fixed cooperative baseline), versus independent/full **0.2239**. Under a partner who always refuses, however, the fixed cooperative rule and role-shared/compact both score **-0.2250**, worse than fixed hold at **0.0000**. At 128 episodes independent compact/full catch up to the fixed rule on native partners. **No method is justified as universally optimal or safe under partner shift**; additional sample efficiency does not demonstrate general MARL convergence.
+
 ## What this cannot establish
 
 This is a short, reset-between-episodes repeated-game simulator. It does not demonstrate convergence in nonstationary MARL, open-ended learning, real-world cooperation, Agent Genome evolution, an approved social institution, real consent, cross-world transaction or independent security audit. Group mean/histogram/ECF may leak information about small groups; the host computes them only for one synthetic owner. Exact W3 SIMULATED replay does not prove event authenticity outside the local simulator.
