@@ -1,0 +1,69 @@
+# Explicit manual-only research experiment. NO push/PR/schedule triggers.
+# WARNING: GitHub Actions runner minutes and network downloads may incur costs
+# depending on repository/account billing settings. Run only with owner approval.
+name: W5 PostgreSQL parity (manual research)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openworld-w5-postgres-parity
+  cancel-in-progress: false
+
+jobs:
+  postgres-parity:
+    name: Disposable PostgreSQL parity
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: openworld_research
+          POSTGRES_PASSWORD: disposable-ci-password-not-a-secret
+          POSTGRES_DB: openworld_ephemeral_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U openworld_research -d openworld_ephemeral_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - name: Checkout pinned source revision
+        uses: actions/checkout@v5
+      - name: Set up supported Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install opt-in PostgreSQL driver
+        run: python -m pip install "psycopg[binary]>=3,<4"
+      - name: Run same logical trace and two-connection race
+        env:
+          # All credentials are disposable CI-only and are not used anywhere else.
+          OPENWORLD_PG_TEST_ISOLATED: YES_EPHEMERAL_DB
+          OPENWORLD_PG_TEST_DSN: postgresql://openworld_research:disposable-ci-password-not-a-secret@localhost:5432/openworld_ephemeral_ci
+        run: python benchmarks/w5_storage_parity.py --with-postgres > w5-parity-result.json
+      - name: Summarize verified differential result
+        run: |
+          python - <<'PY'
+          import json
+          data = json.load(open("w5-parity-result.json", encoding="utf-8"))
+          assert data["postgres"]["status"] == "MATCH"
+          assert data["sqlite"]["logical"] == data["postgres"]["logical"]
+          assert data["sqlite"]["contention"]["committed"] == 1
+          assert data["postgres"]["contention"]["committed"] == 1
+          print("SQLite and disposable PostgreSQL agreed on the synthetic trace.")
+          print("Both two-connection tests allowed exactly one commit.")
+          print("No production/performance or real identity claims.")
+          PY
+      - name: Upload synthetic benchmark report (no DSN)
+        uses: actions/upload-artifact@v4
+        with:
+          name: openworld-w5-sqlite-postgres-parity
+          path: w5-parity-result.json
+          retention-days: 7
+          if-no-files-found: error
