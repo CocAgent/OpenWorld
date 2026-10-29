@@ -17,6 +17,10 @@ Can a donor learn from delayed reward whether transferring resources helps an ag
 
 **Classification:** This is **delayed-feedback contextual learning embedded in a two-step stateful W3 simulator**. It is not independently adapting multi-agent reinforcement learning: recipient policies are fixed, the world resets between episodes, and only 10 donors choose learned actions.
 
+## Recorded measured checkpoint
+
+The [three-seed measured CI report](P2-THREE-SEED-HOLDOUT-REPORT.md) and [raw JSON](P2-THREE-SEED-HOLDOUT.json) provide actual replay-checked W3 action reward: the four-bin histogram achieved a mean holdout reward of **0.8715** versus **0.8056** for ECF and **0.7500** for role-group mean or always-transfer across the deliberately constructed test. This is a positive control, not evidence of generic multi-agent cooperation or a representation theorem.
+
 ## Baselines
 
 | Method | Information available | Essential control |
