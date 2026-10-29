@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from pathlib import Path
 import subprocess
 import sys
@@ -78,11 +79,11 @@ class P3MutualLearnersTests(unittest.TestCase):
         policies = self.policies()
         run_episode(self.router, self.tokens, self.world, "no_summary",
                     policies, seed=6101, episode=0, training=True)
-        before = {a: (p.updates, json.dumps(p.q, sort_keys=True))
+        before = {a: (p.updates, deepcopy(p.q))
                   for a, p in policies.items()}
         run_episode(self.router, self.tokens, self.world, "no_summary",
                     policies, seed=6102, episode=0, training=False)
-        self.assertEqual(before, {a: (p.updates, json.dumps(p.q, sort_keys=True))
+        self.assertEqual(before, {a: (p.updates, deepcopy(p.q))
                                   for a, p in policies.items()})
 
     def test_identical_world_seed_is_replay_deterministic(self):
