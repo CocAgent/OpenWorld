@@ -78,10 +78,11 @@ class P3MutualLearnersTests(unittest.TestCase):
         policies = self.policies()
         run_episode(self.router, self.tokens, self.world, "no_summary",
                     policies, seed=6101, episode=0, training=True)
-        before = {a: (p.updates, dict(p.q)) for a, p in policies.items()}
+        before = {a: (p.updates, json.dumps(p.q, sort_keys=True))
+                  for a, p in policies.items()}
         run_episode(self.router, self.tokens, self.world, "no_summary",
                     policies, seed=6102, episode=0, training=False)
-        self.assertEqual(before, {a: (p.updates, dict(p.q))
+        self.assertEqual(before, {a: (p.updates, json.dumps(p.q, sort_keys=True))
                                   for a, p in policies.items()})
 
     def test_identical_world_seed_is_replay_deterministic(self):
@@ -92,9 +93,14 @@ class P3MutualLearnersTests(unittest.TestCase):
         self.assertEqual(a, b)
 
     def test_group_mean_can_hide_different_need_patterns(self):
-        cases = [build_world(seed=6101, episode=i) for i in range(20)]
-        needy = next(world for world, n in cases if n[1])
-        funded = next(world for world, n in cases if not n[1])
+        cases = [build_world(seed=6101, episode=i) for i in range(60)]
+        # Hold the first destination group's mode fixed: otherwise donor a15's
+        # *own* balance changes, confounding the intended mean-collapse test.
+        modes = {pair: world for world, pair in cases}
+        donor_mode = next(mode for mode in (0, 1)
+                          if (mode, 0) in modes and (mode, 1) in modes)
+        needy = modes[(donor_mode, 1)]
+        funded = modes[(donor_mode, 0)]
         mean_n = donor_context(needy, "a15", "guild-2", "group_mean",
                                previous_return=0)
         mean_f = donor_context(funded, "a15", "guild-2", "group_mean",
