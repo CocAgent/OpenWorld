@@ -1,5 +1,7 @@
 """Single-DB synthetic consent/transfer atomicity reference tests."""
 import sqlite3
+import concurrent.futures
+import sqlite3
 import sys
 import tempfile
 import unittest
@@ -140,6 +142,40 @@ class AtomicLedgerTests(unittest.TestCase):
                                ('owner-mallory', 'agent-b'))
         with self.assertRaises(TransactionDenied):
             self.ledger.execute(self.operation, now=120)
+
+    def test_target_balance_overflow_denied(self):
+        self.both()
+        self.ledger.db.execute('UPDATE accounts SET balance=? WHERE agent=?',
+                               (2**63 - 1, 'agent-b'))
+        with self.assertRaises(TransactionDenied):
+            self.ledger.execute(self.operation, now=120)
+
+    def test_reject_oversize_integer_before_sqlite_write(self):
+        with self.assertRaises(ValueError):
+            intent(amount=2**63).canonical()
+        with self.assertRaises(ValueError):
+            self.ledger.seed_account('agent-c', 'owner-c', 2**63)
+
+    def test_competing_intents_do_not_both_consume_same_world_tick(self):
+        another = intent(intent_id='t-2', nonce='nonce-2', amount=2)
+        self.ledger.prepare(another)
+        for i in (self.operation, another):
+            self.ledger.approve(intent_id=i.intent_id, role='source',
+                                authenticated_owner='owner-a', expected_digest=i.digest())
+            self.ledger.approve(intent_id=i.intent_id, role='receiver',
+                                authenticated_owner='owner-b', expected_digest=i.digest())
+
+        def attempt(i):
+            with AtomicWorldLedger(self.path) as db:
+                try:
+                    return db.execute(i, now=120)
+                except TransactionDenied:
+                    return 'denied'
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            results = list(executor.map(attempt, [self.operation, another]))
+        self.assertEqual(sum(result != 'denied' for result in results), 1)
+        self.assertEqual(self.ledger.db.execute('SELECT tick FROM world_meta').fetchone()[0], 1)
+        self.assertEqual(sum(self.balances().values()), 11)
 
     def test_same_owner_cannot_approve_twice(self):
         self.approve('source', 'owner-a')

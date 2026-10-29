@@ -28,7 +28,7 @@ Python 3.11 stdlib only, WAL and `synchronous=FULL`; no authentication provider,
 - The `seed_account` function is a fixture-only administrative primitive; a malicious caller with raw database access can bypass all invariants.
 - One SQLite writer per DB file still limits concurrent writes. No multi-process/large-world benchmark or crash-after-fsync certification is claimed.
 - The recipient's consent is a simulated assertion, not proof of an actual authenticated person. There is no actual billing, payment, or data privacy policy.
-- The reference assumes world resource amounts fit SQLite integer constraints; production needs input limits and overflow checks (not yet tested).
+- The reference assumes world resource amounts fit SQLite integer constraints; research code checks SQLite signed 64-bit amount/balance bounds, but a full domain-level quantity policy is still missing.
 - A database restored from an old backup can still revert balances and consent unless an independently trusted epoch/anchor (Issue #41) is used.
 
 ## Conditional PostgreSQL pilot (not executed)
@@ -43,6 +43,6 @@ The decision to move shared control-plane authority from SQLite to PostgreSQL mu
 
 
 tests: `python -m unittest discover -s tests -v`  
-Focused local prototype: **16/16 passing** (Python 3.13.5, synthetic only). GitHub Actions on integrated repository is required before review.
+Focused local prototype: **19/19 passing** (Python 3.13.5, synthetic only). GitHub Actions on integrated repository is required before review.
 
 **Gate:** No real cross-owner execution until authenticated receiver consent, SEC-002 capability debit, world resource effect, receipt and audit share a reviewed atomic boundary or recoverable protocol with independent witness and owner approval.

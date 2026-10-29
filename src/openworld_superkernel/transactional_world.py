@@ -12,6 +12,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
+MAX_INT64 = 2**63 - 1
+
+
 class TransactionDenied(PermissionError):
     """Operation is unauthorized, stale, altered or already invalidated."""
 
@@ -36,7 +39,7 @@ class TransferIntent:
             raise ValueError('invalid identity, purpose or nonce')
         if (self.source_agent == self.target_agent
                 or self.source_owner == self.target_owner
-                or type(self.amount) is not int or self.amount <= 0
+                or type(self.amount) is not int or not 1 <= self.amount <= MAX_INT64
                 or type(self.expected_tick) is not int or self.expected_tick < 0
                 or type(self.expires_at) is not int or self.expires_at < 1):
             raise ValueError('invalid cross-owner transfer intent')
@@ -91,7 +94,7 @@ class AtomicWorldLedger:
 
     def seed_account(self, agent: str, owner: str, balance: int):
         """Trusted fixture provisioning only; never expose to untrusted users."""
-        if not agent or not owner or type(balance) is not int or balance < 0:
+        if not agent or not owner or type(balance) is not int or not 0 <= balance <= MAX_INT64:
             raise ValueError('invalid account')
         self.db.execute('INSERT INTO accounts VALUES(?,?,?)', (agent, owner, balance))
 
@@ -200,6 +203,8 @@ class AtomicWorldLedger:
                     or target[0] != intent.target_owner or source[1] < intent.amount):
                 raise TransactionDenied('ownership changed or insufficient balance')
             source_new, target_new = source[1] - intent.amount, target[1] + intent.amount
+            if target_new > MAX_INT64:
+                raise TransactionDenied('target balance would overflow SQLite integer')
             self.db.execute('UPDATE accounts SET balance=? WHERE agent=?',
                             (source_new, intent.source_agent))
             if inject_failure:
