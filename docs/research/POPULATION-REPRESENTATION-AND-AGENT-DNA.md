@@ -27,7 +27,7 @@ Let agent i carry observable/simulated state x_i(t) and role/region stratum r(i)
 
 ```math
 \mu_t^{(r)} = \frac{1}{N_r(t)}\sum_{i:r(i)=r}\delta_{x_i(t)}.
-~~~
+```
 
 An optional **empirical characteristic signature** for fixed frequencies $\omega_1,\ldots,\omega_K$ is
 
@@ -35,7 +35,7 @@ An optional **empirical characteristic signature** for fixed frequencies $\omega
 \widehat{\varphi}^{(r)}_t(\omega_k)
 =\frac{1}{N_r(t)}\sum_{i:r(i)=r}
 \exp(\mathrm{i}\,\omega_k^{\mathsf T}x_i(t)), \quad 1\leq k\leq K.
-~~~
+```
 
 Each sketch comprises K real/imaginary pairs; the overall feature size is O(number-of-strata * K), excluding counts and feature definitions. The **cost to compute** is O(N K d), and input/point states remain elsewhere. For a fixed true distribution, the characteristic function at **all** frequencies uniquely identifies its probability law; the finite list of K samples of the function does **not**. ECF also does not encode which sample belongs to which agent, its history, causal network, owner or capability.
 
@@ -46,7 +46,7 @@ a_i(t)\sim\pi_{\theta_{r(i)}}\left(
 \,\cdot\mid o_i(t),\,m_i(t),\,g_i,\,
 \widehat{\varphi}^{(r(i))}_t,\,\mathcal{N}_i(t)
 \right).
-~~~
+```
 
 Here $m_i$ is an individually scoped memory state, $g_i$ an immutable genome, and $\mathcal N_i$ a bounded local graph observation. This is **not** a proof that the signature is a Markov sufficient statistic, that agents are independent, or that grouped policy optimization converges. For strongly strategic, rare or non-exchangeable interactions, use exact local events/POSG reasoning instead of averaging.
 
@@ -73,7 +73,7 @@ Mathematically treat the genome as $g_i\in\mathcal G_{\mathrm{typed}}$, and phen
 \mathrm{behavior}_i(t)
 =\mathcal F\big(g_i,\theta_{\mathrm{role}(i)},m_i(t),
 o_i(t),\mathrm{world}_t\big).
-~~~
+```
 
 Genome and identity are separate: cloning a blueprint is **not** cloning agent ownership, consent, permissions, personal memory, or authenticity. \`policy_digest\` is only a content pointer and does not fetch, execute, verify licenses or grant code admission. The experimental \`mutate_genome\` changes one bounded trait, preserves lineage and creates a content-addressed child. **There is no fitness selection, crossover, population training or code execution** in this implementation.
 
@@ -91,7 +91,7 @@ Classical characteristic function:
 
 ```math
 \varphi_X(\omega)=\mathbb E[\exp(\mathrm{i}\omega^{\mathsf T}X)].
-~~~
+```
 
 For **classically independent** X and Y, $\varphi_{X+Y}=\varphi_X\varphi_Y$; dependence invalidates that factorization. An empirical signature of *unpaired marginals* cannot test chronological or causal independence. QID and FQID are restrictive/specialized families, not synonyms for a universal agent distribution codec.
 

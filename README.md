@@ -41,6 +41,12 @@ The [population representation and typed agent-DNA design](docs/research/POPULAT
 python -m unittest discover -s tests -p 'test_population_repr.py' -v
 ~~~
 
+## W5 population representation benchmark (experimental)
+
+[Issue #44](https://github.com/CocAgent/OpenWorld/issues/44) evaluates whether simple aggregate means and histograms are sufficient, or whether [empirical characteristic functions and random Fourier features](docs/evaluation/W5-POPULATION-REPRESENTATION-BASELINES.md) improve task-specific predictions under matching synthetic train/holdout seeds. The benchmark is **supervised synthetic regression only**, not learned multi-agent RL or proof of population scalability.
+
+Run the bounded [W5 benchmark](benchmarks/w5_population_repr.py) on a local CPU to generate raw JSON evidence. Neither ECF nor Agent Genome is a privileged identity, trusted history or default world-state API.
+
 ## Experimental compositional world research
 
 [RFC-007: Mathematical Foundations](docs/math/RFC-007-OPENWORLD-MATHEMATICAL-FOUNDATIONS.md) is the existing proposed W2 research architecture. The independent [EXPR-001 fixture](docs/experiments/COMPOSABLE-WORLD-FIXTURE.md), [mathematical notes](docs/math/COMPOSITIONAL-WORLD-NOTES.md), and [dependency-free example](examples/composable_world.py) explore only pure typed composition, agent blueprints and resource transfer/replay. They do **not** constitute approved OWP/OCP standards or production SuperKernel code.
