@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "benchmarks"))
 
 from openworld_superkernel.transactional_world import AtomicWorldLedger
-from w5_storage_parity import TraceSummary, percentile, run_trace
+from w5_storage_parity import TraceSummary, percentile, run_trace, run_contention
 
 
 class ParityProtocolTests(unittest.TestCase):
@@ -57,6 +57,19 @@ class ParityProtocolTests(unittest.TestCase):
         self.assertEqual(outbox, 2)
         self.assertEqual(result.logical()["outcomes"]["replay:first"], "ok")
         self.assertEqual(result.logical()["outcomes"]["replay:second"], "ok")
+
+    def test_two_independent_connections_cannot_commit_same_tick(self):
+        with tempfile.TemporaryDirectory() as path:
+            file_path = Path(path) / "world.db"
+            with AtomicWorldLedger(file_path) as ledger:
+                run_trace(ledger)
+                outcome = run_contention(ledger, lambda: AtomicWorldLedger(file_path))
+        self.assertEqual(outcome["committed"], 1)
+        self.assertEqual(outcome["denied"], 1)
+        self.assertEqual(outcome["tick"], 3)
+        self.assertEqual(outcome["receipts"], 3)
+        self.assertEqual(outcome["outbox"], 3)
+        self.assertEqual(outcome["conserved_units"], 130)
 
     def test_refuses_nonempty_ledger(self):
         with tempfile.TemporaryDirectory() as path:

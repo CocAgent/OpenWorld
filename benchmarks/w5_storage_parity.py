@@ -10,6 +10,8 @@ Neither ledger authenticates the claimed owner. No W3 cross-owner execution.
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
+import threading
 import json
 import os
 import platform
@@ -197,6 +199,52 @@ def run_trace(ledger: Any) -> TraceSummary:
     return result
 
 
+def run_contention(ledger: Any, connection_factory: Callable[[], Any]) -> dict[str, int | float]:
+    """Two independently connected writers race against one world tick.
+
+    Exactly one may commit; the other must fail closed. Which writer wins is
+    scheduler-dependent, so never compare winners across database products.
+    """
+    balances, tick, receipts, outbox = _snapshot(ledger)
+    if tick != 2 or receipts != 2 or outbox != 2:
+        raise RuntimeError("contention fixture must follow the completed trace")
+    racers = (
+        _intent(5, "agent-a", "owner-a", "agent-b", "owner-b", 3, tick),
+        _intent(6, "agent-a", "owner-a", "agent-c", "owner-c", 4, tick),
+    )
+    for intent in racers:
+        ledger.prepare(intent)
+        ledger.approve(intent_id=intent.intent_id, role="source",
+                       authenticated_owner="owner-a", expected_digest=intent.digest())
+        ledger.approve(intent_id=intent.intent_id, role="receiver",
+                       authenticated_owner=intent.target_owner,
+                       expected_digest=intent.digest())
+
+    gate = threading.Barrier(2)
+
+    def race(intent: TransferIntent) -> str:
+        with connection_factory() as connection:
+            gate.wait(timeout=15)
+            try:
+                connection.execute(intent, now=1000)
+                return "committed"
+            except TransactionDenied:
+                return "denied"
+
+    start = time.perf_counter_ns()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        outcomes = tuple(pool.map(race, racers))
+    elapsed_ms = (time.perf_counter_ns() - start) / 1_000_000
+    after_balances, new_tick, new_receipts, new_outbox = _snapshot(ledger)
+    if (sorted(outcomes) != ["committed", "denied"]
+            or (new_tick, new_receipts, new_outbox) != (3, 3, 3)
+            or sum(quantity for _, quantity in after_balances) != 130):
+        raise AssertionError("concurrent writers violated single-tick state invariants")
+    return {"committed": 1, "denied": 1, "tick": new_tick,
+            "receipts": new_receipts, "outbox": new_outbox,
+            "conserved_units": 130, "wall_ms": elapsed_ms}
+
+
 def _timing(summary: TraceSummary) -> dict[str, float | int]:
     samples = summary.latency_ms
     return {"operations": len(samples), "total_ms": sum(samples),
@@ -204,7 +252,7 @@ def _timing(summary: TraceSummary) -> dict[str, float | int]:
             "p99_ms": percentile(samples, 0.99)}
 
 
-def _run_postgres() -> tuple[TraceSummary, dict[str, str]]:
+def _run_postgres() -> tuple[TraceSummary, dict[str, str], dict[str, int | float]]:
     if os.environ.get("OPENWORLD_PG_TEST_ISOLATED") != "YES_EPHEMERAL_DB":
         raise RuntimeError("explicit OPENWORLD_PG_TEST_ISOLATED=YES_EPHEMERAL_DB required")
     dsn = os.environ.get("OPENWORLD_PG_TEST_DSN")
@@ -222,9 +270,11 @@ def _run_postgres() -> tuple[TraceSummary, dict[str, str]]:
         # guard. A privileged operator must create the dedicated DB first.
         db = PostgresWorldLedger(conn, initialize=True)
         summary = run_trace(db)
+        contention = run_contention(db, lambda: PostgresWorldLedger(
+            connect_postgres(dsn), initialize=False))
         server_version = conn.execute("SHOW server_version").fetchone()[0]
         return summary, {"database": "ephemeral (name withheld)",
-                         "server_version": server_version}
+                         "server_version": server_version}, contention
     finally:
         conn.close()
 
@@ -238,22 +288,26 @@ def main() -> int:
         path = Path(directory) / "sqlite_world.db"
         with AtomicWorldLedger(path) as sqlite_ledger:
             sqlite = run_trace(sqlite_ledger)
+            sqlite_contention = run_contention(
+                sqlite_ledger, lambda: AtomicWorldLedger(path))
         report: dict[str, Any] = {
             "protocol": "openworld-storage-parity-p1",
             "environment": {"python": platform.python_version(),
                             "sqlite": sqlite3.sqlite_version,
                             "platform": platform.platform()},
-            "sqlite": {"logical": sqlite.logical(), "timing": _timing(sqlite)},
+            "sqlite": {"logical": sqlite.logical(), "timing": _timing(sqlite),
+                       "contention": sqlite_contention},
             "postgres": {"status": "NOT_RUN"},
             "warning": "Tiny synthetic trace; timing includes backend-specific Python/IPC overhead; "
                        "no production, identity, security or throughput conclusion.",
         }
         if args.with_postgres:
-            postgres, server = _run_postgres()
+            postgres, server, pg_contention = _run_postgres()
             if postgres.logical() != sqlite.logical():
                 raise AssertionError("storage backends disagree on logical trace")
             report["postgres"] = {"status": "MATCH", "logical": postgres.logical(),
-                                  "timing": _timing(postgres), "server": server}
+                                  "timing": _timing(postgres), "server": server,
+                                  "contention": pg_contention}
         print(json.dumps(report, indent=2, sort_keys=True))
     return 0
 

@@ -15,7 +15,9 @@ consent, incorrect owner assertion, an injected failure after debit, unchanged
 replay, changed intent rejection, revoked receiver approval, a second legitimate
 transfer, global tick and receipt/outbox invariants, stale-tick rejection, and
 conservation of resources. The expected final state is 91/17/22 units, tick 2,
-two durable receipts and two outbox records. Both systems must produce **identical
+two durable receipts and two outbox records. A **separate two-connection race**
+then makes two intents contend for the same world tick; exactly one must commit,
+leaving tick 3, three receipts and three outbox rows while preserving 130 units. Both systems must produce **identical
 logical outcomes**, including all denials.
 
 ## No-cost SQLite verification
@@ -58,7 +60,8 @@ but do **not** provide a sandbox boundary against malicious processes.
 - Python/SQLite/OS and, if enabled, PostgreSQL server version.
 
 **Not provided yet:** a powered PostgreSQL instance in project CI; meaningful
-throughput/load/stress data; simultaneous multi-process PostgreSQL writers;
+throughput/load/stress data; multi-process PostgreSQL writers beyond the bounded
+two-connection race;
 controlled CPU/RSS/network/disk measurements; WAL/fdatasync durability under
 power loss; independent anti-rollback witness; production identity provider;
 atomic SEC-002 capability debit + world effect across separate systems.
