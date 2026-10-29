@@ -7,9 +7,12 @@ from __future__ import annotations
 
 import shutil
 import sqlite3
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
 from openworld_superkernel.durable_identity import (
     AuthorizationError,
