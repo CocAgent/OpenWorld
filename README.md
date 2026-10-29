@@ -58,6 +58,15 @@ python -m unittest discover -s tests -p 'test_p1_population_learning.py' -v
 python benchmarks/p1_population_learning.py --agents 30 --train-ticks 160 --holdout-ticks 60 --seeds 3
 ~~~
 
+## W3 P0 — Local population connections (research only)
+
+[Population Links P0](docs/world/W3-POPULATION-LINKS-P0.md) turns the earlier community/world/civilization ideas into one bounded experiment: **three agent groups in one local W3 world**, explicit directional contracts and same-owner, double resource-scoped capability checks. It reuses W3's sparse graph, immutable state, event provenance and deterministic replay. **No cross-owner transfer, federation, group privacy, learned cooperation or automatic institutional creation** is implemented.
+
+```bash
+python -m unittest discover -s tests -p 'test_population_links.py' -v
+python examples/populations/local_three_groups.py
+```
+
 ## Experimental compositional world research
 
 [RFC-007: Mathematical Foundations](docs/math/RFC-007-OPENWORLD-MATHEMATICAL-FOUNDATIONS.md) is the existing proposed W2 research architecture. The independent [EXPR-001 fixture](docs/experiments/COMPOSABLE-WORLD-FIXTURE.md), [mathematical notes](docs/math/COMPOSITIONAL-WORLD-NOTES.md), and [dependency-free example](examples/composable_world.py) explore only pure typed composition, agent blueprints and resource transfer/replay. They do **not** constitute approved OWP/OCP standards or production SuperKernel code.

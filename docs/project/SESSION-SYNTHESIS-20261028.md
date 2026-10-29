@@ -117,3 +117,9 @@ This addendum records the owner's **new research question** about scaling agent 
 **Operational status at this synthesis:** W3, W4, W5 and SEC-002 contain research code on the checked repository `main`. Their existence/green tests do not close independent Gate #11, establish actual two-party consent, or authorize untrusted multi-owner deployment. Earlier "W3 next" action descriptions in sections 2/5 were **time-specific proposals** and must not override the current GitHub tree.
 
 **Proposed next evaluation:** compare role-wise mean, role-wise histogram, ECF and learned embeddings under identical holdout seeds, while preserving exact critical interactions. The new Python source is a research fixture with 0 learning loops and 0 policy training runs.
+
+## 8. October 29, 2026 — group composition as a practical integration gate
+
+The source excerpts about independent community worlds, fictional strategy games, organization genesis, world genomes and compositional mathematics are **not** separate adopted runtime specifications. Their first integration experiment is the [W3 Population Links P0](../world/W3-POPULATION-LINKS-P0.md): an owner-controlled local simulation with typed population rosters, directed link quotas and grants checked before the existing W3 reducer. It preserves the **OpenWorld** project identity, the default **cross-owner denial** and all exact/simulated provenance distinctions.
+
+Organization generation, world-genome mutation, federation, OCP/OWP protocol standardization, learned cooperative behavior and independently authenticated bilateral consent are **not implemented by this adapter**. They require distinct tasks, gates, security contracts and actual evidence; do not claim they emerge from a scripted three-group demonstration.
