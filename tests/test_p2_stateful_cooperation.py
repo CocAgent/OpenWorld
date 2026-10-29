@@ -136,6 +136,39 @@ class StatefulPopulationCooperationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             target_summary(self.genesis, GROUPS[2], "unknown")
 
+    def test_measured_three_seed_holdout_benchmark(self):
+        # Actual W3 action-dependent returns. Keep raw negative results.
+        # This is a tiny, pre-declared positive control, not MARL acceptance.
+        by_seed = []
+        for seed in (5101, 5102, 5103):
+            rows = [run_case(seed=seed, method=method, train_episodes=25,
+                             holdout_episodes=12) for method in METHODS]
+            self.assertEqual(len({r["holdout_mode_hash"] for r in rows}), 1)
+            score = {r["method"]: r["holdout_avg_reward"] for r in rows}
+            needy = rows[0]["holdout_needs_count"]
+            analytical_oracle = 1.0 - 0.25 * needy / 24
+            self.assertAlmostEqual(score["rule_transfer"], 0.75)
+            self.assertAlmostEqual(score["rule_hold"], 1.0 - needy / 24)
+            self.assertTrue(all(-0.25 <= value <= analytical_oracle + 0.001
+                                for value in score.values()))
+            by_seed.append({
+                "seed": seed,
+                "mode_hash": rows[0]["holdout_mode_hash"],
+                "oracle": analytical_oracle,
+                "methods": score,
+                "registered_agents": 30,
+                "decision_makers": 10,
+            })
+        mean_scores = {
+            method: sum(case["methods"][method] for case in by_seed)/len(by_seed)
+            for method in METHODS
+        }
+        evidence = {"schema": "openworld.p2.three-seed-holdout.v0",
+                    "cases": by_seed, "mean_holdout_reward": mean_scores,
+                    "test_claim": "scripted 2-tick synthetic W3, not general MARL"}
+        print("P2_MEASURED_HOLDOUT_JSON=" + json.dumps(evidence, sort_keys=True),
+              flush=True)
+
     def test_cli_json_smoke(self):
         script = ROOT / "benchmarks" / "p2_stateful_cooperation.py"
         process = subprocess.run(
