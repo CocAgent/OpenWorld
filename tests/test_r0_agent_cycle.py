@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import json
+import sys
 from dataclasses import replace
 from pathlib import Path
 import tempfile
 import time
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
 from openworld_superkernel.hyper_memory_p1e import HyperMemoryP1e
 from openworld_superkernel.r0_cycle import run_cycle
