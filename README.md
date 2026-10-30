@@ -10,13 +10,13 @@ OpenWorld is an independent, experimental open-source project exploring persiste
 
 ## Core components
 
-| Component | Responsibility |
-|---|---|
-| **SuperKernel** | Agent lifecycle, policy, tools, budgets, and scheduling |
-| **HyperMemory** | Exact historical evidence plus compact predictive memory |
-| **MathKernel** | Stochastic processes, Bayesian learning, predictive state, information theory |
-| **World Runtime** | Reproducible environments, event queues, sparse social interactions |
-| **Open Protocols** | Capability-based interoperability and trusted interfaces |
+| Component | Research responsibility | Actual status |
+|---|---|---|
+| **SuperKernel** | Agent lifecycle, policy, tools, budgets and scheduling | **R0 integration target**; no unified production runtime |
+| **HyperMemory** | Exact-event lane plus compact predictive memory | **Experimental** SQLite/local fixtures; provenance limits apply |
+| **MathKernel** | Finite stochastic processes and Bayesian reference models | **Implemented reference mathematics**; no novel theorem claim |
+| **World Runtime** | Reproducible event-driven environments and replay | **Implemented synthetic same-owner fixtures**; not a distributed world |
+| **Open Protocols** | Capabilities and owner-scoped interfaces | **Research-only guards**; no public MCP/A2A or production bilateral consent |
 
 An agent identity is **not** a dedicated foundation model. Agents may share inference engines while retaining separate memories, permissions, and histories.
 
