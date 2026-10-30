@@ -155,6 +155,10 @@ class R0CycleTests(unittest.TestCase):
         self.assertEqual(report["world_replay"], "PASS")
         self.assertEqual(report["owners"], 1)
         self.assertEqual(report["agents"], 2)
+        self.assertTrue(all(item["prediction_provenance"] == "INFERRED"
+                            for item in report["cycles"]))
+        self.assertTrue(all(item["world_observation_provenance"] == "SIMULATED"
+                            for item in report["cycles"]))
         self.assertEqual([item["action"] for item in report["cycles"]],
                          ["transfer", "signal", "transfer"])
         self.assertTrue(all(item["replay"] == "PASS" for item in report["cycles"]))
