@@ -6,7 +6,7 @@ This ledger is a **living summary**. It does not supersede normative ADRs in [do
 |---|---|---|---|
 | OW-D01 | Project name and repository: **OpenWorld**, `CocAgent/OpenWorld` | **Confirmed** | Public GitHub repository |
 | OW-D02 | The project is independent from AHappy | **Confirmed scope** | Owner's earlier explicit architecture choice; project documents |
-| OW-D03 | English-only public repository artifacts and one monorepo | **Accepted** | ADR-001 / ADR-002 |
+| OW-D03 | English-first public artifacts and one monorepo | **Accepted; scoped Vietnamese docs exception** | ADR-001 amended by ADR-006; ADR-002 |
 | OW-D04 | Separate agent identities from shared model weights and per-agent memory/state | **Design principle** | OpenWorld architecture, requires scaling evaluation |
 | OW-D05 | Memory uses exact evidence + predictive state + replayable generative processes | **Design principle; partial prototype** | RFC-006 + HM-P1e; exact/predictive interfaces evolving |
 | OW-D06 | A simulated or inferred memory must not masquerade as observed history | **Required safety invariant** | RFC-006 proposed; source checks exist but not production-enforced end to end |
@@ -50,3 +50,11 @@ The presence of RFCs, issue tickets, unit tests, or GitHub merges does not estab
 | OW-D21 | Separate online trusted execution from offline policy/world-genome evolution | **Proposed trust boundary** | Admission, benchmark, solvability and resource quotas; W0/W5 review |
 | OW-D22 | Treat 30-agent social-world and 40-unit tactical arena as **separate** optional experiments | **Product/research hypotheses** | [Session synthesis](SESSION-SYNTHESIS-20261028.md); no current capacity or gameplay claim |
 | OW-D23 | Build evidence-grounded, cross-world exchange only after scoped owner and federation contracts | **Deferred proposal** | W4 issue #5; no unilateral transfer of authority/resources/evidence |
+
+## October 31 integration and accessibility decisions
+
+| ID | Decision or hypothesis | State | Evidence / next action |
+|---|---|---|---|
+| OW-D24 | Prioritize R0 local integrated agent cycle, then R1 same-owner coordination, R2 measured adaptation, R3 authenticated cross-owner consent, R4 scaling | **Owner-approved planning order, not implemented** | [R0 scope/gates](../R0-INTEGRATED-AGENT-VERTICAL-SLICE.md), [roadmap](../ROADMAP.md), independent Gate #11 remains OPEN |
+| OW-D25 | Welcome criticism but decide ACCEPT / EXPERIMENT / DEFER / REJECT with evidence and explicit revisit triggers | **Accepted process** | [Review policy](../GOVERNANCE-REVIEW-POLICY.md); no automatic issue/RFC inflation |
+| OW-D26 | Add limited Vietnamese explanatory onboarding while retaining English normative artifacts | **Accepted scoped documentation exception** | ADR-006 and [docs/vi](../vi/README.md); source-link/review-date requirement |
