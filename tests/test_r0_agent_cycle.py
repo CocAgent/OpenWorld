@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 from dataclasses import replace
 from pathlib import Path
@@ -143,6 +144,21 @@ class R0CycleTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.cycle(target_id="unknown")
         self.assertEqual(self.state()["n"], 0)
+
+    def test_single_command_demo_outputs_verifiable_simulated_trace(self):
+        root = Path(__file__).resolve().parents[1]
+        completed = subprocess.run(
+            [sys.executable, str(root / "examples" / "r0_agent_cycle.py")],
+            cwd=root, capture_output=True, text=True, check=True, timeout=30,
+        )
+        report = json.loads(completed.stdout)
+        self.assertEqual(report["world_replay"], "PASS")
+        self.assertEqual(report["owners"], 1)
+        self.assertEqual(report["agents"], 2)
+        self.assertEqual([item["action"] for item in report["cycles"]],
+                         ["transfer", "signal", "transfer"])
+        self.assertTrue(all(item["replay"] == "PASS" for item in report["cycles"]))
+        self.assertIn("NOT atomic", report["limits"])
 
     def test_wrong_actor_claim_denied(self):
         with self.assertRaises(PermissionError):
