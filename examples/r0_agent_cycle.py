@@ -61,6 +61,8 @@ def main() -> None:
                     "tick": result.observation.tick,
                     "strategy": result.strategy,
                     "predictor": result.estimator,
+                    "prediction_provenance": "INFERRED",
+                    "world_observation_provenance": "SIMULATED",
                     "p_success_before_action": round(result.prediction, 4),
                     "action": result.action_kind,
                     "synthetic_feedback": outcome,
@@ -70,6 +72,7 @@ def main() -> None:
             print(json.dumps({
                 "schema": "openworld.r0.vertical-slice.demo.v0",
                 "owners": 1, "agents": 2,
+                "goal": "conditional simulated resource offer to a neighbor",
                 "cycles": cycles,
                 "final_balances": dict(state.balances),
                 "world_sha256": state.fingerprint(),
