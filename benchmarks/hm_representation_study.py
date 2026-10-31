@@ -129,7 +129,7 @@ def decisions(tape: tuple[int, ...], *, period: int = 12) -> dict:
     result = {}
     for name in POLICIES:
         model = None if name.startswith("fixed_") else make_model(name, period=period)
-        observations = offers = successes = failures = probes = 0
+        model_updates = offers = successes = failures = probes = 0
         total_reward = 0.0
         peak_loss = 0.0
         for tick, y in enumerate(tape):
@@ -152,9 +152,10 @@ def decisions(tape: tuple[int, ...], *, period: int = 12) -> dict:
                     probes += 1
                 if model is not None:
                     model.observe(tick, y)
-                    observations += 1
+                    model_updates += 1
         result[name] = {
-            "offers": offers, "observed_feedback": observations,
+            "offers": offers, "observed_feedback": offers,
+            "model_updates": model_updates,
             "successes": successes, "failures": failures, "forced_probes": probes,
             "utility": round(total_reward, 10),
             "gross_failure_exposure": round(peak_loss, 10),
