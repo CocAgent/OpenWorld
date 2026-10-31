@@ -53,10 +53,10 @@ class TestRepresentationStudy(unittest.TestCase):
         # Transition across missing t=2 MUST NOT be hallucinated.
         self.assertEqual(m.transitions[1][0], 0)
         self.assertEqual(m.transitions[1][1], 1)
-        self.assertEqual(m.transitions[0][0], 3)
+        self.assertEqual(m.transitions[0][0], 4)
         self.assertLess(m.predict(8), BetaCountsForecast(2, 7))
         # On a gap, use global marginal instead of stale last-state transition.
-        self.assertAlmostEqual(m.predict(9), (1 + 1) / (2 + 7))
+        self.assertAlmostEqual(m.predict(9), (1 + 2) / (2 + 7))
 
     def test_fourier_is_bounded_and_phase_sensitive(self):
         with self.assertRaises(ValueError):
@@ -104,10 +104,12 @@ class TestRepresentationStudy(unittest.TestCase):
         self.assertEqual(a["fixed_hold"]["observed_feedback"], 0)
         self.assertEqual(a["fixed_hold"]["utility"], 0)
         self.assertEqual(a["fixed_offer"]["offers"], len(outcomes))
-        self.assertEqual(a["fixed_offer"]["observed_feedback"], 0)
+        self.assertEqual(a["fixed_offer"]["observed_feedback"], len(outcomes))
+        self.assertEqual(a["fixed_offer"]["model_updates"], 0)
         for name in MODELS:
             d = a[name]
             self.assertEqual(d["observed_feedback"], d["offers"])
+            self.assertEqual(d["model_updates"], d["offers"])
             self.assertEqual(d["successes"] + d["failures"], d["offers"])
             self.assertLessEqual(d["forced_probes"], d["offers"])
             self.assertLessEqual(d["offers"], len(outcomes))
