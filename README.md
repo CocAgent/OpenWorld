@@ -1,18 +1,22 @@
 # OpenWorld
 
+**Documentation:** English (canonical) | [Tiếng Việt](docs/vi/README.md) · [R0 integration target](docs/R0-INTEGRATED-AGENT-VERTICAL-SLICE.md) · [Evidence-based review](docs/GOVERNANCE-REVIEW-POLICY.md)
+
+**Current priority:** Complete a reproducible, local, same-owner agent vertical slice, with honest baselines and independent validation. Existing standalone W3/HyperMemory demos are not a unified production SuperKernel.
+
 **An open ecosystem for adaptive, collaborative, and evolving AI agents.**
 
 OpenWorld is an independent, experimental open-source project exploring persistent agent identity, auditable memory, online adaptation, resource-aware reasoning, and collaboration. It is **not production ready**.
 
 ## Core components
 
-| Component | Responsibility |
-|---|---|
-| **SuperKernel** | Agent lifecycle, policy, tools, budgets, and scheduling |
-| **HyperMemory** | Exact historical evidence plus compact predictive memory |
-| **MathKernel** | Stochastic processes, Bayesian learning, predictive state, information theory |
-| **World Runtime** | Reproducible environments, event queues, sparse social interactions |
-| **Open Protocols** | Capability-based interoperability and trusted interfaces |
+| Component | Research responsibility | Actual status |
+|---|---|---|
+| **SuperKernel** | Agent lifecycle, policy, tools, budgets and scheduling | **R0 integration target**; no unified production runtime |
+| **HyperMemory** | Exact-event lane plus compact predictive memory | **Experimental** SQLite/local fixtures; provenance limits apply |
+| **MathKernel** | Finite stochastic processes and Bayesian reference models | **Implemented reference mathematics**; no novel theorem claim |
+| **World Runtime** | Reproducible event-driven environments and replay | **Implemented synthetic same-owner fixtures**; not a distributed world |
+| **Open Protocols** | Capabilities and owner-scoped interfaces | **Research-only guards**; no public MCP/A2A or production bilateral consent |
 
 An agent identity is **not** a dedicated foundation model. Agents may share inference engines while retaining separate memories, permissions, and histories.
 
@@ -24,6 +28,11 @@ Requires Python 3.11+; no GPU, model key, or paid GitHub Actions.
 python -m unittest discover -s tests -v
 python scripts/check_repository.py
 ```
+
+Existing local examples (SIMULATED, not integrated agent runtime):
+
+    python examples/world/demo.py --agents 30 --ticks 20 --seed 2026
+    python examples/populations/local_three_groups.py
 
 See [Architecture](docs/ARCHITECTURE.md), [Workstreams](docs/WORKSTREAMS.md), [Roadmap](docs/ROADMAP.md), [Research limitations](research/RESEARCH-STATUS.md), and [Contributing](CONTRIBUTING.md).
 
@@ -103,7 +112,7 @@ python -m unittest discover -s tests -p 'test_composable_world_experiment.py' -v
 
 ## Language and license
 
-English is the canonical language for code, comments, issues, RFCs and pull requests. New source and documentation are available under [Apache-2.0](LICENSE).
+English remains canonical for code, comments, issues, RFCs, pull requests and normative technical documentation; selected explanatory Vietnamese guides live in [docs/vi](docs/vi/README.md) under ADR-006. New source and documentation are available under [Apache-2.0](LICENSE).
 
 ## Project continuity and previous sessions
 

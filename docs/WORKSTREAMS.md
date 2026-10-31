@@ -1,6 +1,6 @@
 # Parallel workstreams
 
-Start as a single monorepo. Each workstream owns a bounded scope and topic branch. Shared contracts require an architecture review.
+Follow the [integration-first R0–R4 roadmap](ROADMAP.md): W0–W5 are research responsibilities, not independently shippable products. Start as a single monorepo. Each workstream owns a bounded scope and topic branch. Shared contracts require an architecture review.
 
 | Track | Prefix | Ownership | First deliverable |
 |---|---|---|---|
@@ -10,6 +10,10 @@ Start as a single monorepo. Each workstream owns a bounded scope and topic branc
 | W3 World Runtime | `feat/world-` | Deterministic simulation and sparse event routing | Replayable multi-agent fixture |
 | W4 Protocols | `feat/protocol-` | Capabilities and MCP/A2A adapters | Deny-by-default schema |
 | W5 Evaluation | `test/` | Security, adversarial and integration benchmarks | Independent reproducible test harness |
+
+## Focus / admission
+
+Until R0 is independently exercised, new work should first reduce the vertical-slice correctness, usability or evaluation gaps. Optional branches and theory work remain research, not release scope. Review external criticism using [four explicit dispositions](GOVERNANCE-REVIEW-POLICY.md) without opening a new RFC for each comment.
 
 ## Integration policy
 

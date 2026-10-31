@@ -1,42 +1,30 @@
-# OpenWorld roadmap
+# OpenWorld roadmap — integration-first (2026-10-31)
 
-## R0 — Public foundation
-- Establish a clean English monorepo and local tests.
-- Define interfaces, security boundaries, a workstream map and experimental reproducibility requirements.
-- Maintain historical research artifacts outside the public repository until explicitly reviewed.
+**Status:** Owner-approved prioritization; future milestones are gated, not promises of production releases. This file replaces the earlier milestone labels for planning only; the [unmodified historical R0–R6 plan](ROADMAP-LEGACY-20261029.md) remains available. W0–W5 are technical workstreams, **not** release stages.
 
-## R1 — HM-P1e: adaptive memory optimization
-- Select predictive adaptation only when validated benefit exceeds added cost.
-- Benchmark full-history, static, discounted, ensemble and sparse modes fairly.
-- Measure runtime WAL, fsync, disk, CPU, memory, latency and quality under regime shift.
+## R0 — One integrated agent vertical slice (current priority)
 
-## R2 — Trustworthy personal agent
-- Persistent identity, consented memory, provenance-aware recall and revocable capabilities.
-- Test realistic long-horizon tasks and cross-user isolation.
+Compose **one local, CPU-only, single-owner** Observe → Memory → Policy → Authorization → World Action → Simulated Evidence → Replay cycle with a reproducible walkthrough, negative security tests and a fixed-rule baseline. No external effects or private user data. See [the R0 specification and G1–G5 gates](R0-INTEGRATED-AGENT-VERTICAL-SLICE.md). Closing independent [Gate #11](https://github.com/CocAgent/OpenWorld/issues/11) requires evidence and a second reviewer, not just passing CI.
 
-## R3 — Social agents and interoperability
-- Sparse event graph, order guarantees, bounded agent communication and shared knowledge with explicit grants.
-- Integrate MCP/A2A only after threat modeling and compatibility testing.
+## R1 — Bounded multi-agent coordination
 
-## R4 — Distributed evaluation
-- Sharding, backups, bounded scheduling, resource budgets and total cost measurement.
-- Do not extrapolate active-agent capacity from record counts alone.
+Demonstrate several independent agents in a replayable same-owner world; constrain budgets, scheduling and action conflicts. Benchmark against simple scripted agents. No cross-owner permissions or distributed authority.
 
-## R5 — Research-aligned optional world and game tracks (proposed, not accepted release scope)
+## R2 — Learning and adaptation with measured value
 
-These proposals are drawn from the [session synthesis](project/SESSION-SYNTHESIS-20261028.md) and the [research map](research/RELATED-RESEARCH-AND-PROJECTS.md). They do not override R0–R4 or the independent W0/W1/W5 gate in [Issue #11](https://github.com/CocAgent/OpenWorld/issues/11).
+Compare memory-aware and role-shared policies with fixed hold/fixed cooperation, tabular and no-memory baselines under equal action budgets and disjoint seeds. Measure task utility minus compute, storage and resource exposure. Preserve P1–P6 negative results; do not adopt a model because its mathematics is sophisticated.
 
-1. **W3 offline world:** one authoritative simulation with typed observation/action, conflict resolution, resource conservation, complete replay inputs and explicitly `SIMULATED` evidence. Gate: unauthorized or conflicting commands never corrupt state.
-2. **Open agent and content contracts:** validate externally authored agents/world packs in a restricted, bounded execution environment. Gate: invalid and unavailable capabilities fail closed; licenses and hashes are declared. W0 reviews before freezing any OCP/OWP syntax.
-3. **Living-world research pilot (optional):** a single toy world, 3 regions, around 30 agent blueprints and 5 roles (proposal, not benchmark). Gate: ablations and holdout seeds show whether memory/institutions improve diverse behavior and user interest relative to rules-only baselines.
-4. **Tactical game pilot (separate optional product hypothesis):** 2 factions, 8 commander agents, 40 fictional units and 3 terrains (proposal only). Gate: an enjoyable complete match, reproducible replay and measured cost; do not conflate with the social pilot.
-5. **Evolution lab:** generate candidate policy/world-genome variants offline, compare quality-diversity and solvability before admission; never let agents deploy code or mutate the trusted core.
-6. **Federation (later):** start with discovering worlds and transferring compatible blueprints/content, not external world currency, authority, inventory or historical truth.
+## R3 — Authenticated cross-owner exchange
 
-**Resource decision:** local CPU and existing hardware first, no new paid GPU/server commitment. Research references are not implementation evidence or product promises.
+Require independently reviewed real identity, durable grant revocation, bilateral consent, transaction receipts, crash tests and one authoritative mutation boundary before any cross-owner W3 effect. PostgreSQL is only a research candidate for shared control-plane transactions; local SQLite memory is not automatically migrated. Issues #34, #35 and #42 are blockers, not implicit approvals.
 
-## R6 — Stratified populations and genome experiments (PROPOSED, not a product milestone)
+## R4 — Evidence-driven scale and interoperability
 
-Investigate [the W2/W3 population representation proposal](research/POPULATION-REPRESENTATION-AND-AGENT-DNA.md) as an opt-in offline branch. Compare aggregate mean, histogram, finite empirical characteristic sketch and learned embeddings on common seeds, matching inference budgets, held-out partner policies and adversarially heterogeneous populations. Typed agent-genome variation requires versioned lineage, bounded traits, admission/consent and clear separation from policy weights, identity, capabilities, immutable kernel rules and exact evidence.
+Only scale measured workloads after R0–R3 safety and utility. Introduce model/LLM adapters, MCP/A2A, sharding or federation when a concrete task and threat model require them. Report p50/p95/p99, CPU/RAM/WAL+disk, recovery cost, privacy and operating expense. No extrapolation from synthetic population counts to real active agents.
 
-Gate: demonstrable task-relative benefit over simpler baselines, reproducible state transitions and no unauthorized sharing of per-agent memory. No claims of scalable learning arise from the standalone sketch implementation or counting agent blueprints.
+## Admission and scope control
+
+- Default to **DEFER** for new RFCs, deep mathematical frameworks, federation, GPUs and agent evolution unless they unblock a failed gate; do not erase existing research.
+- Record criticism as ACCEPT / EXPERIMENT / DEFER / REJECT with evidence and review triggers per [review policy](GOVERNANCE-REVIEW-POLICY.md).
+- Distinguish **Proposed**, **Implemented**, **Independently verified** and **Production validated** for every capability.
+- Keep project independent from AHappy, in English as canonical engineering language; [Vietnamese onboarding](vi/README.md) is explanatory only.

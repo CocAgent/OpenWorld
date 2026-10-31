@@ -2,7 +2,7 @@
 
 We welcome code, proofs, reproducible benchmarks, documentation and constructive reviews.
 
-English is the canonical language. Discuss significant architectural changes in an issue first. Use a topic branch and a small PR; changes to shared interfaces need an Architecture Decision Record.
+English is the canonical engineering language. Selected **explanatory** Vietnamese onboarding pages are permitted only in [docs/vi](docs/vi/README.md) under ADR-006; normative RFCs, schemas, code, issues and PRs remain English. Review criticism via [the evidence-based dispositions](docs/GOVERNANCE-REVIEW-POLICY.md). Discuss significant architectural changes in an issue first. Use a topic branch and a small PR; changes to shared interfaces need an Architecture Decision Record.
 
 Run locally:
 
