@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -156,6 +157,8 @@ class P4LearningAblationTests(unittest.TestCase):
         self.assertEqual(data["schema"], "openworld.p4.sample-efficiency-partner-shift.v0")
         self.assertEqual(len(data["cases"]), 2)
 
+    @unittest.skipUnless(os.environ.get("OPENWORLD_SLOW_TESTS") == "1",
+                         "slow multi-seed research benchmark; set OPENWORLD_SLOW_TESTS=1")
     def test_five_seed_measured_full_matrix_no_assumed_winner(self):
         """CI produces original data, including negative outcomes, without thresholds."""
         proc = subprocess.run([
