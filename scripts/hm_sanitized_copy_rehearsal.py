@@ -39,6 +39,14 @@ class InspectionBlocked(RuntimeError):
     """Input cannot safely be assessed with the narrow supported contract."""
 
 
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def _readonly(source: Path) -> sqlite3.Connection:
     # Require a checkpointed, detached copy. Immutable SQLite does NOT read
     # external WAL and therefore must never be used on a live WAL database.
@@ -133,12 +141,15 @@ def run(*, source: Path, acknowledgment: str, mode: str = "inspect") -> dict:
     # backup to create a DETACHED, checkpointed, sanitized source first.
     if any(Path(str(source) + suffix).exists() for suffix in ("-wal", "-shm")):
         raise InspectionBlocked("WAL/SHM sidecars present; provide detached checkpointed copy")
-    original_sha = hashlib.sha256(source.read_bytes()).hexdigest()
-    with _readonly(source) as db:
+    original_sha = _file_sha256(source)
+    db = _readonly(source)
+    try:
         before, source_fingerprint = _preflight(db)
+    finally:
+        db.close()
     # The source file is never opened in read-write mode.
     if mode == "inspect":
-        if hashlib.sha256(source.read_bytes()).hexdigest() != original_sha:
+        if _file_sha256(source) != original_sha:
             raise InspectionBlocked("input file changed during inspection")
         return {
             "schema": SCHEMA, "status": "INSPECT_ONLY", "source_untouched": True,
@@ -159,9 +170,12 @@ def run(*, source: Path, acknowledgment: str, mode: str = "inspect") -> dict:
         clone = path / "detached-copy.sqlite3"
         backup = path / "preserved-legacy-backup.sqlite3"
         started = time.perf_counter()
-        with _readonly(source) as source_db:
+        source_db = _readonly(source)
+        try:
             with sqlite3.connect(clone) as clone_db:
                 source_db.backup(clone_db)
+        finally:
+            source_db.close()
         with sqlite3.connect(clone) as clone_db:
             if fingerprint(clone_db) != source_fingerprint:
                 raise InspectionBlocked("source and disposable clone mismatch")
@@ -207,7 +221,7 @@ def run(*, source: Path, acknowledgment: str, mode: str = "inspect") -> dict:
         }
     # Check source a second time AFTER all temporary clones are removed.
     results["legacy_source_unchanged"] = (
-        hashlib.sha256(source.read_bytes()).hexdigest() == original_sha)
+        _file_sha256(source) == original_sha)
     if not all(results.values()):
         raise InspectionBlocked("source or copied rows changed during rehearsal")
     return {
