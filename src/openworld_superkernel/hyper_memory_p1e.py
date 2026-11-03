@@ -28,6 +28,19 @@ class EvidenceIntegrityError(ValueError):
     """An exact ledger record's payload digest does not match."""
 
 
+class LegacyNamespaceMigrationRequired(RuntimeError):
+    """The legacy globally-unique ledger needs an operator-approved migration."""
+
+
+class UnexpectedExactEventSchema(RuntimeError):
+    """Refuse to rebuild an unknown or dependent exact-event schema."""
+
+
+_EVENT_COLUMNS = ("owner_id", "agent_id", "seq", "event_id",
+                  "provenance", "event_type", "payload", "payload_hash")
+_EVENT_COLUMNS_SQL = ",".join(_EVENT_COLUMNS)
+
+
 @dataclass(frozen=True, slots=True)
 class Observation:
     event: MemoryEvent
