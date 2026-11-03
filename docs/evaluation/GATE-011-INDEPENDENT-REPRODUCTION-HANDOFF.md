@@ -14,9 +14,12 @@ paid services or untrusted external event feeds.
 ```sh
 git clone https://github.com/CocAgent/OpenWorld.git
 cd OpenWorld
+git fetch --prune origin main
 git switch main
+git merge --ff-only origin/main
 git status --porcelain
 git rev-parse HEAD
+git rev-parse refs/remotes/origin/main
 python scripts/gate11_reproduction_bundle.py --list-only
 ```
 
@@ -28,8 +31,10 @@ python scripts/gate11_reproduction_bundle.py --expected-sha <FULL_COMMIT_SHA> --
 
 The output directory must not already exist, must be outside the repository
 and its parent must exist. The command refuses a dirty worktree,
-a detached/older checkout not identical to the local main ref,
-or SHA mismatch. It runs the **full tests** with OPENWORLD_SLOW_TESTS=1,
+a detached checkout, a local main or fetched origin/main that differs from
+the pinned SHA, or SHA mismatch. It checks the *local fetched ref*, not live
+GitHub availability: the reviewer must fetch and independently compare the
+ref's SHA to the public repository before asserting freshness. It runs the **full tests** with OPENWORLD_SLOW_TESTS=1,
 repository checks, W5 abrupt/stable/noise benchmarks from Issue #11,
 additional gradual/alternating holdout seeds, the protected five-agent
 SEC-001 replay/corruption suite, owner namespace negatives, and R0 demo.

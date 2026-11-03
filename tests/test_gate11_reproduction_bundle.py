@@ -50,14 +50,37 @@ class TestGate11EvidenceBundle(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     gate.verify_clean_pinned_main(value)
         with patch.object(gate, "_git", side_effect=[
-            PINNED_SHA, "b" * 40,
+            "main", PINNED_SHA, "b" * 40, PINNED_SHA,
         ]):
             with self.assertRaises(RuntimeError):
                 gate.verify_clean_pinned_main(PINNED_SHA)
 
+    def test_rejects_stale_remote_main_and_detached_head(self):
+        with patch.object(gate, "_git", side_effect=[
+            "main", PINNED_SHA, PINNED_SHA, "b" * 40,
+        ]):
+            with self.assertRaisesRegex(RuntimeError, "origin/main"):
+                gate.verify_clean_pinned_main(PINNED_SHA)
+        with patch.object(gate, "_git", side_effect=[
+            "HEAD", PINNED_SHA, PINNED_SHA, PINNED_SHA,
+        ]):
+            with self.assertRaisesRegex(RuntimeError, "detached"):
+                gate.verify_clean_pinned_main(PINNED_SHA)
+
+    def test_accepts_exactly_pinned_fetched_main(self):
+        with patch.object(gate, "_git", side_effect=[
+            "main", PINNED_SHA, PINNED_SHA, PINNED_SHA,
+            "", "Test main subject",
+        ]):
+            result = gate.verify_clean_pinned_main(PINNED_SHA)
+        self.assertEqual(result["head_sha"], PINNED_SHA)
+        self.assertEqual(result["origin_main_sha"], PINNED_SHA)
+        self.assertEqual(result["checked_out_branch"], "main")
+
     def test_refuses_dirty_checkout(self):
         with patch.object(gate, "_git", side_effect=[
-            PINNED_SHA, PINNED_SHA, " M tests/new.py",
+            "main", PINNED_SHA, PINNED_SHA, PINNED_SHA,
+            " M tests/new.py",
         ]):
             with self.assertRaises(RuntimeError):
                 gate.verify_clean_pinned_main(PINNED_SHA)
