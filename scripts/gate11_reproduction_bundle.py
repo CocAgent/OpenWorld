@@ -71,10 +71,15 @@ def verify_clean_pinned_main(expected_sha: str) -> dict:
     # This checks the FETCHED origin/main ref, not the live GitHub network.
     # An independent reviewer MUST first fetch origin/main and compare its
     # SHA with GitHub before claiming the review targets current merged main.
-    branch = _git("symbolic-ref", "--quiet", "--short", "HEAD")
-    head = _git("rev-parse", "HEAD")
-    main = _git("rev-parse", "refs/heads/main")
-    remote_main = _git("rev-parse", "--verify", "refs/remotes/origin/main")
+    try:
+        branch = _git("symbolic-ref", "--quiet", "--short", "HEAD")
+        head = _git("rev-parse", "HEAD")
+        main = _git("rev-parse", "refs/heads/main")
+        remote_main = _git("rev-parse", "--verify", "refs/remotes/origin/main")
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            "refuse detached checkout or missing local/origin main reference"
+        ) from exc
     if (branch != "main" or head != expected_sha or
             main != expected_sha or remote_main != expected_sha):
         raise RuntimeError(
