@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+from contextlib import closing
 import json
 from pathlib import Path
 import sqlite3
@@ -55,7 +56,7 @@ class TestSanitizedCopyInspection(unittest.TestCase):
 
     def test_rehearsal_only_mutates_temporary_clones(self):
         before = hashlib.sha256(self.source.read_bytes()).hexdigest()
-        with sqlite3.connect(self.source) as db:
+        with closing(sqlite3.connect(self.source)) as db:
             rows_before = fingerprint(db)
         report = run(source=self.source, acknowledgment=ACK, mode="rehearse")
         self.assertEqual(report["status"], "PASS_DISPOSABLE_COPY_ONLY")
@@ -65,7 +66,7 @@ class TestSanitizedCopyInspection(unittest.TestCase):
                            ["temporary_preserved_backup_total"], 0)
         self.assertGreater(report["sqlite_pages_after"]["page_count"], 0)
         self.assertEqual(hashlib.sha256(self.source.read_bytes()).hexdigest(), before)
-        with sqlite3.connect(self.source) as db:
+        with closing(sqlite3.connect(self.source)) as db:
             self.assertEqual(fingerprint(db), rows_before)
             indexes = [
                 tuple(v[2] for v in db.execute(
@@ -93,16 +94,17 @@ class TestSanitizedCopyInspection(unittest.TestCase):
             run(source=alias, acknowledgment=ACK, mode="rehearse")
 
     def test_unknown_schema_and_bad_digest_fail_closed(self):
-        with sqlite3.connect(self.source) as db:
+        with closing(sqlite3.connect(self.source)) as db:
             db.execute("CREATE INDEX extra_event_type ON exact_events(event_type)")
         with self.assertRaises(InspectionBlocked):
             run(source=self.source, acknowledgment=ACK, mode="rehearse")
-        with sqlite3.connect(self.source) as db:
+        with closing(sqlite3.connect(self.source)) as db:
             db.execute("DROP INDEX extra_event_type")
             db.execute(
                 "UPDATE exact_events SET payload=X'AA' "
                 "WHERE event_id='synthetic-event-00000000'"
             )
+            db.commit()
         with self.assertRaises(InspectionBlocked):
             run(source=self.source, acknowledgment=ACK, mode="inspect")
 
