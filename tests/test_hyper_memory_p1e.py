@@ -106,10 +106,25 @@ class HyperMemoryP1eTests(unittest.TestCase):
             self.db.get_state(owner_id="owner-a", agent_id="agent-a",
                               requester_owner_id="owner-b")
 
-    def test_cross_owner_exact_event_denied(self):
+    def test_cross_owner_exact_event_indistinguishable_from_absent(self):
         self.db.apply_batch([observation(1, protected=True)], requester_owner_id="owner-a")
-        with self.assertRaises(PermissionError):
-            self.db.exact_event("agent-a:step-1", requester_owner_id="owner-b")
+        self.assertIsNone(
+            self.db.exact_event("agent-a:step-1", requester_owner_id="owner-b"))
+        self.assertIsNone(
+            self.db.exact_event("nonexistent", requester_owner_id="owner-b"))
+
+    def test_same_event_id_in_different_owner_namespaces(self):
+        first = observation(1, owner="owner-a", protected=True)
+        second = observation(1, owner="owner-b", protected=True)
+        self.assertEqual(first.event.event_id, second.event.event_id)
+        self.db.apply_batch([first], requester_owner_id="owner-a")
+        self.db.apply_batch([second], requester_owner_id="owner-b")
+        self.assertEqual(self.db.exact_event(
+            first.event.event_id, requester_owner_id="owner-a"), first.event.payload)
+        self.assertEqual(self.db.exact_event(
+            second.event.event_id, requester_owner_id="owner-b"), second.event.payload)
+        with self.assertRaises(ValueError):
+            self.db.exact_event(first.event.event_id, requester_owner_id="")
 
     def test_corrupt_exact_payload_is_detected(self):
         self.db.apply_batch([observation(1, protected=True)], requester_owner_id="owner-a")
