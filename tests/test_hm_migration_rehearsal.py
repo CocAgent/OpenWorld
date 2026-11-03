@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import sqlite3
 from pathlib import Path
 import subprocess
 import sys
@@ -12,7 +13,8 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "benchmarks"))
-from hm_migration_rehearsal import SCHEMA, run
+from hm_migration_rehearsal import SCHEMA, run, make_legacy, fingerprint
+from openworld_superkernel.hyper_memory_p1e import (HyperMemoryP1e, LegacyNamespaceMigrationRequired)
 
 
 class SyntheticMigrationRehearsalTests(unittest.TestCase):
@@ -61,6 +63,38 @@ class SyntheticMigrationRehearsalTests(unittest.TestCase):
                                     text=True, timeout=90)
             self.assertNotEqual(denied.returncode, 0)
             self.assertEqual(target.read_bytes(), original)
+
+    def test_forced_mid_migration_failure_restores_original_legacy_table(self):
+        class FailedFingerprintMemory(HyperMemoryP1e):
+            def _event_fingerprint(self, table, *, db=None):
+                result = super()._event_fingerprint(table, db=db)
+                if table == "exact_events_namespace_v2":
+                    raise RuntimeError("synthetic fault before SQLite commit")
+                return result
+
+        with tempfile.TemporaryDirectory(prefix="openworld-midflight-") as d:
+            source = Path(d) / "legacy.sqlite3"
+            backup = Path(d) / "preserved.sqlite3"
+            make_legacy(source, events=500, owners=4,
+                        agents_per_owner=2, payload_bytes=1024)
+            with sqlite3.connect(source) as db:
+                before = fingerprint(db)
+            with self.assertRaisesRegex(RuntimeError, "synthetic fault"):
+                FailedFingerprintMemory(source, migrate_legacy=True,
+                                        legacy_backup_path=backup)
+            self.assertTrue(backup.exists())
+            with sqlite3.connect(source) as db:
+                self.assertEqual(fingerprint(db), before)
+                unique_index = [tuple(x[2] for x in db.execute(
+                    'PRAGMA index_info("' + row[1] + '")'))
+                    for row in db.execute("PRAGMA index_list('exact_events')")
+                    if row[2]]
+                self.assertIn(("event_id",), unique_index)
+                self.assertNotIn(("owner_id", "event_id"), unique_index)
+            with sqlite3.connect(backup) as db:
+                self.assertEqual(fingerprint(db), before)
+            with self.assertRaises(LegacyNamespaceMigrationRequired):
+                HyperMemoryP1e(source)
 
     @unittest.skipUnless(
         os.environ.get("OPENWORLD_SLOW_TESTS") == "1",
