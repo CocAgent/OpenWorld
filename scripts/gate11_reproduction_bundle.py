@@ -67,17 +67,26 @@ def verify_clean_pinned_main(expected_sha: str) -> dict:
     if not isinstance(expected_sha, str) or not re.fullmatch(
             r"[0-9a-f]{40}", expected_sha):
         raise ValueError("expected SHA must be an exact lowercase 40-hex commit")
+    # A local main branch at an old SHA could otherwise incorrectly pass.
+    # This checks the FETCHED origin/main ref, not the live GitHub network.
+    # An independent reviewer MUST first fetch origin/main and compare its
+    # SHA with GitHub before claiming the review targets current merged main.
+    branch = _git("symbolic-ref", "--quiet", "--short", "HEAD")
     head = _git("rev-parse", "HEAD")
     main = _git("rev-parse", "refs/heads/main")
-    if head != expected_sha or main != expected_sha:
+    remote_main = _git("rev-parse", "--verify", "refs/remotes/origin/main")
+    if (branch != "main" or head != expected_sha or
+            main != expected_sha or remote_main != expected_sha):
         raise RuntimeError(
-            "refuse unpinned/non-main or outdated worktree: "
-            "HEAD and local main must equal --expected-sha")
+            "refuse detached, outdated or unpinned tree: "
+            "local main, origin/main and HEAD must match --expected-sha")
     if _git("status", "--porcelain", "--untracked-files=all"):
         raise RuntimeError("working tree is dirty; reproduce on a clean clone")
     return {
         "head_sha": head,
         "main_sha": main,
+        "origin_main_sha": remote_main,
+        "checked_out_branch": branch,
         "git_status": "clean",
         "commit_subject": _git("show", "-s", "--format=%s", "HEAD"),
     }
