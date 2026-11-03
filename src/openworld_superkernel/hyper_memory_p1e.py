@@ -155,13 +155,14 @@ class HyperMemoryP1e:
             indexes.add(columns)
         return indexes
 
-    def _event_fingerprint(self, table: str) -> tuple[int, str]:
+    def _event_fingerprint(self, table: str, *, db: sqlite3.Connection | None = None) -> tuple[int, str]:
         """Count and full-row digest, using constant memory; compare BEFORE commit."""
         if table not in ("exact_events", "exact_events_namespace_v2"):
             raise ValueError("unknown migration table")
         sha = hashlib.sha256()
         count = 0
-        for row in self.db.execute(
+        source_db = self.db if db is None else db
+        for row in source_db.execute(
                 f"SELECT {_EVENT_COLUMNS_SQL} FROM {table} "
                 "ORDER BY owner_id,agent_id,seq"):
             if not isinstance(row[6], bytes):
@@ -248,10 +249,8 @@ class HyperMemoryP1e:
                 self.db.backup(target)
                 if target.execute("PRAGMA integrity_check").fetchone() != ("ok",):
                     raise EvidenceIntegrityError("backup SQLite integrity_check failed")
-                count = target.execute(
-                    "SELECT count(*) FROM exact_events").fetchone()[0]
-                if count != before[0]:
-                    raise EvidenceIntegrityError("backup row count mismatch")
+                if self._event_fingerprint("exact_events", db=target) != before:
+                    raise EvidenceIntegrityError("backup exact ledger differs")
         except BaseException:
             backup.unlink(missing_ok=True)
             raise
