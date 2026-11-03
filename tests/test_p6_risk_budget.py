@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -134,6 +135,8 @@ class TestRiskBudget(unittest.TestCase):
         with self.assertRaises(ValueError):
             evaluate(regimes=("hostile","hostile"))
 
+    @unittest.skipUnless(os.environ.get("OPENWORLD_SLOW_TESTS") == "1",
+                         "slow multi-seed research benchmark; set OPENWORLD_SLOW_TESTS=1")
     def test_full_ten_seed_matrix_without_claiming_policy_winner(self):
         data=evaluate()
         cases=data["cases"]

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -146,6 +147,8 @@ class P1PopulationBanditTests(unittest.TestCase):
         self.assertGreater(spectral_methods["ecf"]["holdout_action_accuracy"],
                            spectral_methods["no_summary"]["holdout_action_accuracy"] + 0.10)
 
+    @unittest.skipUnless(os.environ.get("OPENWORLD_SLOW_TESTS") == "1",
+                         "slow multi-seed research benchmark; set OPENWORLD_SLOW_TESTS=1")
     def test_three_seed_measured_learning_benchmark(self):
         # This is a bounded W5 evidence run, not a scaling or MARL claim.
         # Print a machine-readable record to the exact-head CI logs, including

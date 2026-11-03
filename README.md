@@ -25,9 +25,27 @@ An agent identity is **not** a dedicated foundation model. Agents may share infe
 Requires Python 3.11+; no GPU, model key, or paid GitHub Actions.
 
 ```bash
-python -m unittest discover -s tests -v
+python examples/r0_agent_cycle.py          # one same-owner SIMULATED agent cycle, local replay
+python -m unittest discover -s tests -v    # fast default: tests excluding three multi-seed research matrices
 python scripts/check_repository.py
 ```
+
+The **fast default** leaves three expensive multi-seed experiments out of the
+local feedback loop: P1 population learning, P4 sample efficiency, and P6 risk
+budgets. These tests report **skipped**, not PASSED. Their smaller correctness
+and security controls stay enabled.
+
+For the **full research suite** (all three matrices), use:
+
+```bash
+OPENWORLD_SLOW_TESTS=1 python -m unittest discover -s tests -v
+```
+
+On Windows PowerShell, use
+`$env:OPENWORLD_SLOW_TESTS="1"; python -m unittest discover -s tests -v`.
+GitHub CI sets `OPENWORLD_SLOW_TESTS=1` and checks R0 demo replay and
+`SIMULATED`/`INFERRED` provenance. Neither a fast PASS nor a full
+CI PASS closes independent [Gate #11](https://github.com/CocAgent/OpenWorld/issues/11).
 
 Existing local examples (SIMULATED, not integrated agent runtime):
 
