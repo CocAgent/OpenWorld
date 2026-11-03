@@ -167,6 +167,36 @@ class TestOwnerNamespaceMigration(unittest.TestCase):
             ).fetchone())
         self.assertFalse(self.backup.exists())
 
+    def test_refused_legacy_open_has_no_schema_or_journal_side_effect(self):
+        make_legacy(self.source)
+        with sqlite3.connect(self.source) as db:
+            before_schema = list(db.execute(
+                "SELECT name,sql FROM sqlite_master ORDER BY name"))
+            before_journal = db.execute("PRAGMA journal_mode").fetchone()
+        with self.assertRaises(LegacyNamespaceMigrationRequired):
+            HyperMemoryP1e(self.source)
+        with sqlite3.connect(self.source) as db:
+            self.assertEqual(list(db.execute(
+                "SELECT name,sql FROM sqlite_master ORDER BY name")), before_schema)
+            self.assertEqual(db.execute("PRAGMA journal_mode").fetchone(),
+                             before_journal)
+
+    def test_one_thousand_preserved_exact_rows_and_backup(self):
+        make_legacy(self.source, count=1000)
+        with HyperMemoryP1e(
+            self.source, migrate_legacy=True, legacy_backup_path=self.backup
+        ) as store:
+            self.assertEqual(store.db.execute(
+                "SELECT count(*) FROM exact_events").fetchone()[0], 1000)
+            self.assertEqual(store.exact_event(
+                "same:1000", requester_owner_id="owner-a"),
+                b"protected legacy event 1000")
+            self.assertEqual(store.db.execute(
+                "PRAGMA integrity_check").fetchone(), ("ok",))
+        with sqlite3.connect(self.backup) as backup:
+            self.assertEqual(backup.execute(
+                "SELECT count(*) FROM exact_events").fetchone()[0], 1000)
+
     def test_custom_trigger_refused_without_discarding_it(self):
         make_legacy(self.source, trigger=True)
         with self.assertRaises(UnexpectedExactEventSchema):

@@ -124,6 +124,17 @@ class HyperMemoryP1e:
         self.gate_penalty = gate_penalty
         self.db = sqlite3.connect(str(path), isolation_level=None, timeout=15)
         try:
+            # Check pre-existing databases BEFORE changing journal mode or
+            # creating tables. An unapproved legacy open must leave the
+            # original file untouched, including SQLite schema and journal.
+            existed = self.db.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' "
+                "AND name='exact_events'").fetchone() is not None
+            if existed:
+                self._verify_or_migrate_namespace(
+                    source_path=path, migrate_legacy=migrate_legacy,
+                    legacy_backup_path=legacy_backup_path,
+                )
             self.db.execute("PRAGMA journal_mode=WAL")
             self.db.execute("PRAGMA synchronous=FULL")
             self.db.executescript(
@@ -148,10 +159,11 @@ class HyperMemoryP1e:
                 );
                 """
             )
-            self._verify_or_migrate_namespace(
-                source_path=path, migrate_legacy=migrate_legacy,
-                legacy_backup_path=legacy_backup_path,
-            )
+            if not existed:
+                self._verify_or_migrate_namespace(
+                    source_path=path, migrate_legacy=migrate_legacy,
+                    legacy_backup_path=legacy_backup_path,
+                )
         except BaseException:
             self.db.close()
             raise
