@@ -235,6 +235,11 @@ def run(*, events: int = 20000, owners: int = 12,
             if fingerprint(store.db) != source_fp:
                 raise AssertionError("uncommitted probe changed migrated ledger")
             online_disk = disk_bytes(clone)
+            migrated_page_stats = {
+                "page_size": store.db.execute("PRAGMA page_size").fetchone()[0],
+                "page_count": store.db.execute("PRAGMA page_count").fetchone()[0],
+                "freelist_count": store.db.execute("PRAGMA freelist_count").fetchone()[0],
+            }
             store.checkpoint()
             checkpoint_disk = disk_bytes(clone)
 
@@ -274,6 +279,7 @@ def run(*, events: int = 20000, owners: int = 12,
                 "owner_namespace_isolation": True,
                 "collision_probe_transaction_rolled_back": True,
             },
+            "sqlite_pages_after_migration": migrated_page_stats,
             "disk_bytes": {
                 "source_initial": source_disk,
                 "migrated_online": online_disk,
