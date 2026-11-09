@@ -177,4 +177,4 @@ The next chapters treat query sufficiency, compression limits, revision and epis
 ### Related prior art
 
 - Green, Karvounarakis, Tannen, [Provenance Semirings, PODS 2007](https://doi.org/10.1145/1265530.1265535).
-- Bohannon, Pierce, Vaughan et al., [A Language for Bi-Directional Tree Transformations](https://www.cis.upenn.edu/~bcpierce/papers/lenses.pdf), for partial bidirectional transformation laws; no such laws are claimed here.
+- Greenwald, Moore, Pierce, Schmitt and Foster (technical report, revised 2004), [A Language for Bi-Directional Tree Transformations](https://www.cis.upenn.edu/~bcpierce/papers/lenses.pdf), for partial bidirectional transformation laws; no such laws are claimed here.
