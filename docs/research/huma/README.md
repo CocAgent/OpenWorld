@@ -20,6 +20,7 @@ The program asks whether a *typed, contextual, provenance-preserving algebra of 
 4. [04 — Symbolic case studies](04-SYMBOLIC-CASE-STUDIES.md): I Ching, stem–branch cycles and numerology, clearly separated from empirical predictions.
 5. [05 — Proof obligations and critical review](05-PROOF-OBLIGATIONS.md): established facts, proposed axioms, unproved claims, counterexamples and novelty criteria.
 6. [06 — Theory-only continuation plan](06-THEORY-ONLY-ROADMAP.md): bounded writing milestones and independent review criteria without running experiments.
+7. [07 — Typed contextual provenance calculus](07-TYPED-PROVENANCE-CALCULUS.md): syntax, typing, unverified traces, and elementary no-promotion proof sketch.
 
 ## The target structure
 
