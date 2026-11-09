@@ -1,7 +1,7 @@
 # EXPR-001 — Composable World Fixture
 
 **Status:** Experimental local example; **not** RFC-007, a stable protocol, or a ratified core API.  
-**Research home:** OpenWorld, independent of AHappy.  
+**Research home:** OpenWorld, independent of unrelated products.  
 **Related:** [RFC-007 mathematical foundations](../math/RFC-007-OPENWORLD-MATHEMATICAL-FOUNDATIONS.md), [W2 P0 gates](../math/MATHKERNEL-P0-IMPLEMENTATION-GATES.md), proposed [RFC-006 memory contracts](../rfcs/RFC-006-MEMORY-AND-AGENT-CONTRACTS.md), and [Issue #11](https://github.com/CocAgent/OpenWorld/issues/11).
 
 ## Source boundary
