@@ -1,6 +1,6 @@
 # HUMA — Hyper Universal Memory Algebra
 
-**Status:** Research-program synthesis and mathematical specification draft v0.5 (2026-11-09).  
+**Status:** Research-program synthesis and mathematical specification draft v0.6 (2026-11-09).  
 **Scope:** Documentation only, no runtime implementation, no benchmark, no holdout, no new GitHub Actions, and no production admission.  
 **Primary repository:** OpenWorld (public). Canonical normative language: English.
 
@@ -39,8 +39,20 @@ The program asks whether a *typed, contextual, provenance-preserving algebra of 
 23. [23 — Temporal authorization and future grants](23-TEMPORAL-AUTHORIZATION-AND-FUTURE-GRANTS.md): exact-memory lower bound when future grants may reveal protected content; policy rollback and declassification caveats.
 24. [24 — Fan-in provenance and withdrawal](24-FAN-IN-PROVENANCE-AND-SOURCE-WITHDRAWAL.md): global source-rename faithfulness, multi-agent alias collisions, pullback availability and onward-sharing limits.
 25. [25 — Graph-local theorem agenda and countermodels](25-GRAPH-LOCAL-THEOREM-AGENDA-AND-COUNTERMODELS.md): status ledger, open synthesis problems, explicit countermodels and privacy-first research gates.
+26. [26 — Coarsest local memory congruence](26-COARSEST-LOCAL-MEMORY-CONGRUENCE.md): a finite descending partition refinement, written optimality proof within product-local quotients and a bounded-neighborhood checking bound.
+27. [27 — Worked contract synthesis models](27-CONTRACT-SYNTHESIS-WORKED-MODELS.md): two-agent CopyX, future SwapA, attribution fan-in, future grants and coupled-state counterexamples.
+28. [28 — Positive and negative refinement certificates](28-LOCAL-CERTIFICATES-AND-REFINEMENT-TRACES.md): complete local QC/EC checks, decreasing reasons for state-pair splits and restricted optimality certificates.
+29. [29 — Reachable-state theorem frontier](29-CONTRACT-SYNTHESIS-OPEN-THEOREM-AND-REVIEW.md): precise open problem for coupled constraints, scopes, source identity and authorization with no novelty overclaim.
 
-## Theory v0.5: graph-local multi-agent memory and temporal authority
+## Theory v0.6: local contract synthesis with an explicit proof baseline
+
+Chapters 26–29 no longer merely *assume* that exact local memory interfaces are supplied. In a **finite, deterministic, full-product, fixed-contract setting**, Chapter 26 defines a descending refinement that computes the **coarsest locally admissible tuple of equivalence relations**. Chapter 28 provides a human-reviewable positive QC/EC certificate and finite negative witness chains for excluded local state pairs. Chapter 27 works through two-agent and grant/provenance examples, and Chapter 29 specifies the unresolved harder case of coupled admissibility and changing authority.
+
+The optimality result is **restricted to product-of-local quotient abstractions**, not arbitrary global encodings or deployed storage. It follows standard congruence/partition-refinement reasoning and **is not claimed to be an original theorem**. The coupled reachable-state synthesis and privacy-aware provenance problem remains open.
+
+**Review-only, not execution:** no tests, benchmarks, simulations, Python, Lean, CI, holdout, third-party confidential material or changes to runtime policy. The public documentation continues to exclude unrelated private research and product affiliations.
+
+## Theory v0.5: previous milestone
 
 Chapters 22–25 model typed **dependency hypergraphs** of multiple agents. A written finite deterministic result states that if every declared local query and event factors through authorized interface codes, then future query answers are preserved under any admitted event word. A stronger guard condition handles interface-defined cross-agent constraints. For bounded neighborhood size, verification of explicitly supplied local certificate conditions avoids enumeration of the entire global raw state space; this is a *mathematical case-count bound*, not a measured performance gain.
 
