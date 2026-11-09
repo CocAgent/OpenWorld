@@ -4,7 +4,7 @@
 
 ## Scope: an executable mathematical reference, not an agent platform
 
-Phase 1 implements pure finite-state, CPU-only, dependency-light reference functions. All new code and tests must use English. Do not connect to model APIs, personal user data, live servers, AHappy or paid CI.
+Phase 1 implements pure finite-state, CPU-only, dependency-light reference functions. All new code and tests must use English. Do not connect to model APIs, personal user data, live servers, unrelated services or paid CI.
 
 ### Deliverable A: finite controlled stochastic kernels
 

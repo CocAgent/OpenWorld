@@ -8,8 +8,8 @@
 
 | Stage from supplied material | Core proposal | Retained | Superseded, deferred or contested |
 |---|---|---|---|
-| Initial world-war concept | POSG, graph/game theory, agent roles, tactical world, user command | Partial observability, strategic multiagent tasks, game appeal | **AHappy World War** branding; concrete vehicle/weapon-control simulation; any implication that the game exists |
-| Community-built open game | Open source, local-first, World Packs, Python agents, authoritative state | No central-service dependency; executable agent adapter; self-host and modding vision | AHappy SSO/infrastructure; proposal to license new server code AGPL is **not accepted** (current repository is Apache-2.0) |
+| Initial world-war concept | POSG, graph/game theory, agent roles, tactical world, user command | Partial observability, strategic multiagent tasks, game appeal | earlier private branding; concrete vehicle/weapon-control simulation; any implication that the game exists |
+| Community-built open game | Open source, local-first, World Packs, Python agents, authoritative state | No central-service dependency; executable agent adapter; self-host and modding vision | cross-project SSO/infrastructure; proposal to license new server code AGPL is **not accepted** (current repository is Apache-2.0) |
 | Standalone OpenWorld | Name **OpenWorld**, independent identity, GitHub, CPU-first prototyping | Canonical name and clean monorepo; offline-first design | Price quotes and future hosting providers are historical estimates, **not commitments** |
 | SuperKernel and living civilization | Kernel boundaries, identity/capabilities, verified events, genome, history, social organizations, trust | Guarded action intents, evidence/provenance separation, quota checks | Full autonomous civilization, federation and self-evolution not implemented |
 | Open-ended evolution | World genomes, quality-diversity archive, POET/PAIRED-like challenges, institutions, discovery | Offline evaluation and admission gates; controlled design grammar as research proposal | Unbounded live self-modifying rules, million-LLM claims, arbitrary agent spawning |
@@ -19,7 +19,7 @@ These source sections are **historical recommendations in the attachments**. The
 
 ## 2. Current boundaries anchored in the repository
 
-- **Accepted:** OpenWorld name, independence from AHappy, English-first, single monorepo, Apache-2.0 for new repository-authored content and local-first validation.
+- **Accepted:** OpenWorld name, independence from unrelated projects, English-first, single monorepo, Apache-2.0 for new repository-authored content and local-first validation.
 - **Implemented research fixtures:** HyperMemory P1e and memory contracts; finite MathKernel experiments and standalone pure composition/resource-transfer example. Presence in `src/`, `examples/` or `tests/` is **not** a production acceptance claim.
 - **Proposed:** Exact evidence vs predictive memory, controlled stochastic agent semantics, OWP/OCP-style world/agent interface family, world genome, civilization institutions, federation, quality-diversity and discovery grammar.
 - **Deferred:** Publicly frozen cross-world protocol, untrusted mod execution, distributed world transactions, complete game client and autonomous agent evolution. A2A/MCP are optional adapters, not authoritative game-state protocols.
@@ -66,7 +66,7 @@ This diagram is **a target separation of concerns**, not a deployed architecture
 
 | Conflict in supplied sessions | Repository-aligned resolution |
 |---|---|
-| Project named AHappy World War, AHappy OpenWorld, OpenWorld, or Open Civilization Protocol | **OpenWorld** is the single confirmed project name. Game theme and OCP are separate *working* proposals; no rename, no automatic AHappy integration |
+| Multiple provisional game, product and protocol names competed with OpenWorld | **OpenWorld** is the single confirmed project name. Game themes and OCP are separate *working* proposals; no rename and no automatic cross-project integration |
 | 'Category Theory is the core' vs 'POSG is the core' vs current RFC-007's stochastic P0 | **Different layers**: category theory composes modules; stochastic kernels model transitions; POSG models strategic interaction; trusted execution enforces state/permissions |
 | Fully open mods, decentralized volunteers vs authoritative state | Local and federation may be open, while each live world chooses an authoritative state owner; untrusted code needs isolation; volunteer compute cannot grant itself capabilities |
 | Agent 'memory' and stories vs event-ledger truth | Preserve evidence provenance: observed claims require source; simulated narratives are labeled `SIMULATED`; inferences are not promoted to `VERIFIED` |
