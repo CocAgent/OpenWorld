@@ -27,4 +27,4 @@ Only scale measured workloads after R0–R3 safety and utility. Introduce model/
 - Default to **DEFER** for new RFCs, deep mathematical frameworks, federation, GPUs and agent evolution unless they unblock a failed gate; do not erase existing research.
 - Record criticism as ACCEPT / EXPERIMENT / DEFER / REJECT with evidence and review triggers per [review policy](GOVERNANCE-REVIEW-POLICY.md).
 - Distinguish **Proposed**, **Implemented**, **Independently verified** and **Production validated** for every capability.
-- Keep project independent from AHappy, in English as canonical engineering language; [Vietnamese onboarding](vi/README.md) is explanatory only.
+- Keep the project independent of unrelated external services, with English as the canonical engineering language; [Vietnamese onboarding](vi/README.md) is explanatory only.
