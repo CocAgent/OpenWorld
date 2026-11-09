@@ -1,6 +1,6 @@
 # HUMA — Hyper Universal Memory Algebra
 
-**Status:** Research-program synthesis and mathematical specification draft v0.6 (2026-11-09).  
+**Status:** Research-program synthesis and mathematical specification draft v0.7 (2026-11-09).  
 **Scope:** Documentation only, no runtime implementation, no benchmark, no holdout, no new GitHub Actions, and no production admission.  
 **Primary repository:** OpenWorld (public). Canonical normative language: English.
 
@@ -43,6 +43,15 @@ The program asks whether a *typed, contextual, provenance-preserving algebra of 
 27. [27 — Worked contract synthesis models](27-CONTRACT-SYNTHESIS-WORKED-MODELS.md): two-agent CopyX, future SwapA, attribution fan-in, future grants and coupled-state counterexamples.
 28. [28 — Positive and negative refinement certificates](28-LOCAL-CERTIFICATES-AND-REFINEMENT-TRACES.md): complete local QC/EC checks, decreasing reasons for state-pair splits and restricted optimality certificates.
 29. [29 — Reachable-state theorem frontier](29-CONTRACT-SYNTHESIS-OPEN-THEOREM-AND-REVIEW.md): precise open problem for coupled constraints, scopes, source identity and authorization with no novelty overclaim.
+30. [30 — PCMM core research thesis](30-PCMM-CORE-RESEARCH-THESIS.md): proof-carrying minimal-memory contracts, exact kernel factorization criterion, permission/provenance scope and the genuinely open graph-local synthesis problem.
+
+## Theory v0.7: recommended central research thesis — PCMM
+
+**Proof-Carrying Minimal Memory (PCMM)** is the proposed primary HUMA research direction. Rather than claiming universally compact memory, it seeks *the smallest exact state relative to explicitly declared future authorized queries and events*, with separately certified source attribution, scope and authority. Chapter 30 provides a necessary-and-sufficient factorization criterion using kernel relations and explains why the basic result is established quotient theory rather than a new discovery.
+
+The open contribution is a *constructive, locally verifiable certificate-synthesis theorem* for coupled, typed and provenance-aware multi-agent graphs with evolving permissions. No novelty, practical compression advantage or implemented security has yet been demonstrated.
+
+This is documentation only. No unrelated confidential projects or source records are introduced. GitHub-hosted experiments, benchmarks, tests, Python, Lean, simulations and CI remain **NOT RUN by design**.
 
 ## Theory v0.6: local contract synthesis with an explicit proof baseline
 
