@@ -38,7 +38,7 @@ Fixed hold is 0 in **every** regime and therefore protects the simulated finite 
 - Rewards are designed and asymmetric; returned resources produce a positive artificial net benefit. **Risk and expected utility need separate definitions for any consequential domain.**
 - A donor sees only its own successfully accepted donation/return history, not independent evidence of another agent's trustworthiness, real identity, signed intention or authorization. Probe timings could be gamed by an adaptive counterpart.
 - Registered population size, active donors and independent learned policies are different quantities. P5 has **10 active donor decision policies and scripted recipients**, not 30 learning agents.
-- GitHub Actions reports **0.94 s** of standalone benchmark wall time and **31996 KiB Linux peak process RSS** on a 4-CPU Python 3.11.17 host. This is not per-agent latency, production throughput or an AHappy/Vua Cóc deployment estimate.
+- GitHub Actions reports **0.94 s** of standalone benchmark wall time and **31996 KiB Linux peak process RSS** on a 4-CPU Python 3.11.17 host. This is not per-agent latency, production throughput or an estimate for any unrelated production deployment.
 
 ## Decision and next gate
 
