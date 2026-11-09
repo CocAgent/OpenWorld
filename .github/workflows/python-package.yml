@@ -1,25 +1,29 @@
-# Minimal, dependency-free validation for OpenWorld's supported Python.
-# This workflow is deliberately single-job to avoid redundant GitHub Actions usage.
-name: Python validation
+# Resource-freeze policy: no automatic GitHub Actions on push or PR.
+# Only a human may explicitly request this *fast, non-research* check.
+# GitHub-hosted runners still consume billable minutes if manually invoked.
+name: Python validation (manual fast only)
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      runner_ack:
+        description: "Type RUN_FAST_ONLY to acknowledge hosted runner usage"
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: openworld-manual-fast-validation
   cancel-in-progress: true
 
 jobs:
   unit-tests:
-    name: Unit tests (Python 3.11)
+    if: ${{ github.ref == 'refs/heads/main' && inputs.runner_ack == 'RUN_FAST_ONLY' }}
+    name: Opt-in fast unit tests (Python 3.11)
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -28,10 +32,10 @@ jobs:
         with:
           python-version: "3.11"
       - name: Validate Python syntax
-        run: python -m compileall -q src tests benchmarks examples
-      - name: Run all repository unit tests including research matrices
+        run: python -m compileall -q src tests examples
+      - name: Run fast correctness and security unit tests only
         env:
-          OPENWORLD_SLOW_TESTS: "1"
+          OPENWORLD_SLOW_TESTS: "0"
         run: python -m unittest discover -s tests -v
       - name: Run R0 demo and check replay, provenance and exact memory
         run: |
