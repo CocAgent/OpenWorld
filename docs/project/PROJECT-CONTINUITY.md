@@ -9,7 +9,7 @@ This document consolidates the project decisions **visible in the current OpenWo
 
 ## 1. Mission and product boundary
 
-**OpenWorld** is an independent, open-source ecosystem for adaptive, collaborative, evolving agents. It is separate from AHappy and must not reference AHappy infrastructure, user data, deployments, accounts, or repositories as dependencies. A possible future public-facing product is *OpenWorld Companion*, but product readiness is not established.
+**OpenWorld** is an independent, open-source ecosystem for adaptive, collaborative, evolving agents. It must not depend on unrelated projects' infrastructure, user data, deployments, accounts, or repositories. A possible future public-facing product is *OpenWorld Companion*, but product readiness is not established.
 
 > Many agent identities can share a small pool of inference models without storing a distinct set of foundation-model weights for every identity.
 
@@ -119,4 +119,4 @@ No claim of one-billion-active-agent capacity, production readiness, universal m
 3. Treat *discussion*, *proposed design*, *committed source*, *independently tested*, and *production deployed* as separate statuses.
 4. For new research, state a falsifiable claim, baselines, assumptions, datasets, costs and exit criteria.
 5. Never invent the contents of unavailable chat share links. Record a pending source and request an export only if needed to complete the historical record.
-6. Remain independent of AHappy and use English in committed artifacts.
+6. Remain independent of unrelated projects and use English in committed artifacts.
