@@ -16,7 +16,7 @@ Let V be a finite set of agent/context vertices. For each i in V choose:
 
 - a finite, nonempty local raw state set S_i;
 - a finite interface code set Z_i;
-- an abstraction alpha_i:S_i -> Z_i.
+- a **surjective** abstraction alpha_i:S_i -> Z_i (otherwise replace Z_i by the image of alpha_i; the theorem concerns reachable interface codes).
 
 Let S=product_(i in V) S_i, Z=product_(i in V) Z_i and alpha=product_i alpha_i. Agent identifiers and source identifiers are explicitly different sorts. Principal identity, current grants and source-availability markers can be components of local states **only when declared**; they are never inferred from a provenance polynomial.
 
