@@ -5,7 +5,7 @@ This ledger is a **living summary**. It does not supersede normative ADRs in [do
 | ID | Decision or hypothesis | State | Evidence / next action |
 |---|---|---|---|
 | OW-D01 | Project name and repository: **OpenWorld**, `CocAgent/OpenWorld` | **Confirmed** | Public GitHub repository |
-| OW-D02 | The project is independent from AHappy | **Confirmed scope** | Owner's earlier explicit architecture choice; project documents |
+| OW-D02 | The project is independent from unrelated external projects | **Confirmed scope** | Owner's earlier explicit architecture choice; project documents |
 | OW-D03 | English-first public artifacts and one monorepo | **Accepted; scoped Vietnamese docs exception** | ADR-001 amended by ADR-006; ADR-002 |
 | OW-D04 | Separate agent identities from shared model weights and per-agent memory/state | **Design principle** | OpenWorld architecture, requires scaling evaluation |
 | OW-D05 | Memory uses exact evidence + predictive state + replayable generative processes | **Design principle; partial prototype** | RFC-006 + HM-P1e; exact/predictive interfaces evolving |
