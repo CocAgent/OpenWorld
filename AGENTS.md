@@ -5,7 +5,7 @@ You contribute to **OpenWorld**. Read `README.md`, `docs/ARCHITECTURE.md`, `docs
 ## Boundaries
 
 - Use **English** for all normative public prose, issues, PRs, code comments and commit messages. Only `docs/vi/` explanatory onboarding is allowed in Vietnamese under ADR-006, with canonical English source links and review dates.
-- Work only in this repository; never edit AHappy or unrelated projects.
+- Work only in this repository; never edit unrelated projects.
 - Prioritize R0 integrated agent validation before new theory/framework work; triage critique ACCEPT / EXPERIMENT / DEFER / REJECT based on measured relevance.
 - Use feature branches and small pull requests. Do not merge to `main` without owner review.
 - Treat historical benchmarks as synthetic research evidence, not production claims.
