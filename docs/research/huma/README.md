@@ -1,6 +1,6 @@
 # HUMA — Hyper Universal Memory Algebra
 
-**Status:** Research-program synthesis and mathematical specification draft v0.3 (2026-11-09).  
+**Status:** Research-program synthesis and mathematical specification draft v0.4 (2026-11-09).  
 **Scope:** Documentation only, no runtime implementation, no benchmark, no holdout, no new GitHub Actions, and no production admission.  
 **Primary repository:** OpenWorld (public). Canonical normative language: English.
 
@@ -30,8 +30,23 @@ The program asks whether a *typed, contextual, provenance-preserving algebra of 
 14. [14 — Guarded translation non-collapse](14-GUARDED-TRANSLATION-NONCOLLAPSE.md): proof that source-distinguishable states cannot be merged by a strong observation-preserving simulation.
 15. [15 — Originality frontier](15-NOVELTY-FRONTIER-AND-THEOREM-PROGRAMME.md): explicit no-go boundaries, open research problems and critical prior-art gates.
 16. [16 — Compositional product quotient baseline](16-COMPOSITIONAL-QUOTIENT-BASELINE.md): sufficient local-interface factorization conditions, full written proof and a hidden-bit interaction counterexample.
+17. [17 — Coupled-context interface closure](17-COUPLED-CONTEXT-INTERFACE-CLOSURE.md): exact dynamic summary under local query/event interface certificates, dependent parity example, and explicit failure cases.
+18. [18 — Principal-scoped memory and noninterference](18-PRINCIPAL-SCOPED-MEMORY-AND-NONINTERFERENCE.md): how current denial differs from future-grant distinguishability, and when declared low-view factorization protects observable results.
+19. [19 — Provenance-preserving interfaces](19-PROVENANCE-PRESERVING-INTERFACES.md): exact source-renaming laws, injectivity, identity collisions and withdrawal limits.
+20. [20 — Affine interface certificate](20-AFFINE-INTERFACE-CERTIFICATE.md): matrix and kernel conditions for a coupled deterministic binary model without global raw-state enumeration.
+21. [21 — Critical review and next proofs](21-HUMA-N1-CRITICAL-REVIEW-AND-NEXT-PROOFS.md): theorem-status register, adversarial counterexamples, novelty obligations and publication boundaries.
 
-## Theory v0.3: exactly what has changed
+## Theory v0.4: coupled contexts, scope and provenance
+
+HUMA-N1 now has a **conditional coupled-context interface-closure theorem** (Chapter 17), a **principal-scoped observability/noninterference model** (Chapter 18), exact algebraic **source-renaming and attribution** propositions (Chapter 19), and a **checkable binary-affine special case** based on matrix equalities and finite-field linear algebra (Chapter 20). Chapter 21 identifies all remaining theorem and originality obligations.
+
+All results remain mathematical manuscript statements under declared assumptions; the techniques are largely known automata, simulation, semiring and linear algebra results and **are not claimed to be novel**. Formal security, human consent, privacy, semantic truth and empirical performance are not established.
+
+HUMA-N1 is still open in the general setting of arbitrary partial, nonlinear, stochastic, privacy-constrained and provenance-dependent context graphs. These chapters advance its **restricted tractable formulation**, not its general solution.
+
+**No GitHub Actions, experiments, Python, Lean, simulations, holdouts, benchmarks, private data, production changes or new runtime dependencies.**
+
+## Theory v0.3: previous milestone
 
 The v0.3 writing track advances from static memory to *dynamic behavioral memory*, where the declared future event alphabet matters for safe compression. It gives a finite-state quotient theorem, a guarded cross-context non-collapse theorem, and a product-factorization theorem under strong interface requirements. These are **established automata, simulation and quotient proof patterns applied to a candidate memory system**, not novel HUMA discoveries.
 
