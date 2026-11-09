@@ -43,9 +43,13 @@ OPENWORLD_SLOW_TESTS=1 python -m unittest discover -s tests -v
 
 On Windows PowerShell, use
 `$env:OPENWORLD_SLOW_TESTS="1"; python -m unittest discover -s tests -v`.
-GitHub CI sets `OPENWORLD_SLOW_TESTS=1` and checks R0 demo replay and
-`SIMULATED`/`INFERRED` provenance. Neither a fast PASS nor a full
-CI PASS closes independent [Gate #11](https://github.com/CocAgent/OpenWorld/issues/11).
+**Hosted research freeze (2026-11-09):** automatic GitHub Actions on push/PR
+are proposed for suspension to avoid unattended runner usage. The manual
+fast-only check requires an explicit acknowledgement; W5 PostgreSQL hosted
+research is disabled. See [execution freeze](docs/operations/RESEARCH-EXECUTION-FREEZE-20261109.md).
+Local correctness and security checks remain available. An absent CI run
+is not a PASS and does not close independent
+[Gate #11](https://github.com/CocAgent/OpenWorld/issues/11).
 
 Existing local examples (SIMULATED, not integrated agent runtime):
 
