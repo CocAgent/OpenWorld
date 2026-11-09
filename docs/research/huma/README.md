@@ -1,6 +1,6 @@
 # HUMA — Hyper Universal Memory Algebra
 
-**Status:** Research-program synthesis and mathematical specification draft v0.2 (2026-11-09).  
+**Status:** Research-program synthesis and mathematical specification draft v0.3 (2026-11-09).  
 **Scope:** Documentation only, no runtime implementation, no benchmark, no holdout, no new GitHub Actions, and no production admission.  
 **Primary repository:** OpenWorld (public). Canonical normative language: English.
 
@@ -25,6 +25,19 @@ The program asks whether a *typed, contextual, provenance-preserving algebra of 
 9. [09 — Exact memory and information bounds](09-EXACT-MEMORY-AND-INFORMATION-BOUNDS.md): impossibility of uniformly compressing all strings, exact query-sufficiency quotient theorem and mutual-information constraints.
 10. [10 — Revision, time and revocation](10-REVISION-TIME-AND-REVOCATION.md): deterministic replay, provenance availability, anti-rollback conditions and lawful deletion boundaries.
 11. [11 — Compositional research theorems](11-COMPOSITIONAL-RESEARCH-THEOREMS.md): conditional positivity preservation across contexts, counterexamples, combined safety obligations and the novelty gate.
+12. [12 — Unified contextual axioms](12-UNIFIED-CONTEXTUAL-AXIOMS.md): ten candidate axioms covering typed claims, provenance, exactness, event updates and witnessed translations.
+13. [13 — Dynamic-query memory theorem](13-DYNAMIC-QUERY-MEMORY-THEOREM.md): a complete finite-state behavioral quotient proof, minimal exact-state bound and future-update counterexamples.
+14. [14 — Guarded translation non-collapse](14-GUARDED-TRANSLATION-NONCOLLAPSE.md): proof that source-distinguishable states cannot be merged by a strong observation-preserving simulation.
+15. [15 — Originality frontier](15-NOVELTY-FRONTIER-AND-THEOREM-PROGRAMME.md): explicit no-go boundaries, open research problems and critical prior-art gates.
+16. [16 — Compositional product quotient baseline](16-COMPOSITIONAL-QUOTIENT-BASELINE.md): sufficient local-interface factorization conditions, full written proof and a hidden-bit interaction counterexample.
+
+## Theory v0.3: exactly what has changed
+
+The v0.3 writing track advances from static memory to *dynamic behavioral memory*, where the declared future event alphabet matters for safe compression. It gives a finite-state quotient theorem, a guarded cross-context non-collapse theorem, and a product-factorization theorem under strong interface requirements. These are **established automata, simulation and quotient proof patterns applied to a candidate memory system**, not novel HUMA discoveries.
+
+**Open HUMA-N1:** determine nontrivial and efficiently checkable interface certificates that let a graph of partial context transformations compose without losing future authorized query or source-provenance distinctions. HUMA-N2 concerns scoped provenance and erasure-aware authority. Neither problem is solved by these chapters.
+
+This is a *writing-only manuscript addition*. GitHub CI, benchmark matrices, Python, Lean, simulation, holdout selection and private evidence transfer remain **NOT RUN**.
 
 ## What the new mathematical chapters establish (and do not)
 
