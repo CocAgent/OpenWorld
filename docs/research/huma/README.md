@@ -1,6 +1,6 @@
 # HUMA — Hyper Universal Memory Algebra
 
-**Status:** Research-program synthesis and mathematical specification draft v0.1 (2026-11-09).  
+**Status:** Research-program synthesis and mathematical specification draft v0.2 (2026-11-09).  
 **Scope:** Documentation only, no runtime implementation, no benchmark, no holdout, no new GitHub Actions, and no production admission.  
 **Primary repository:** OpenWorld (public). Canonical normative language: English.
 
@@ -21,6 +21,18 @@ The program asks whether a *typed, contextual, provenance-preserving algebra of 
 5. [05 — Proof obligations and critical review](05-PROOF-OBLIGATIONS.md): established facts, proposed axioms, unproved claims, counterexamples and novelty criteria.
 6. [06 — Theory-only continuation plan](06-THEORY-ONLY-ROADMAP.md): bounded writing milestones and independent review criteria without running experiments.
 7. [07 — Typed contextual provenance calculus](07-TYPED-PROVENANCE-CALCULUS.md): syntax, typing, unverified traces, and elementary no-promotion proof sketch.
+8. [08 — Typed syntax and denotational semantics](08-TYPED-SYNTAX-AND-DENOTATIONAL-SEMANTICS.md): precise formation rules, source valuations, witnessed context translations, conditional coherence and trace/proof separation.
+9. [09 — Exact memory and information bounds](09-EXACT-MEMORY-AND-INFORMATION-BOUNDS.md): impossibility of uniformly compressing all strings, exact query-sufficiency quotient theorem and mutual-information constraints.
+10. [10 — Revision, time and revocation](10-REVISION-TIME-AND-REVOCATION.md): deterministic replay, provenance availability, anti-rollback conditions and lawful deletion boundaries.
+11. [11 — Compositional research theorems](11-COMPOSITIONAL-RESEARCH-THEOREMS.md): conditional positivity preservation across contexts, counterexamples, combined safety obligations and the novelty gate.
+
+## What the new mathematical chapters establish (and do not)
+
+- **Proved in finite abstract models, by written arguments:** lossless encoding cannot strictly compress every fixed-length source; an exact summary for a query family must distinguish its query-equivalence classes; a well-formed provenance polynomial's availability semantics respects admissible source substitutions; a trace-only calculus does not introduce a formal proof term.
+- **Conditional, not deployed security:** rollback-safe revocation relies on a separately current authoritative policy history.
+- **Not shown:** novel HUMA theorem, validated cross-context semantic equivalence, empirical prediction of events from traditional symbols, effective compression of real agent histories, authenticated source evidence, verified Lean proofs or production safety.
+
+No test, benchmark, holdout, code generation, simulation or hosted CI is part of this manuscript update. The [OpenWorld hosted-workflow freeze](../../operations/RESEARCH-EXECUTION-FREEZE-20261109.md) remains in force.
 
 ## The target structure
 
