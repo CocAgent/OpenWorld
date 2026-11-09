@@ -1,6 +1,6 @@
 # HUMA — Hyper Universal Memory Algebra
 
-**Status:** Research-program synthesis and mathematical specification draft v0.4 (2026-11-09).  
+**Status:** Research-program synthesis and mathematical specification draft v0.5 (2026-11-09).  
 **Scope:** Documentation only, no runtime implementation, no benchmark, no holdout, no new GitHub Actions, and no production admission.  
 **Primary repository:** OpenWorld (public). Canonical normative language: English.
 
@@ -35,8 +35,24 @@ The program asks whether a *typed, contextual, provenance-preserving algebra of 
 19. [19 — Provenance-preserving interfaces](19-PROVENANCE-PRESERVING-INTERFACES.md): exact source-renaming laws, injectivity, identity collisions and withdrawal limits.
 20. [20 — Affine interface certificate](20-AFFINE-INTERFACE-CERTIFICATE.md): matrix and kernel conditions for a coupled deterministic binary model without global raw-state enumeration.
 21. [21 — Critical review and next proofs](21-HUMA-N1-CRITICAL-REVIEW-AND-NEXT-PROOFS.md): theorem-status register, adversarial counterexamples, novelty obligations and publication boundaries.
+22. [22 — Graph-local multi-agent certificate](22-GRAPH-LOCAL-MULTIAGENT-CERTIFICATE.md): conditional future-query preservation on dependency hypergraphs, interface-local constraints and bounded-neighborhood certificate verification.
+23. [23 — Temporal authorization and future grants](23-TEMPORAL-AUTHORIZATION-AND-FUTURE-GRANTS.md): exact-memory lower bound when future grants may reveal protected content; policy rollback and declassification caveats.
+24. [24 — Fan-in provenance and withdrawal](24-FAN-IN-PROVENANCE-AND-SOURCE-WITHDRAWAL.md): global source-rename faithfulness, multi-agent alias collisions, pullback availability and onward-sharing limits.
+25. [25 — Graph-local theorem agenda and countermodels](25-GRAPH-LOCAL-THEOREM-AGENDA-AND-COUNTERMODELS.md): status ledger, open synthesis problems, explicit countermodels and privacy-first research gates.
 
-## Theory v0.4: coupled contexts, scope and provenance
+## Theory v0.5: graph-local multi-agent memory and temporal authority
+
+Chapters 22–25 model typed **dependency hypergraphs** of multiple agents. A written finite deterministic result states that if every declared local query and event factors through authorized interface codes, then future query answers are preserved under any admitted event word. A stronger guard condition handles interface-defined cross-agent constraints. For bounded neighborhood size, verification of explicitly supplied local certificate conditions avoids enumeration of the entire global raw state space; this is a *mathematical case-count bound*, not a measured performance gain.
+
+Future grant and revocation events are modeled separately from source-lineage support. An exact future read can force the *internal combined state* to retain distinctions currently hidden from an agent. Attributing sources across fan-in requires a globally faithful rename on the distinctions promised by the authorized query contract, not just an injective rename per sender.
+
+**Scientific status:** the results apply known finite-state simulation, quotient, information-flow and provenance semiring reasoning. They are **not presented as a newly discovered HUMA theorem or deployed security control**. The open problem is useful certificate *synthesis*, under partial updates, time-changing authority and exact permitted attribution.
+
+**Privacy:** no unrelated private-project references, sensitive evidence records, user identities, actual access tokens or externally private research work are imported.
+
+**Resource freeze:** Markdown editing only; experiments, CI, simulations, benchmarks, Python, Lean, holdouts and hosted runners remain **NOT RUN**.
+
+## Theory v0.4: previous milestone
 
 HUMA-N1 now has a **conditional coupled-context interface-closure theorem** (Chapter 17), a **principal-scoped observability/noninterference model** (Chapter 18), exact algebraic **source-renaming and attribution** propositions (Chapter 19), and a **checkable binary-affine special case** based on matrix equalities and finite-field linear algebra (Chapter 20). Chapter 21 identifies all remaining theorem and originality obligations.
 
