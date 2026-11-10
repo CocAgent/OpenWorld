@@ -1,6 +1,6 @@
 # HUMA — Hyper Universal Memory Algebra
 
-**Status:** Research-program synthesis and mathematical specification draft v0.7 (2026-11-09).  
+**Status:** Research-program synthesis and mathematical specification draft v0.8 (2026-11-09).  
 **Scope:** Documentation only, no runtime implementation, no benchmark, no holdout, no new GitHub Actions, and no production admission.  
 **Primary repository:** OpenWorld (public). Canonical normative language: English.
 
@@ -44,8 +44,25 @@ The program asks whether a *typed, contextual, provenance-preserving algebra of 
 28. [28 — Positive and negative refinement certificates](28-LOCAL-CERTIFICATES-AND-REFINEMENT-TRACES.md): complete local QC/EC checks, decreasing reasons for state-pair splits and restricted optimality certificates.
 29. [29 — Reachable-state theorem frontier](29-CONTRACT-SYNTHESIS-OPEN-THEOREM-AND-REVIEW.md): precise open problem for coupled constraints, scopes, source identity and authorization with no novelty overclaim.
 30. [30 — PCMM core research thesis](30-PCMM-CORE-RESEARCH-THESIS.md): proof-carrying minimal-memory contracts, exact kernel factorization criterion, permission/provenance scope and the genuinely open graph-local synthesis problem.
+31. [31 — PCMM-A coupled-state certification](31-PCMM-A-COUPLED-STATE-CERTIFICATION.md): necessary-and-sufficient exactness via unsatisfiable state-closure, query and event witness CSPs, with an explicit augmented-treewidth qualification.
+32. [32 — PCMM-B scoped provenance and authority](32-PCMM-B-SCOPED-PROVENANCE-AND-AUTHORITY.md): separated source lineage, permitted observations, future grants, revocation, erasure and coalition-view risk.
+33. [33 — PCMM-C finite-grammar synthesis](33-PCMM-C-DECIDABLE-SYNTHESIS-AND-LOWER-BOUNDS.md): exhaustive minimum-cost candidate search under a finite grammar, complexity factors and counterexample to naive refinement monotonicity.
+34. [34 — PCMM theorem audit and next research gates](34-PCMM-THEOREM-REVIEW-AND-RESEARCH-GATES.md): theorem-status ledger, adversarial countermodels, exact novelty frontier and independent review gate.
 
-## Theory v0.7: recommended central research thesis — PCMM
+## Theory v0.8: PCMM-A/B/C as a restricted mathematical program
+
+The primary PCMM thesis is developed in Chapters 31–34:
+
+- **PCMM-A** provides a necessary-and-sufficient criterion for checking a *given* abstraction on **admissible coupled states** using exact finite-domain counterexample CSPs; tractability depends on the width of the **augmented witness CSP**, not just the original agent graph.
+- **PCMM-B** records provenance, source identity, principal-specific authorized observations, future grants and erasure as different contracts; observational agreement with a raw policy **does not prove the policy itself is secure**.
+- **PCMM-C** proves exhaustive minimum-cost interface selection **within an explicitly finite candidate grammar**, with candidate search cost potentially exponential in the number of agents. It includes a counterexample showing arbitrary refinement of an exact interface may break update compatibility.
+- **Chapter 34** collects mathematical status, adversarial cases and the still-open *nontrivial compositional synthesis* problem.
+
+The propositions and proofs are **written conditional mathematics grounded in established quotient, CSP, provenance and information-flow work**. They have not undergone independent verification, and no original HUMA theorem, deployed security result or measured compression advantage is asserted.
+
+**Strict privacy and resource controls:** Public abstract mathematical examples only, no unrelated private project labels, personal data, raw research evidence or private repo transfer. No tests, Python, Lean, experimental runs, simulations, benchmarks, holdout work or hosted CI are invoked.
+
+## Theory v0.7: previous milestone
 
 **Proof-Carrying Minimal Memory (PCMM)** is the proposed primary HUMA research direction. Rather than claiming universally compact memory, it seeks *the smallest exact state relative to explicitly declared future authorized queries and events*, with separately certified source attribution, scope and authority. Chapter 30 provides a necessary-and-sufficient factorization criterion using kernel relations and explains why the basic result is established quotient theory rather than a new discovery.
 
