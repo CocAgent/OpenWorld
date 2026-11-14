@@ -14,6 +14,12 @@
 - Persistent identity, consented memory, provenance-aware recall and revocable capabilities.
 - Test realistic long-horizon tasks and cross-user isolation.
 
+Local research slice (2026-11-14): [durable two-agent receipts and memory](experiments/DURABLE-TWO-AGENT-RECEIPTS.md)
+connects the existing W3 lab to per-agent HyperMemory, with partner-derived
+feedback and round-level recovery of reservations and delayed notices. This
+bounded same-owner example is partial R2/R3 research, not completion of the
+personal-agent, cross-user isolation or production reliability gates.
+
 ## R3 — Social agents and interoperability
 - Sparse event graph, order guarantees, bounded agent communication and shared knowledge with explicit grants.
 - Integrate MCP/A2A only after threat modeling and compatibility testing.

@@ -44,7 +44,7 @@ def main():
     source_files = ["examples/durable_two_agents.py", "examples/persistent_agents.py", "examples/two_agents.py",
                     "tests/test_durable_two_agents.py", "scripts/validate_durable_two_agents.py",
                     "docs/experiments/DURABLE-TWO-AGENT-RECEIPTS.md", "README.md",
-                    "docs/project/EXECUTION-HANDOFF.md"]
+                    "docs/project/EXECUTION-HANDOFF.md", "docs/ROADMAP.md"]
     source_files += [str(p.relative_to(ROOT)).replace("\\", "/") for p in sorted((ROOT/"src").rglob("*.py"))]
     commit = subprocess.run(["git", "-c", f"safe.directory={ROOT.as_posix()}", "rev-parse", "HEAD"],
                             cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
@@ -55,6 +55,7 @@ def main():
               "source_sha256": {name: sha256((ROOT/name).read_bytes()).hexdigest() for name in source_files},
               "checks": checks,
               "initial_test_finding": "Initial authored 13-test run had one history-comparison failure: live tuples versus CLI JSON lists. Round records now normalize to JSON types; no persistent world or memory mismatch was found.",
+              "harness_portability_fix": "The first full validation passed every check, then failed printing the accented repository path on a cp1252 console. The completion message now uses ASCII; this report is from the subsequent complete validation invocation.",
               "limits": ["Synthetic, same-owner, bounded 20-round lab; no LLM, user data or outside effects.",
                          "Journal and memory commit separately; process-exit tests are not physical power-loss certification.",
                          "No policy-superiority, storage-performance, shared-contract or production acceptance claim."]}
@@ -94,7 +95,7 @@ def main():
     finally:
         report["artifact_sha256"] = {check["log"]: sha256((args.out/check["log"]).read_bytes()).hexdigest() for check in checks}
         (args.out/"validation.json").write_text(json.dumps(report, indent=2, sort_keys=True)+"\n", encoding="utf-8")
-    print(f"PASS: local validation evidence written to {args.out}")
+    print("PASS: local validation completed; see validation.json in the output directory")
 
 
 if __name__ == "__main__":
