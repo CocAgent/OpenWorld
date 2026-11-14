@@ -85,6 +85,20 @@ memory, then replays any committed records whose memory update was interrupted.
 Feedback is the fixed lab sequence `0, 1, 1`, not an independent partner response
 or an LLM output. See [design, restart behavior and limitations](docs/experiments/PERSISTENT-AGENT-SIMULATION.md).
 
+The next integration, [durable two-agent receipts](examples/durable_two_agents.py),
+uses B's actual scripted return/keep decisions. It persists complete rounds,
+risk reservations, receipts, delayed notifications and each agent's own memory.
+A's saved return estimate can gate its next gift; the hard risk cap still applies.
+
+```bash
+python examples/durable_two_agents.py --db data/pair.sqlite3 --rounds 3
+python examples/durable_two_agents.py --db data/pair.sqlite3 --rounds 3
+python examples/durable_two_agents.py --db data/pair.sqlite3 --status --history
+```
+
+This bounded same-owner simulation commits the round journal before its
+recoverable memory projection. See [failure boundaries, controls and verification](docs/experiments/DURABLE-TWO-AGENT-RECEIPTS.md).
+
 ## Dự án đã có những gì?
 
 | Thành phần | Phần đã triển khai để nghiên cứu | Mục tiêu dài hạn |

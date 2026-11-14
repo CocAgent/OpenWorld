@@ -1,5 +1,10 @@
 # OpenWorld Execution Handoff — Starting Point for Parallel Agent Work
 
+**2026-11-14 example integration:** [durable two-agent receipts and memory](../experiments/DURABLE-TWO-AGENT-RECEIPTS.md)
+continues the existing persistent lab with partner-derived feedback, durable
+risk reservations and a recoverable per-agent memory projection. This bounded
+local example does not close upstream acceptance or production security gates.
+
 **Current continuation:** read the [2026-11-04 fork snapshot](RESEARCH-SNAPSHOT-20261104.md)
 before using the historical starting point below. It records fresh local
 validation and P7 outcomes without closing upstream review or security gates.
