@@ -1,0 +1,69 @@
+{
+  "balances": {
+    "alice": 3,
+    "bob": 3
+  },
+  "database": "TEMPORARY_SYNTHETIC_EVIDENCE/demo.sqlite3",
+  "exact_events": 3,
+  "limits": "Scripted same-owner lab feedback; journal and memory projection use separate transactions. Recovery is from exact journal records, not inferred history. No outside actions, authenticated identity or production power-loss certification.",
+  "memory": {
+    "alice": {
+      "estimator": "static",
+      "observations": 2,
+      "prediction": 0.5,
+      "prediction_provenance": "INFERRED",
+      "sequence": 2,
+      "successes": 1
+    },
+    "bob": {
+      "estimator": "static",
+      "observations": 1,
+      "prediction": 0.6666666666666666,
+      "prediction_provenance": "INFERRED",
+      "sequence": 1,
+      "successes": 1
+    }
+  },
+  "new_cycles": [
+    {
+      "action": "transfer",
+      "actor": "alice",
+      "amount": 1,
+      "memory_event_id": "persistent-feedback-0-alice",
+      "prediction_before": 0.5,
+      "provenance": "SIMULATED",
+      "synthetic_feedback": 0,
+      "target": "bob",
+      "tick": 0
+    },
+    {
+      "action": "transfer",
+      "actor": "bob",
+      "amount": 1,
+      "memory_event_id": "persistent-feedback-1-bob",
+      "prediction_before": 0.5,
+      "provenance": "SIMULATED",
+      "synthetic_feedback": 1,
+      "target": "alice",
+      "tick": 1
+    },
+    {
+      "action": "signal",
+      "actor": "alice",
+      "amount": 0,
+      "memory_event_id": "persistent-feedback-2-alice",
+      "prediction_before": 0.3333333333333333,
+      "provenance": "SIMULATED",
+      "synthetic_feedback": 1,
+      "target": "bob",
+      "tick": 2
+    }
+  ],
+  "provenance": "SIMULATED",
+  "recovered_memory_events": 0,
+  "resumed_from_tick": 0,
+  "schema": "openworld.persistent-agent-demo.v1",
+  "tick": 3,
+  "world_replay": "PASS",
+  "world_sha256": "c1fe9800e2f055e61cca97a7876d145c5062b618f34e2c67e1abc8db318234d4"
+}

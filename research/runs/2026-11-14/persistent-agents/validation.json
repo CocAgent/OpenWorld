@@ -1,0 +1,89 @@
+{
+  "source_commit": "9ebdc8aac78de7c808787242ef9b43261015d5ca",
+  "base_commit": "385ecb2949eeab939f6b272a5a999fa693e4510b",
+  "environment": {
+    "python": "3.14.7 (main, Aug  8 2026, 21:15:19)  [MINGW GCC UCRT 16.2.0 64 bit (AMD64)]",
+    "sqlite": "3.53.4",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "source_sha256": {
+    "examples/persistent_agents.py": "05e5fec61dfe33e853bf021e241354e190c517afec30d0348e45ff3cfe82ed6b",
+    "tests/test_persistent_agents.py": "c92ad1fd39159257385e49bb0396a3fd0ed8b6f8966f9384cfcd0b5a1687bdf1",
+    "docs/experiments/PERSISTENT-AGENT-SIMULATION.md": "309638dc7a914e0651e81fb5d8cc502d944446825e838f7f23fae2eed88f9fe6",
+    "README.md": "1f143f70a2c057b36872973466f787cebf0f5f6e7fb7b99fd90a4f2f0df9ff0e",
+    ".gitignore": "1329f29a677c0c39a8e4f61cc65420793bc5bb634092cf56938e106ae2bde833"
+  },
+  "checks": [
+    {
+      "command": "python -m unittest discover -s tests -v",
+      "exit_code": 0,
+      "run": 486,
+      "skipped": 6,
+      "expected_failures": 2,
+      "unexpected_failures": 0,
+      "persistent_tests_in_suite": 14,
+      "seconds": 121.501,
+      "log": "full-tests.log"
+    },
+    {
+      "command": "python -m unittest discover -s tests -p test_persistent_agents.py -v",
+      "exit_code": 0,
+      "run": 12,
+      "note": "Initial smoke before two additional restart tests; current 14 tests all passed in the full suite.",
+      "log": "targeted-tests.log"
+    },
+    {
+      "command": "python scripts/check_repository.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python -m py_compile examples/persistent_agents.py tests/test_persistent_agents.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "local Markdown link verification",
+      "exit_code": 0
+    }
+  ],
+  "restart_evidence": {
+    "commands": [
+      "python examples/persistent_agents.py --db TEMPORARY_SYNTHETIC_EVIDENCE/demo.sqlite3 --steps 3",
+      "python examples/persistent_agents.py --db TEMPORARY_SYNTHETIC_EVIDENCE/demo.sqlite3 --steps 3",
+      "python examples/persistent_agents.py --db TEMPORARY_SYNTHETIC_EVIDENCE/demo.sqlite3 --status",
+      "python examples/persistent_agents.py --db TEMPORARY_SYNTHETIC_EVIDENCE/demo.sqlite3 --status --history"
+    ],
+    "ticks": [
+      3,
+      6,
+      6,
+      6
+    ],
+    "exact_events": [
+      3,
+      6,
+      6,
+      6
+    ],
+    "same_memory_on_status": true,
+    "note": "Commands used a temporary synthetic DB. Only the output database path was normalized in the JSON evidence; no user DB was opened."
+  },
+  "limits": [
+    "Synthetic same-owner scripted feedback; no LLM or real-world observations.",
+    "Journal and HyperMemory projection use separate transactions, with replay-based catch-up.",
+    "Process-exit tests are not physical power-loss or disk-full certification.",
+    "No shared runtime API changed and no production/independent acceptance gate closed."
+  ],
+  "artifact_sha256": {
+    "full-tests.log": "d2aacf0e00acd6dda927a95ff8670f9de0b612643c20a84bacaf7ef40828a22e",
+    "persistent-tests-extract.log": "5c3f54721f0dd7a15abfeeae4f8b1148cf7c82a7204af7d848496675b3e75a71",
+    "restart-1.json": "4472cbe0c0064175e75ce0f5de472d62ac867b11cd61c20b6270007580d07f76",
+    "restart-2.json": "348a3ab24a9e8668db47a4cd557e1e10c9ba683a7152decad6ac5c2a41119a07",
+    "restart-3.json": "6ae73e993e0f04faccba8cf9cea836f9ebbfe1d407a591bafd2c2f528e7bd40a",
+    "restart-4.json": "15cf257c5a189ccb90006843533af51fd9942606349f6107aa25ac00f6261032",
+    "targeted-tests.log": "2786bf869d329938305cea3fb7757d444f6590211ed90a1f0e226632ec9cd426"
+  }
+}

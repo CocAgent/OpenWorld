@@ -1,0 +1,35 @@
+{
+  "balances": {
+    "alice": 4,
+    "bob": 2
+  },
+  "database": "TEMPORARY_SYNTHETIC_EVIDENCE/demo.sqlite3",
+  "exact_events": 6,
+  "limits": "Scripted same-owner lab feedback; journal and memory projection use separate transactions. Recovery is from exact journal records, not inferred history. No outside actions, authenticated identity or production power-loss certification.",
+  "memory": {
+    "alice": {
+      "estimator": "static",
+      "observations": 3,
+      "prediction": 0.6,
+      "prediction_provenance": "INFERRED",
+      "sequence": 3,
+      "successes": 2
+    },
+    "bob": {
+      "estimator": "static",
+      "observations": 3,
+      "prediction": 0.6,
+      "prediction_provenance": "INFERRED",
+      "sequence": 3,
+      "successes": 2
+    }
+  },
+  "new_cycles": [],
+  "provenance": "SIMULATED",
+  "recovered_memory_events": 0,
+  "resumed_from_tick": 6,
+  "schema": "openworld.persistent-agent-demo.v1",
+  "tick": 6,
+  "world_replay": "PASS",
+  "world_sha256": "ac8476e2a6acec7da2759bcecad2cc3470430119886abdba89a7e15278fe5261"
+}
