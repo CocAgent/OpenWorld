@@ -1,0 +1,74 @@
+{
+  "actual_loss": 0,
+  "balances": {
+    "A": 8,
+    "B": 0
+  },
+  "budget": {
+    "blocked": 12,
+    "exposure": 4,
+    "known_loss": 0,
+    "observed": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "peak_exposure": 4,
+    "pending": [
+      1,
+      3,
+      5,
+      7
+    ],
+    "recent": [
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "channel": [],
+  "database": "C:\\Users\\sunyn\\AppData\\Local\\Packages\\OpenAI.Codex_2p2nqsd0c76g0\\AC\\#!sandbox.{59342858-082e-4f80-b8b0-f166a6637d21}\\Temp\\tmpjxzkje1a\\cooperative-notifications.sqlite3",
+  "duplicates_ignored": 0,
+  "exact_events": 24,
+  "memory": {
+    "A": {
+      "estimator": "static",
+      "observations": 4,
+      "prediction": 0.8333333333333334,
+      "prediction_provenance": "INFERRED",
+      "sequence": 4,
+      "successes": 4
+    },
+    "B": {
+      "estimator": "fast",
+      "observations": 20,
+      "prediction": 0.2091439235241326,
+      "prediction_provenance": "INFERRED",
+      "sequence": 20,
+      "successes": 8
+    }
+  },
+  "observations": 4,
+  "peak_actual_exposure": 1,
+  "provenance": "SIMULATED",
+  "reconciled": 0,
+  "recovered_memory_events": 0,
+  "replay_verified": true,
+  "resumed_from_round": 0,
+  "returned": 8,
+  "round": 20,
+  "schema": "openworld.durable-two-agents.v1",
+  "sent": 8,
+  "settings": {
+    "delay": 1,
+    "drop_every": 2,
+    "mode": "notifications",
+    "policy": "memory",
+    "recover_at": 10,
+    "scenario": "cooperative",
+    "seed": 2026
+  },
+  "world_sha256": "8fbc1af0633526f8b93f2f6d335a0aacef44ca26d03357837908eb8cf6c9f5f3"
+}

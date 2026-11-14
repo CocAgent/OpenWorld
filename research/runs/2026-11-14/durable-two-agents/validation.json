@@ -1,0 +1,274 @@
+{
+  "artifact_sha256": {
+    "cooperative-notifications.json": "f143fc8e4e00f83afb15324f6d9c6f53d74fedeed3ab952c82f00022795b74f1",
+    "cooperative-reconcile.json": "fadbcf85fcc25043fb2eaadb6cf26e5394e91cccd5782ae7ceefa9ae9eae1674",
+    "diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "full-tests.log": "e335929ef8f6b06a45739a844c2194a3eaea00b7a823df70f4b7c055e512ee33",
+    "hostile-control.json": "b61a85460f1be9e1dbf5ae8b6560c0a04ce700880ceb2ea887b6d266390b5831",
+    "hostile-memory.json": "db98291a518c01c3e2191752f8a69bbe2f1b7e2ab3f11c151fc506f800984197",
+    "repository-check.log": "967f01231873cbf4bce5476a0d2121efce7c42629603f6271d4c250bf886d44e",
+    "restart-1.json": "474e44c7c5636b8438b5c672b739dbde2b05ddd60460d6c031c171334c822507",
+    "restart-2.json": "91a56eef3eb318dad9873adc67e2e59ffdd72ac13b4f790d52fbffc3b1bfd22a",
+    "restart-status.json": "90172e8cfc112abefc1537c1a0de06bf539fa41e82f97808c69fc65891bfa4d4",
+    "syntax-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "targeted-tests.log": "a16829b6096ddb00f869985521b6e2d3dfb00c8d6dac03054a8354540d645ae2"
+  },
+  "checks": [
+    {
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_durable_two_agents.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "targeted-tests.log",
+      "seconds": 7.96
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "full-tests.log",
+      "seconds": 138.779
+    },
+    {
+      "command": [
+        "python",
+        "scripts/check_repository.py"
+      ],
+      "exit_code": 0,
+      "log": "repository-check.log",
+      "seconds": 0.101
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "py_compile",
+        "examples/durable_two_agents.py",
+        "tests/test_durable_two_agents.py",
+        "scripts/validate_durable_two_agents.py"
+      ],
+      "exit_code": 0,
+      "log": "syntax-check.log",
+      "seconds": 0.203
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "safe.directory=C:/Users/sunyn/OneDrive/Ta\u0300i li\u00ea\u0323u/ChatGPT/OpenWorld",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "diff-check.log",
+      "seconds": 0.091
+    },
+    {
+      "command": [
+        "python",
+        "examples/durable_two_agents.py",
+        "--db",
+        "TEMPORARY_SYNTHETIC_EVIDENCE",
+        "--rounds",
+        "3"
+      ],
+      "exit_code": 0,
+      "log": "restart-1.json",
+      "seconds": 0.336
+    },
+    {
+      "command": [
+        "python",
+        "examples/durable_two_agents.py",
+        "--db",
+        "TEMPORARY_SYNTHETIC_EVIDENCE",
+        "--rounds",
+        "3"
+      ],
+      "exit_code": 0,
+      "log": "restart-2.json",
+      "seconds": 0.32
+    },
+    {
+      "command": [
+        "python",
+        "examples/durable_two_agents.py",
+        "--db",
+        "TEMPORARY_SYNTHETIC_EVIDENCE",
+        "--status",
+        "--history"
+      ],
+      "exit_code": 0,
+      "log": "restart-status.json",
+      "seconds": 0.313
+    },
+    {
+      "command": [
+        "python",
+        "examples/durable_two_agents.py",
+        "--db",
+        "TEMPORARY_SYNTHETIC_EVIDENCE",
+        "--rounds",
+        "20",
+        "--delay",
+        "0",
+        "--drop-every",
+        "0",
+        "--scenario",
+        "hostile"
+      ],
+      "exit_code": 0,
+      "log": "hostile-memory.json",
+      "seconds": 0.33
+    },
+    {
+      "command": [
+        "python",
+        "examples/durable_two_agents.py",
+        "--db",
+        "TEMPORARY_SYNTHETIC_EVIDENCE",
+        "--rounds",
+        "20",
+        "--delay",
+        "0",
+        "--drop-every",
+        "0",
+        "--scenario",
+        "hostile",
+        "--policy",
+        "always_offer"
+      ],
+      "exit_code": 0,
+      "log": "hostile-control.json",
+      "seconds": 0.318
+    },
+    {
+      "command": [
+        "python",
+        "examples/durable_two_agents.py",
+        "--db",
+        "TEMPORARY_SYNTHETIC_EVIDENCE",
+        "--rounds",
+        "20",
+        "--mode",
+        "notifications"
+      ],
+      "exit_code": 0,
+      "log": "cooperative-notifications.json",
+      "seconds": 0.33
+    },
+    {
+      "command": [
+        "python",
+        "examples/durable_two_agents.py",
+        "--db",
+        "TEMPORARY_SYNTHETIC_EVIDENCE",
+        "--rounds",
+        "20",
+        "--mode",
+        "reconcile"
+      ],
+      "exit_code": 0,
+      "log": "cooperative-reconcile.json",
+      "seconds": 0.355
+    }
+  ],
+  "environment": {
+    "cpu_count": 8,
+    "machine": "AMD64",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+    "python": "3.14.7 (main, Aug  8 2026, 21:15:19)  [MINGW GCC UCRT 16.2.0 64 bit (AMD64)]",
+    "sqlite": "3.53.4"
+  },
+  "harness_portability_fix": "The first full validation passed every check, then failed printing the accented repository path on a cp1252 console. The completion message now uses ASCII; this report is from the subsequent complete validation invocation.",
+  "initial_test_finding": "Initial authored 13-test run had one history-comparison failure: live tuples versus CLI JSON lists. Round records now normalize to JSON types; no persistent world or memory mismatch was found.",
+  "limits": [
+    "Synthetic, same-owner, bounded 20-round lab; no LLM, user data or outside effects.",
+    "Journal and memory commit separately; process-exit tests are not physical power-loss certification.",
+    "No policy-superiority, storage-performance, shared-contract or production acceptance claim."
+  ],
+  "restart_rounds": [
+    3,
+    6,
+    6
+  ],
+  "source_commit": "c0dae577d9a9934ade4b56fc7cf949bf310a7130",
+  "source_sha256": {
+    "README.md": "641357df1029cc5223341647b19658c92c96ef8817919d62c7d70418169d8faa",
+    "docs/ROADMAP.md": "b5ae07883a04e75bfea3f8fd6302c1b96b63fd9e5669ece5488c5727c9ebd523",
+    "docs/experiments/DURABLE-TWO-AGENT-RECEIPTS.md": "0a438d077480317e530c870e5095d6695f9d832bb2218967b0a4611216027d9e",
+    "docs/project/EXECUTION-HANDOFF.md": "780929802064f7339c63607ee330aa2f3df74dd6689eee6a701ced610c0ab5e4",
+    "examples/durable_two_agents.py": "8394f221bb32f0b03dd7fdac0f03a87ee687372d30d54ba29306aaa7524e95f0",
+    "examples/persistent_agents.py": "05e5fec61dfe33e853bf021e241354e190c517afec30d0348e45ff3cfe82ed6b",
+    "examples/two_agents.py": "3b9b5beaaf6d8bc786a00790e749050bbcac3a89e280e4880d7b54223fdc6d39",
+    "scripts/validate_durable_two_agents.py": "f1a838531b7ddd6380e77cee94d8715dbd9c199ff945014200bb2a8319511488",
+    "src/openworld_superkernel/__init__.py": "5dea27238e3a2e52da8ea3e431c0c9abba06f87c077d8294a540b700a123c669",
+    "src/openworld_superkernel/anti_rollback.py": "5640388424bb531f8b7bd8b935ff946599244952bf8adcf96be18a98cc936f90",
+    "src/openworld_superkernel/durable_identity.py": "17a0e72b1275e5263fea3d142a1cca83e92c045090f49d30cbce7f776942a32d",
+    "src/openworld_superkernel/hyper_memory_ensemble.py": "d6a705563a55ccbaec3842bdba4a652c3bc153267da4afa12586326bfaa352c5",
+    "src/openworld_superkernel/hyper_memory_p1e.py": "b050422b9e9866748109e5366fe4e71fa0a237be605a8bf21e2af58acd3aacad",
+    "src/openworld_superkernel/institution_proposals.py": "1fff2570711bfda3426979c8440ab71128ae9ebe6f39f26a2bc55186e3540153",
+    "src/openworld_superkernel/math_kernel.py": "51c7effdbc2cd97bc4b097e727be1f1e99ceb94a034886bb359028b2f2ae6cfb",
+    "src/openworld_superkernel/memory_contracts.py": "1ee8460528c0956efa8902af120cd8ab7f0f710eb6c329f2fea624cf659cf3cb",
+    "src/openworld_superkernel/online_ensemble.py": "f2ded3fce6e574d78acc1cd4eb0cbaaee166adc606c31ba0210ba2242cec1e9e",
+    "src/openworld_superkernel/population_links.py": "633483817a81d694798cc97bf3eb9d1c8234dd1c9687638118c65879d9c9bcc1",
+    "src/openworld_superkernel/population_repr.py": "7de6285115502bc03f9487a140f4cfb10a795fbd00880123311fe15b6d717e68",
+    "src/openworld_superkernel/postgres_control_plane.py": "a07d9fed29c1a4c38b33fed5ab3f3b550e45cb6c1f860e792ed635da9f4c1baa",
+    "src/openworld_superkernel/protocol_revocation.py": "035b8a4774ba5fe8104f501e86e5741a443136f5fa5d912f007d662333fc8d3d",
+    "src/openworld_superkernel/risk_budget.py": "18e2c5e72bad464d52f4425bb88d47afe6d3a2df306d1473cd8dccec9819849e",
+    "src/openworld_superkernel/transactional_world.py": "63cf67f056f0fecdcc57bd1d75eea1bdabcb4ab40abc477e34202f897347c4a0",
+    "src/openworld_superkernel/trust_boundaries.py": "91b10ea8c3905861db3660591c5afe6d926f2698a39f90f08f520aa31054e1c9",
+    "src/openworld_superkernel/witness_recovery.py": "9b118f626489d8e74908c4f98a2c4e0d9c89a175b582b9901fba75165605083f",
+    "src/openworld_superkernel/world_fixture.py": "218eb450438606b9b8be16130f740d0d0458b3385aa8dbeadb8a2e1510201bd9",
+    "src/openworld_superkernel/world_guard.py": "e610551a0db5f497cff0290a392bde334b2e02214f21aef82a24c86348913398",
+    "src/openworld_superkernel/world_persistence.py": "938efe6eb014770b1e27e8971fc187db3f9faf4d6f3298772f033a7b4435cd92",
+    "tests/test_durable_two_agents.py": "1d4a72ad5d722cdcc96e174571960d2822f63db3aa52588847b5937f5bc117e0"
+  },
+  "status": "passed",
+  "synthetic_controls": {
+    "cooperative-notifications": {
+      "actual_loss": 0,
+      "exact_events": 24,
+      "peak_actual_exposure": 1,
+      "returned": 8,
+      "sent": 8
+    },
+    "cooperative-reconcile": {
+      "actual_loss": 0,
+      "exact_events": 39,
+      "peak_actual_exposure": 1,
+      "returned": 20,
+      "sent": 20
+    },
+    "hostile-control": {
+      "actual_loss": 4,
+      "exact_events": 24,
+      "peak_actual_exposure": 4,
+      "returned": 0,
+      "sent": 4
+    },
+    "hostile-memory": {
+      "actual_loss": 2,
+      "exact_events": 22,
+      "peak_actual_exposure": 2,
+      "returned": 0,
+      "sent": 2
+    }
+  }
+}

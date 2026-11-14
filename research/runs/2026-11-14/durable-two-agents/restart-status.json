@@ -1,0 +1,860 @@
+{
+  "actual_loss": 0,
+  "balances": {
+    "A": 8,
+    "B": 0
+  },
+  "budget": {
+    "blocked": 0,
+    "exposure": 2,
+    "known_loss": 0,
+    "observed": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "peak_exposure": 2,
+    "pending": [
+      3,
+      5
+    ],
+    "recent": [
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "channel": [],
+  "database": "C:\\Users\\sunyn\\AppData\\Local\\Packages\\OpenAI.Codex_2p2nqsd0c76g0\\AC\\#!sandbox.{59342858-082e-4f80-b8b0-f166a6637d21}\\Temp\\tmpjxzkje1a\\pair.sqlite3",
+  "duplicates_ignored": 0,
+  "exact_events": 10,
+  "history": [
+    {
+      "events": [
+        {
+          "actor": "A",
+          "amount": 1,
+          "digest": "6fbfc92e29df709719a54a69a49ce3afe4bb41c830ff053291397393785d0ed3",
+          "kind": "transfer",
+          "prev_hash": "GENESIS",
+          "provenance": "SIMULATED",
+          "sequence": 1,
+          "target": "B",
+          "tick": 0
+        },
+        {
+          "actor": "B",
+          "amount": 1,
+          "digest": "0d97ac647c8e33a9f041997b04a210a2fdbfbf4019c3616e6315bfb0d935e94a",
+          "kind": "transfer",
+          "prev_hash": "6fbfc92e29df709719a54a69a49ce3afe4bb41c830ff053291397393785d0ed3",
+          "provenance": "SIMULATED",
+          "sequence": 2,
+          "target": "A",
+          "tick": 1
+        }
+      ],
+      "gift": true,
+      "inputs": [
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "A",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "gift-0",
+              "target": "B",
+              "tick": 0
+            }
+          ],
+          "external": [],
+          "tick": 0
+        },
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "B",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "return-0",
+              "target": "A",
+              "tick": 1
+            }
+          ],
+          "external": [],
+          "tick": 1
+        }
+      ],
+      "memory_events": [
+        {
+          "agent": "B",
+          "event_id": "durable-B-0",
+          "event_type": "simulated_incoming_gift",
+          "outcome": 1,
+          "payload": "{\"completed_tick\":1,\"gift_digest\":\"6fbfc92e29df709719a54a69a49ce3afe4bb41c830ff053291397393785d0ed3\",\"gift_received\":true,\"origin\":0,\"phase_sha256\":\"6bb9395fc1ebe506d3e6a534f3990b10d2af3609cac3db5807a651c9622f3528\",\"provenance\":\"SIMULATED\",\"schema\":\"openworld.durable-two-agents.v1\"}",
+          "sequence": 1
+        }
+      ],
+      "notification": "due-1",
+      "predictions_before": {
+        "A": {
+          "estimator": "static",
+          "probability": 0.5,
+          "provenance": "INFERRED"
+        },
+        "B": {
+          "estimator": "static",
+          "probability": 0.5,
+          "provenance": "INFERRED"
+        }
+      },
+      "previous_record_hash": "GENESIS",
+      "provenance": "SIMULATED",
+      "return": true,
+      "round": 0,
+      "schema": "openworld.durable-two-agents.v1",
+      "state": {
+        "actual_loss": 0,
+        "balances": {
+          "A": 8,
+          "B": 0
+        },
+        "budget": {
+          "blocked": 0,
+          "exposure": 1,
+          "known_loss": 0,
+          "observed": [],
+          "peak_exposure": 1,
+          "pending": [
+            0
+          ],
+          "recent": []
+        },
+        "channel": [
+          {
+            "due": 1,
+            "origin": 0,
+            "receipt_digest": "0d97ac647c8e33a9f041997b04a210a2fdbfbf4019c3616e6315bfb0d935e94a",
+            "returned": true
+          }
+        ],
+        "duplicates_ignored": 0,
+        "observations": 0,
+        "peak_actual_exposure": 1,
+        "reconciled": 0,
+        "returned": 1,
+        "round": 1,
+        "sent": 1,
+        "world_sha256": "f423bb0aff7069bc25738c22d7d7ee2d5da600e622f79a9d35cabae7377e37fe"
+      }
+    },
+    {
+      "events": [
+        {
+          "actor": "A",
+          "amount": 1,
+          "digest": "02c57429d2b8afd3bf6f6e6df4a5681777f10aa4f7a8d71f7e1eefd807e41945",
+          "kind": "transfer",
+          "prev_hash": "0d97ac647c8e33a9f041997b04a210a2fdbfbf4019c3616e6315bfb0d935e94a",
+          "provenance": "SIMULATED",
+          "sequence": 3,
+          "target": "B",
+          "tick": 2
+        },
+        {
+          "actor": "B",
+          "amount": 1,
+          "digest": "85db1f98aefe7b39c26c50972581fca6b82553223323a8cce117827c1297a209",
+          "kind": "transfer",
+          "prev_hash": "02c57429d2b8afd3bf6f6e6df4a5681777f10aa4f7a8d71f7e1eefd807e41945",
+          "provenance": "SIMULATED",
+          "sequence": 4,
+          "target": "A",
+          "tick": 3
+        }
+      ],
+      "gift": true,
+      "inputs": [
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "A",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "gift-1",
+              "target": "B",
+              "tick": 2
+            }
+          ],
+          "external": [],
+          "tick": 2
+        },
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "B",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "return-1",
+              "target": "A",
+              "tick": 3
+            }
+          ],
+          "external": [],
+          "tick": 3
+        }
+      ],
+      "memory_events": [
+        {
+          "agent": "A",
+          "event_id": "durable-A-0",
+          "event_type": "simulated_partner_return",
+          "outcome": 1,
+          "payload": "{\"at_round\":1,\"completed_tick\":2,\"origin\":0,\"phase_sha256\":\"f423bb0aff7069bc25738c22d7d7ee2d5da600e622f79a9d35cabae7377e37fe\",\"provenance\":\"SIMULATED\",\"receipt_digest\":\"0d97ac647c8e33a9f041997b04a210a2fdbfbf4019c3616e6315bfb0d935e94a\",\"returned\":true,\"schema\":\"openworld.durable-two-agents.v1\",\"source\":\"notification\"}",
+          "sequence": 1
+        },
+        {
+          "agent": "B",
+          "event_id": "durable-B-1",
+          "event_type": "simulated_incoming_gift",
+          "outcome": 1,
+          "payload": "{\"completed_tick\":3,\"gift_digest\":\"02c57429d2b8afd3bf6f6e6df4a5681777f10aa4f7a8d71f7e1eefd807e41945\",\"gift_received\":true,\"origin\":1,\"phase_sha256\":\"909a29a18592e7da2420a99cd78db3e3e1669c492bd083822e604c8c73750239\",\"provenance\":\"SIMULATED\",\"schema\":\"openworld.durable-two-agents.v1\"}",
+          "sequence": 2
+        }
+      ],
+      "notification": "dropped",
+      "predictions_before": {
+        "A": {
+          "estimator": "static",
+          "probability": 0.6666666666666666,
+          "provenance": "INFERRED"
+        },
+        "B": {
+          "estimator": "static",
+          "probability": 0.6666666666666666,
+          "provenance": "INFERRED"
+        }
+      },
+      "previous_record_hash": "063fd10dec91ec0ed9bb698996c6cfad418e1e9b2b74b1ebf1e961667129be83",
+      "provenance": "SIMULATED",
+      "return": true,
+      "round": 1,
+      "schema": "openworld.durable-two-agents.v1",
+      "state": {
+        "actual_loss": 0,
+        "balances": {
+          "A": 8,
+          "B": 0
+        },
+        "budget": {
+          "blocked": 0,
+          "exposure": 1,
+          "known_loss": 0,
+          "observed": [
+            1
+          ],
+          "peak_exposure": 1,
+          "pending": [
+            1
+          ],
+          "recent": [
+            1
+          ]
+        },
+        "channel": [],
+        "duplicates_ignored": 0,
+        "observations": 1,
+        "peak_actual_exposure": 1,
+        "reconciled": 0,
+        "returned": 2,
+        "round": 2,
+        "sent": 2,
+        "world_sha256": "065e3ffe7b74ca6eefc5f8892c7be8be5aea2e4a38eb021bd5dfd8dd2d3a4dd4"
+      }
+    },
+    {
+      "events": [
+        {
+          "actor": "A",
+          "amount": 1,
+          "digest": "394890940cbc2f6c66244c88ff11b1d0745ec0f25b529a0df49771444a77605c",
+          "kind": "transfer",
+          "prev_hash": "85db1f98aefe7b39c26c50972581fca6b82553223323a8cce117827c1297a209",
+          "provenance": "SIMULATED",
+          "sequence": 5,
+          "target": "B",
+          "tick": 4
+        },
+        {
+          "actor": "B",
+          "amount": 1,
+          "digest": "0a4642117a8b1f7e5cc9355a3ab5374a1e25b55a1aaa85ae6322d89d99bacca7",
+          "kind": "transfer",
+          "prev_hash": "394890940cbc2f6c66244c88ff11b1d0745ec0f25b529a0df49771444a77605c",
+          "provenance": "SIMULATED",
+          "sequence": 6,
+          "target": "A",
+          "tick": 5
+        }
+      ],
+      "gift": true,
+      "inputs": [
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "A",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "gift-2",
+              "target": "B",
+              "tick": 4
+            }
+          ],
+          "external": [],
+          "tick": 4
+        },
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "B",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "return-2",
+              "target": "A",
+              "tick": 5
+            }
+          ],
+          "external": [],
+          "tick": 5
+        }
+      ],
+      "memory_events": [
+        {
+          "agent": "B",
+          "event_id": "durable-B-2",
+          "event_type": "simulated_incoming_gift",
+          "outcome": 1,
+          "payload": "{\"completed_tick\":5,\"gift_digest\":\"394890940cbc2f6c66244c88ff11b1d0745ec0f25b529a0df49771444a77605c\",\"gift_received\":true,\"origin\":2,\"phase_sha256\":\"ffa3ceebafe42af0e3c94f915ceadd15022c06eeb44901801939b7f65a7e0f58\",\"provenance\":\"SIMULATED\",\"schema\":\"openworld.durable-two-agents.v1\"}",
+          "sequence": 3
+        }
+      ],
+      "notification": "due-3",
+      "predictions_before": {
+        "A": {
+          "estimator": "static",
+          "probability": 0.6666666666666666,
+          "provenance": "INFERRED"
+        },
+        "B": {
+          "estimator": "static",
+          "probability": 0.75,
+          "provenance": "INFERRED"
+        }
+      },
+      "previous_record_hash": "2a3735635bc7a2465bf552db797e72695f755a15bc694531b767b16ce404b94a",
+      "provenance": "SIMULATED",
+      "return": true,
+      "round": 2,
+      "schema": "openworld.durable-two-agents.v1",
+      "state": {
+        "actual_loss": 0,
+        "balances": {
+          "A": 8,
+          "B": 0
+        },
+        "budget": {
+          "blocked": 0,
+          "exposure": 2,
+          "known_loss": 0,
+          "observed": [
+            1
+          ],
+          "peak_exposure": 2,
+          "pending": [
+            1,
+            2
+          ],
+          "recent": [
+            1
+          ]
+        },
+        "channel": [
+          {
+            "due": 3,
+            "origin": 2,
+            "receipt_digest": "0a4642117a8b1f7e5cc9355a3ab5374a1e25b55a1aaa85ae6322d89d99bacca7",
+            "returned": true
+          }
+        ],
+        "duplicates_ignored": 0,
+        "observations": 1,
+        "peak_actual_exposure": 1,
+        "reconciled": 0,
+        "returned": 3,
+        "round": 3,
+        "sent": 3,
+        "world_sha256": "a2ecbf77a045ea899a20b629af5ed1b0965128ac8ab30ddf7e84476f0b60c6b6"
+      }
+    },
+    {
+      "events": [
+        {
+          "actor": "A",
+          "amount": 1,
+          "digest": "415ccd7b04a71087de7aa931a727c97573701a40ed815c415b32b021c6194161",
+          "kind": "transfer",
+          "prev_hash": "0a4642117a8b1f7e5cc9355a3ab5374a1e25b55a1aaa85ae6322d89d99bacca7",
+          "provenance": "SIMULATED",
+          "sequence": 7,
+          "target": "B",
+          "tick": 6
+        },
+        {
+          "actor": "B",
+          "amount": 1,
+          "digest": "46ad0307b6a673784229070d24c558beacb9c9a95303067c6b96e65b7556b871",
+          "kind": "transfer",
+          "prev_hash": "415ccd7b04a71087de7aa931a727c97573701a40ed815c415b32b021c6194161",
+          "provenance": "SIMULATED",
+          "sequence": 8,
+          "target": "A",
+          "tick": 7
+        }
+      ],
+      "gift": true,
+      "inputs": [
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "A",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "gift-3",
+              "target": "B",
+              "tick": 6
+            }
+          ],
+          "external": [],
+          "tick": 6
+        },
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "B",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "return-3",
+              "target": "A",
+              "tick": 7
+            }
+          ],
+          "external": [],
+          "tick": 7
+        }
+      ],
+      "memory_events": [
+        {
+          "agent": "A",
+          "event_id": "durable-A-2",
+          "event_type": "simulated_partner_return",
+          "outcome": 1,
+          "payload": "{\"at_round\":3,\"completed_tick\":6,\"origin\":2,\"phase_sha256\":\"a2ecbf77a045ea899a20b629af5ed1b0965128ac8ab30ddf7e84476f0b60c6b6\",\"provenance\":\"SIMULATED\",\"receipt_digest\":\"0a4642117a8b1f7e5cc9355a3ab5374a1e25b55a1aaa85ae6322d89d99bacca7\",\"returned\":true,\"schema\":\"openworld.durable-two-agents.v1\",\"source\":\"notification\"}",
+          "sequence": 2
+        },
+        {
+          "agent": "A",
+          "event_id": "durable-A-1",
+          "event_type": "simulated_partner_return",
+          "outcome": 1,
+          "payload": "{\"at_round\":3,\"completed_tick\":4,\"origin\":1,\"phase_sha256\":\"065e3ffe7b74ca6eefc5f8892c7be8be5aea2e4a38eb021bd5dfd8dd2d3a4dd4\",\"provenance\":\"SIMULATED\",\"receipt_digest\":\"85db1f98aefe7b39c26c50972581fca6b82553223323a8cce117827c1297a209\",\"returned\":true,\"schema\":\"openworld.durable-two-agents.v1\",\"source\":\"reconciliation\"}",
+          "sequence": 3
+        },
+        {
+          "agent": "B",
+          "event_id": "durable-B-3",
+          "event_type": "simulated_incoming_gift",
+          "outcome": 1,
+          "payload": "{\"completed_tick\":7,\"gift_digest\":\"415ccd7b04a71087de7aa931a727c97573701a40ed815c415b32b021c6194161\",\"gift_received\":true,\"origin\":3,\"phase_sha256\":\"525519f40d6f478353812be3bc7e28120c679a70a26cb9196849c3489d4410a7\",\"provenance\":\"SIMULATED\",\"schema\":\"openworld.durable-two-agents.v1\"}",
+          "sequence": 4
+        }
+      ],
+      "notification": "dropped",
+      "predictions_before": {
+        "A": {
+          "estimator": "static",
+          "probability": 0.8,
+          "provenance": "INFERRED"
+        },
+        "B": {
+          "estimator": "static",
+          "probability": 0.8,
+          "provenance": "INFERRED"
+        }
+      },
+      "previous_record_hash": "9e4609027c2b71584118722731d7af96d4eb38e40056b64aa477a346ca7c6ce4",
+      "provenance": "SIMULATED",
+      "return": true,
+      "round": 3,
+      "schema": "openworld.durable-two-agents.v1",
+      "state": {
+        "actual_loss": 0,
+        "balances": {
+          "A": 8,
+          "B": 0
+        },
+        "budget": {
+          "blocked": 0,
+          "exposure": 1,
+          "known_loss": 0,
+          "observed": [
+            1,
+            1,
+            1
+          ],
+          "peak_exposure": 2,
+          "pending": [
+            3
+          ],
+          "recent": [
+            1,
+            1,
+            1
+          ]
+        },
+        "channel": [],
+        "duplicates_ignored": 0,
+        "observations": 3,
+        "peak_actual_exposure": 1,
+        "reconciled": 1,
+        "returned": 4,
+        "round": 4,
+        "sent": 4,
+        "world_sha256": "53cb372ce47bd448c5a13dff5c7e4d93fd95a6fcccce4bbc64054cee488b6d91"
+      }
+    },
+    {
+      "events": [
+        {
+          "actor": "A",
+          "amount": 1,
+          "digest": "a924e9faf00aa0f590e0e73d8af89c627815e668fca56ad9ac6a3bf0743a8ae2",
+          "kind": "transfer",
+          "prev_hash": "46ad0307b6a673784229070d24c558beacb9c9a95303067c6b96e65b7556b871",
+          "provenance": "SIMULATED",
+          "sequence": 9,
+          "target": "B",
+          "tick": 8
+        },
+        {
+          "actor": "B",
+          "amount": 1,
+          "digest": "d86c1ea6cf57d6f74da28d0b2ed7aa6ee960793e6bc17188f339758e2ae71944",
+          "kind": "transfer",
+          "prev_hash": "a924e9faf00aa0f590e0e73d8af89c627815e668fca56ad9ac6a3bf0743a8ae2",
+          "provenance": "SIMULATED",
+          "sequence": 10,
+          "target": "A",
+          "tick": 9
+        }
+      ],
+      "gift": true,
+      "inputs": [
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "A",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "gift-4",
+              "target": "B",
+              "tick": 8
+            }
+          ],
+          "external": [],
+          "tick": 8
+        },
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "B",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "return-4",
+              "target": "A",
+              "tick": 9
+            }
+          ],
+          "external": [],
+          "tick": 9
+        }
+      ],
+      "memory_events": [
+        {
+          "agent": "B",
+          "event_id": "durable-B-4",
+          "event_type": "simulated_incoming_gift",
+          "outcome": 1,
+          "payload": "{\"completed_tick\":9,\"gift_digest\":\"a924e9faf00aa0f590e0e73d8af89c627815e668fca56ad9ac6a3bf0743a8ae2\",\"gift_received\":true,\"origin\":4,\"phase_sha256\":\"bff561523e40bec56ee66ffa5dd337abd7a0caf9b452f69a0e33aa59dee9595b\",\"provenance\":\"SIMULATED\",\"schema\":\"openworld.durable-two-agents.v1\"}",
+          "sequence": 5
+        }
+      ],
+      "notification": "due-5",
+      "predictions_before": {
+        "A": {
+          "estimator": "static",
+          "probability": 0.8,
+          "provenance": "INFERRED"
+        },
+        "B": {
+          "estimator": "static",
+          "probability": 0.8333333333333334,
+          "provenance": "INFERRED"
+        }
+      },
+      "previous_record_hash": "fc571d3df05bc89ce00a6b6b15acc13ea5f289681fa0a7aebdc865928ad2a5ff",
+      "provenance": "SIMULATED",
+      "return": true,
+      "round": 4,
+      "schema": "openworld.durable-two-agents.v1",
+      "state": {
+        "actual_loss": 0,
+        "balances": {
+          "A": 8,
+          "B": 0
+        },
+        "budget": {
+          "blocked": 0,
+          "exposure": 2,
+          "known_loss": 0,
+          "observed": [
+            1,
+            1,
+            1
+          ],
+          "peak_exposure": 2,
+          "pending": [
+            3,
+            4
+          ],
+          "recent": [
+            1,
+            1,
+            1
+          ]
+        },
+        "channel": [
+          {
+            "due": 5,
+            "origin": 4,
+            "receipt_digest": "d86c1ea6cf57d6f74da28d0b2ed7aa6ee960793e6bc17188f339758e2ae71944",
+            "returned": true
+          }
+        ],
+        "duplicates_ignored": 0,
+        "observations": 3,
+        "peak_actual_exposure": 1,
+        "reconciled": 1,
+        "returned": 5,
+        "round": 5,
+        "sent": 5,
+        "world_sha256": "aab210f0486c645cdf7d82322320a98a2b709f87c98bbf4226991e54e68b6792"
+      }
+    },
+    {
+      "events": [
+        {
+          "actor": "A",
+          "amount": 1,
+          "digest": "b872ddcfdccd1a1700b1c2d636bcc0fb89bc15e91b019fbf5fdb475999bbf8c2",
+          "kind": "transfer",
+          "prev_hash": "d86c1ea6cf57d6f74da28d0b2ed7aa6ee960793e6bc17188f339758e2ae71944",
+          "provenance": "SIMULATED",
+          "sequence": 11,
+          "target": "B",
+          "tick": 10
+        },
+        {
+          "actor": "B",
+          "amount": 1,
+          "digest": "fa3c18829cd9634206ccd86a479a1a25921db387543e5db60a41e2cf98fd954e",
+          "kind": "transfer",
+          "prev_hash": "b872ddcfdccd1a1700b1c2d636bcc0fb89bc15e91b019fbf5fdb475999bbf8c2",
+          "provenance": "SIMULATED",
+          "sequence": 12,
+          "target": "A",
+          "tick": 11
+        }
+      ],
+      "gift": true,
+      "inputs": [
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "A",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "gift-5",
+              "target": "B",
+              "tick": 10
+            }
+          ],
+          "external": [],
+          "tick": 10
+        },
+        {
+          "action_budget": 1,
+          "actions": [
+            {
+              "actor": "B",
+              "amount": 1,
+              "kind": "transfer",
+              "principal": "two-agent-owner",
+              "request_id": "return-5",
+              "target": "A",
+              "tick": 11
+            }
+          ],
+          "external": [],
+          "tick": 11
+        }
+      ],
+      "memory_events": [
+        {
+          "agent": "A",
+          "event_id": "durable-A-4",
+          "event_type": "simulated_partner_return",
+          "outcome": 1,
+          "payload": "{\"at_round\":5,\"completed_tick\":10,\"origin\":4,\"phase_sha256\":\"aab210f0486c645cdf7d82322320a98a2b709f87c98bbf4226991e54e68b6792\",\"provenance\":\"SIMULATED\",\"receipt_digest\":\"d86c1ea6cf57d6f74da28d0b2ed7aa6ee960793e6bc17188f339758e2ae71944\",\"returned\":true,\"schema\":\"openworld.durable-two-agents.v1\",\"source\":\"notification\"}",
+          "sequence": 4
+        },
+        {
+          "agent": "B",
+          "event_id": "durable-B-5",
+          "event_type": "simulated_incoming_gift",
+          "outcome": 1,
+          "payload": "{\"completed_tick\":11,\"gift_digest\":\"b872ddcfdccd1a1700b1c2d636bcc0fb89bc15e91b019fbf5fdb475999bbf8c2\",\"gift_received\":true,\"origin\":5,\"phase_sha256\":\"71da452220bd4a29e005612443837b64eea0fbd8da63e1912b8bd61482bdda63\",\"provenance\":\"SIMULATED\",\"schema\":\"openworld.durable-two-agents.v1\"}",
+          "sequence": 6
+        }
+      ],
+      "notification": "dropped",
+      "predictions_before": {
+        "A": {
+          "estimator": "static",
+          "probability": 0.8333333333333334,
+          "provenance": "INFERRED"
+        },
+        "B": {
+          "estimator": "static",
+          "probability": 0.8571428571428571,
+          "provenance": "INFERRED"
+        }
+      },
+      "previous_record_hash": "ad0f29ffbc823076f5a8a5f5a8de0da2dcd4c76d9bcffc8404e43abd88abb106",
+      "provenance": "SIMULATED",
+      "return": true,
+      "round": 5,
+      "schema": "openworld.durable-two-agents.v1",
+      "state": {
+        "actual_loss": 0,
+        "balances": {
+          "A": 8,
+          "B": 0
+        },
+        "budget": {
+          "blocked": 0,
+          "exposure": 2,
+          "known_loss": 0,
+          "observed": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "peak_exposure": 2,
+          "pending": [
+            3,
+            5
+          ],
+          "recent": [
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "channel": [],
+        "duplicates_ignored": 0,
+        "observations": 4,
+        "peak_actual_exposure": 1,
+        "reconciled": 1,
+        "returned": 6,
+        "round": 6,
+        "sent": 6,
+        "world_sha256": "0295fe0c14436a73775192e842a8a3d25093491e83e8544e22c942b812c5156f"
+      }
+    }
+  ],
+  "memory": {
+    "A": {
+      "estimator": "static",
+      "observations": 4,
+      "prediction": 0.8333333333333334,
+      "prediction_provenance": "INFERRED",
+      "sequence": 4,
+      "successes": 4
+    },
+    "B": {
+      "estimator": "static",
+      "observations": 6,
+      "prediction": 0.875,
+      "prediction_provenance": "INFERRED",
+      "sequence": 6,
+      "successes": 6
+    }
+  },
+  "observations": 4,
+  "peak_actual_exposure": 1,
+  "provenance": "SIMULATED",
+  "reconciled": 1,
+  "recovered_memory_events": 0,
+  "replay_verified": true,
+  "resumed_from_round": 6,
+  "returned": 6,
+  "round": 6,
+  "schema": "openworld.durable-two-agents.v1",
+  "sent": 6,
+  "settings": {
+    "delay": 1,
+    "drop_every": 2,
+    "mode": "reconcile",
+    "policy": "memory",
+    "recover_at": 10,
+    "scenario": "cooperative",
+    "seed": 2026
+  },
+  "world_sha256": "0295fe0c14436a73775192e842a8a3d25093491e83e8544e22c942b812c5156f"
+}
