@@ -60,6 +60,31 @@ Với cấu hình mặc định, A chỉ chờ thông báo gửi được **8 l�
 
 Đây là hai agent có chính sách viết bằng mã, chạy trên CPU và không gọi mô hình ngôn ngữ. Xem [thiết kế và cách chạy](docs/experiments/TWO-AGENT-RECEIPT-SIMULATION.md) hoặc chạy `python examples/two_agents.py --help` để xem tham số.
 
+## Persistent simulation and agent memory
+
+The [persistent two-agent example](examples/persistent_agents.py) saves its
+simulation journal, exact memory events and predictive state in one local
+SQLite file. Alice and Bob take turns acting. Running the command again resumes
+the existing world and each agent's own memory.
+
+```bash
+# First run: ticks 0-2; the file remains after Python exits.
+python examples/persistent_agents.py --db data/openworld.sqlite3 --steps 3
+
+# Second run: ticks 3-5, continuing from the same file.
+python examples/persistent_agents.py --db data/openworld.sqlite3 --steps 3
+
+# Inspect saved state or include the exact simulation history.
+python examples/persistent_agents.py --db data/openworld.sqlite3 --status
+python examples/persistent_agents.py --db data/openworld.sqlite3 --status --history
+```
+
+The journal is authoritative; HyperMemory is a recoverable projection written
+in a separate transaction. Startup verifies the exact journal and existing
+memory, then replays any committed records whose memory update was interrupted.
+Feedback is the fixed lab sequence `0, 1, 1`, not an independent partner response
+or an LLM output. See [design, restart behavior and limitations](docs/experiments/PERSISTENT-AGENT-SIMULATION.md).
+
 ## Dự án đã có những gì?
 
 | Thành phần | Phần đã triển khai để nghiên cứu | Mục tiêu dài hạn |
