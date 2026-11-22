@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenWorld — Live Two-Agent Visual Studio (Python Backend)</title>
+  <style>
+    /* Semantic design tokens: tactile studio light & refined charcoal dark (no purple-on-dark) */
+    :root {
+      --bg: #f6f5f1;
+      --surface: #ffffff;
+      --surface-soft: #f0eee8;
+      --border: #e2dfd7;
+      --border-strong: #cfc9bc;
+      --fg: #181a1f;
+      --muted: #5b616e;
+      --alice: #0f6cbd;
+      --alice-fg: #ffffff;
+      --bob: #0e8a62;
+      --success: #0e8a62;
+      --warning: #c8740a;
+      --error: #cf2e2e;
+      --shadow-sm: 0 2px 10px -4px rgba(18, 22, 31, 0.08);
+      --shadow-md: 0 14px 32px -14px rgba(18, 22, 31, 0.14);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #111419;
+      --surface: #181c23;
+      --surface-soft: #20252f;
+      --border: #2a313e;
+      --border-strong: #3b4456;
+      --fg: #eef1f5;
+      --muted: #98a2b3;
+      --alice: #38bdf8;
+      --alice-fg: #0a1420;
+      --bob: #34d399;
+      --success: #34d399;
+      --warning: #f59e0b;
+      --error: #f87171;
+      --shadow-sm: 0 2px 12px -4px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 18px 36px -14px rgba(0, 0, 0, 0.55);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 20px 18px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 650px;
+    }
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--fg);
+      font-variant-numeric: tabular-nums;
+      box-shadow: var(--shadow-sm);
+    }
+    .dot-live {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      display: inline-block;
+    }
+    .dot-live.offline { background: var(--error); }
+
+    .icon-toggle {
+      padding: 5px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 120ms ease, border-color 140ms ease;
+    }
+    .icon-toggle:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+
+    /* Scenario Selector */
+    .mode-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .mode-btn {
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 120ms ease, background 150ms ease, border-color 150ms ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .mode-btn:hover { transform: translateY(-1px); border-color: var(--border-strong); }
+    .mode-btn.active {
+      background: var(--alice);
+      color: var(--alice-fg);
+      border-color: var(--alice);
+      font-weight: 600;
+    }
+
+    /* Main Stage Card */
+    .stage-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .stage-top {
+      padding: 11px 16px;
+      background: var(--surface-soft);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+    }
+    .stage-top .insight { color: var(--fg); }
+    .p7-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .p7-switch.hidden { display: none; }
+    .mini-btn {
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .mini-btn.active-warn { background: var(--warning); border-color: var(--warning); color: #fff; font-weight: 600; }
+    .mini-btn.active-ok { background: var(--success); border-color: var(--success); color: #fff; font-weight: 600; }
+
+    .stage-viewport {
+      position: relative;
+      width: 100%;
+    }
+    #stageCanvas {
+      width: 100%;
+      height: 410px;
+      display: block;
+    }
+
+    /* Interactive Play-as-Bob Overlay */
+    .bob-overlay {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      width: min(350px, calc(100% - 32px));
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .bob-overlay.hidden { display: none; }
+    .bob-overlay-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+    .bob-overlay p { margin: 0; font-size: 12.5px; color: var(--muted); }
+    .bob-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    /* Transport Bar */
+    .stage-controls {
+      padding: 12px 16px;
+      background: var(--surface-soft);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .btn-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      padding: 7px 14px;
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 110ms ease, opacity 140ms ease, border-color 140ms ease;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); border-color: var(--border-strong); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn.primary { background: var(--alice); border-color: var(--alice); color: var(--alice-fg); }
+    .btn.danger { color: var(--error); border-color: var(--error); }
+    .btn.hidden { display: none; }
+
+    .caption {
+      flex: 1;
+      min-width: 220px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .caption strong { color: var(--fg); }
+
+    .speed-group { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-family: var(--font-mono); color: var(--muted); }
+    .speed-btn {
+      padding: 4px 8px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      cursor: pointer;
+    }
+    .speed-btn.active { border-color: var(--alice); color: var(--alice); font-weight: 700; }
+
+    /* Two-column companion panels */
+    .grid-two {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+    .panel {
+      grid-column: span 6;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    @media (max-width: 820px) {
+      .panel { grid-column: span 12; }
+    }
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .panel h2 { margin: 0; font-size: 14.5px; font-weight: 700; letter-spacing: -0.01em; }
+    .panel .sub { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+    .big-stat {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+    .big-stat .val { font-size: 18px; font-weight: 700; color: var(--alice); }
+    .big-stat .tag { font-size: 11.5px; color: var(--muted); }
+
+    #brainCanvas {
+      width: 100%;
+      height: 165px;
+      display: block;
+      border-radius: 12px;
+      background: var(--surface-soft);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+    }
+    .legend-items { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .swatch { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
+    /* Visual Round Strip & Receipt Card */
+    .round-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      min-height: 56px;
+      align-content: flex-start;
+    }
+    .round-tile {
+      padding: 6px 10px;
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      text-align: left;
+      cursor: pointer;
+      transition: transform 120ms ease, border-color 140ms ease;
+    }
+    .round-tile:hover { transform: translateY(-2px); }
+    .round-tile.selected { border-color: var(--alice); background: var(--surface); }
+    .round-tile .rt-top { font-size: 12px; font-weight: 700; font-family: var(--font-mono); }
+    .round-tile .rt-sub { font-size: 11px; color: var(--muted); }
+
+    .receipt-box {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      padding: 12px;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .receipt-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+    .receipt-hash { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+    .receipt-box p { margin: 0; color: var(--muted); line-height: 1.5; }
+
+    /* Live Backend Security & SQLite Drawer */
+    .backend-strip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sec-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .sec-buttons { display: flex; flex-wrap: wrap; gap: 7px; }
+    .sec-result {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      padding: 10px 12px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .sec-result.hidden { display: none; }
+
+    details.sqlite-details summary {
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--fg);
+      user-select: none;
+    }
+    .sqlite-list {
+      margin-top: 10px;
+      max-height: 210px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sqlite-row {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div>
+        <h1>Alice &amp; Bob — Mô phỏng 2 Agent Kết nối Backend Python OpenWorld</h1>
+        <p>
+          Mọi lượt giao tiếp, xác thực quyền HMAC, chuyển xu trên thế giới <code>W3</code>, kiểm chứng <code>verify_replay()</code> và cập nhật SQLite <code>HyperMemoryP1e</code> đều chạy trực tiếp trên máy chủ Python phía sau.
+        </p>
+      </div>
+      <div class="header-meta">
+        <span class="pill" id="backendBadge">
+          <span class="dot-live" id="liveDot"></span>
+          <span id="backendStatusText">Đang kết nối Python...</span>
+        </span>
+        <span class="pill" id="topRoundPill">Vòng 0 / 10</span>
+        <span class="pill" id="topCoinsPill">10/10 xu · Replay PASS</span>
+        <button class="icon-toggle" id="themeBtn" title="Đổi giao diện Sáng / Tối">◐ Sáng / Tối</button>
+      </div>
+    </header>
+
+    <!-- Scenario Mode Bar -->
+    <nav class="mode-bar" aria-label="Kịch bản">
+      <button data-mode="cooperative" class="mode-btn active">🤝 Hợp tác</button>
+      <button data-mode="hostile_refuse" class="mode-btn">✋ Từ chối thẳng</button>
+      <button data-mode="hostile_liar" class="mode-btn">🎭 Kẻ lừa đảo (ACK giả)</button>
+      <button data-mode="lost_notices" class="mode-btn">📡 Mất thông báo (P7)</button>
+      <button data-mode="recovery" class="mode-btn">🌱 Phục hồi (HM-P1e)</button>
+      <button data-mode="play_bob" class="mode-btn">🎮 Bạn đóng vai Bob</button>
+    </nav>
+
+    <!-- Living 60fps Stage -->
+    <section class="stage-card">
+      <div class="stage-top">
+        <span class="insight" id="modeInsight">
+          Kết nối trực tiếp API Python: Alice đề xuất trao đổi 1 xu → Bob đồng ý và trả xu trên W3 → Sổ cái xác nhận biên nhận thật.
+        </span>
+        <div class="p7-switch hidden" id="p7Switch">
+          <span style="color:var(--muted)">Chế độ Alice:</span>
+          <button class="mini-btn" id="p7NotifBtn">Chỉ chờ thông báo</button>
+          <button class="mini-btn active-ok" id="p7ReconBtn">Đối chiếu biên nhận W3</button>
+        </div>
+      </div>
+
+      <div class="stage-viewport">
+        <canvas id="stageCanvas"></canvas>
+
+        <!-- Interactive Play-as-Bob Overlay -->
+        <div class="bob-overlay hidden" id="bobOverlay">
+          <div class="bob-overlay-head">
+            <span id="bobOverlayTitle">Lượt của bạn (Bob)</span>
+            <span style="font-family:var(--font-mono);color:var(--muted);font-weight:500;">POST /api/bob/...</span>
+          </div>
+          <p id="bobOverlayDesc">Alice vừa gửi đề xuất 1 xu qua cổng W3. Bạn sẽ chọn gì?</p>
+          <div class="bob-actions" id="bobActions"></div>
+        </div>
+      </div>
+
+      <div class="stage-controls">
+        <div class="btn-group">
+          <button class="btn primary" id="btnPlay">▶ Bắt đầu</button>
+          <button class="btn" id="btnStep">Chạy 1 vòng →</button>
+          <button class="btn" id="btnReset">↺ Làm lại</button>
+        </div>
+
+        <div class="caption" id="liveCaption">
+          Sẵn sàng — mọi bấm nút đều gọi API thật tới <strong>examples/two_agents_server.py</strong>.
+        </div>
+
+        <div class="speed-group">
+          <span>Tốc độ</span>
+          <button class="speed-btn" data-speed="0.7">0.7x</button>
+          <button class="speed-btn active" data-speed="1">1x</button>
+          <button class="speed-btn" data-speed="1.8">1.8x</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Companion Panels: HM-P1e Brain + Visual Round Receipts -->
+    <div class="grid-two">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Bộ não Trí nhớ HyperMemoryP1e (SQLite thật)</h2>
+            <p class="sub">Dữ liệu đọc trực tiếp từ <code>memory.predict()</code> &amp; <code>memory.get_state()</code> phía Python.</p>
+          </div>
+          <div class="big-stat">
+            <div class="val" id="brainProb">50.0%</div>
+            <div class="tag" id="brainMode">mode: static</div>
+          </div>
+        </div>
+
+        <canvas id="brainCanvas"></canvas>
+
+        <div class="legend">
+          <div class="legend-items">
+            <span><i class="swatch" style="background:var(--alice)"></i>static</span>
+            <span><i class="swatch" style="background:var(--bob)"></i>fast (γ=0.65)</span>
+            <span style="color:var(--warning)">--- ngưỡng 29.4%</span>
+          </div>
+          <span id="brainCounts">n=0 · trả=0</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Nhật ký Vòng &amp; Biên nhận Sổ cái W3</h2>
+            <p class="sub">Chạm từng vòng để xem mã băm W3 thật và fingerprint sau khi <code>verify_replay()</code> kiểm chứng.</p>
+          </div>
+          <span class="pill" id="receiptCountPill">0 biên nhận</span>
+        </div>
+
+        <div class="round-strip" id="roundStrip">
+          <span style="font-size:12px;color:var(--muted);">Chưa có vòng nào. Bấm "▶ Bắt đầu" hoặc "Chạy 1 vòng →".</span>
+        </div>
+
+        <div class="receipt-box">
+          <div class="receipt-head">
+            <span id="detailTitle">Backend Python đang chạy trực tiếp</span>
+            <span class="receipt-hash" id="detailDigest">SIMULATED</span>
+          </div>
+          <p id="detailBody">
+            Trình duyệt không tự tính toán giả lập: mỗi hành động được gửi lên máy chủ Python, xác thực token HMAC qua GuardedWorldGateway, lưu sự kiện thật vào SQLite HyperMemoryP1e và trả về biên nhận W3.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Real Backend Security Controls + Live SQLite exact_events Viewer -->
+    <section class="backend-strip">
+      <div class="sec-row">
+        <div>
+          <strong style="font-size:13.5px;">Kiểm thử Bảo mật Trực tiếp trên Backend Python (POST /api/security/test)</strong>
+          <div style="font-size:12px;color:var(--muted);">Gửi yêu cầu tấn công thật vào <code>BoundedCommunicationHub</code> &amp; <code>CapabilityAuthority</code> — xem ngoại lệ Python thực tế.</div>
+        </div>
+        <div class="sec-buttons">
+          <button class="btn" data-attack="cross_owner">1. Khác chủ sở hữu</button>
+          <button class="btn" data-attack="wrong_token">2. Dùng nhầm token Bob</button>
+          <button class="btn" data-attack="spoof_verified">3. Giả nhãn VERIFIED</button>
+          <button class="btn" data-attack="replay_id">4. Phát lại trùng ID</button>
+          <button class="btn danger" data-attack="toggle_revoke_alice" id="btnRevokeAlice">5. Thu hồi token Alice</button>
+        </div>
+      </div>
+
+      <div class="sec-result hidden" id="secResult"></div>
+
+      <details class="sqlite-details">
+        <summary id="sqliteSummary">Xem bảng SQLite exact_events thực tế từ Python (0 bản ghi) &amp; W3 World Fingerprint</summary>
+        <div class="sqlite-list" id="sqliteList"></div>
+      </details>
+    </section>
+
+  </div>
+
+<script>
+// ===========================================================================
+// Pure Visual Frontend — 100% driven by live Python OpenWorld HTTP API
+// ===========================================================================
+const INSIGHTS = {
+  cooperative: "Hợp tác trung thực: Python chạy đủ 5 pha W3 — Bob trả xu thật, sổ cái đóng dấu biên nhận, SQLite HM-P1e tăng dần độ tin cậy.",
+  hostile_refuse: "Từ chối thẳng (DECLINE): Bob từ chối trước khi chuyển xu → mất 0 xu, không tốn ô rủi ro DonorBudget, HM-P1e vẫn học được.",
+  hostile_liar: "Kẻ lừa đảo: Bob nói ACCEPT, giữ xu và gửi COMMIT_ACK giả kèm override_cap=999 → Python find_committed_transfer() bắt sống & chặn cứng ở 4/4.",
+  lost_notices: "Thí nghiệm P7 (Mất thông báo): Bob luôn trả xu thật trên W3, nhưng thông báo rớt 50%! Bật/tắt Đối chiếu biên nhận W3 để thấy sự khác biệt.",
+  recovery: "Phục hồi chuyển pha: 8 vòng đầu Bob từ chối (0 lỗ), từ vòng 9 Bob hợp tác → theo dõi SQLite HM-P1e tự chuyển từ static sang fast!",
+  play_bob: "Bạn đang đóng vai Bob! Mỗi quyết định của bạn gửi trực tiếp POST /api/bob/reply hoặc /api/bob/return vào lõi Python OpenWorld."
+};
+
+const ui = {
+  state: null,          // Latest authoritative JSON from Python /api/*
+  speed: 1.0,
+  autoPlay: false,
+  animating: false,
+  selectedRound: null,
+  lastRttMs: 0,
+  animGen: 0,
+
+  // Visual stage interpolated state (mirrors Python events step-by-step)
+  visAliceBal: 8,
+  visBobBal: 2,
+  visKnownBad: 0,
+  visPending: 0,
+  visReceipts: 0,
+  aliceMood: "calm",
+  bobMood: "friendly",
+  aliceSpeech: "Đang kết nối Python...",
+  bobSpeech: "Chào Alice!",
+  activePhase: "idle",
+  phaseT: 0,
+  phaseDuration: 750,
+  phaseStart: 0,
+  _resolvePhase: null,
+
+  flyingPacket: null,
+  flyingCoin: null,
+  scanBeam: null,
+  particles: []
+};
+
+// ---------------------------------------------------------------------------
+// API Client (Real fetch to Python OpenWorld backend)
+// ---------------------------------------------------------------------------
+async function apiCall(path, method = "GET", payload = null) {
+  const t0 = performance.now();
+  const opts = { method, headers: {} };
+  if (payload !== null) {
+    opts.headers["Content-Type"] = "application/json";
+    opts.body = JSON.stringify(payload);
+  }
+  const resp = await fetch(path, opts);
+  const data = await resp.json();
+  ui.lastRttMs = Math.max(1, Math.round(performance.now() - t0));
+  if (!resp.ok) {
+    const err = new Error(data.error || `HTTP ${resp.status}`);
+    err.data = data;
+    err.status = resp.status;
+    throw err;
+  }
+  return data;
+}
+
+// ---------------------------------------------------------------------------
+// Visual Stage Animator (Replays the EXACT micro-events returned by Python)
+// ---------------------------------------------------------------------------
+function playAnim(phaseName, durationMs, setupFn) {
+  return new Promise(resolve => {
+    ui.activePhase = phaseName;
+    ui.phaseT = 0;
+    ui.phaseDuration = Math.max(220, durationMs / ui.speed);
+    ui.phaseStart = performance.now();
+    if (setupFn) setupFn();
+    ui._resolvePhase = resolve;
+  });
+}
+
+function spawnParticles(x, y, colorVar, count = 14) {
+  for (let i = 0; i < count; i++) {
+    const a = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+    const sp = 1.2 + Math.random() * 2.6;
+    ui.particles.push({
+      x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.6,
+      life: 1.0, size: 2.3 + Math.random() * 2.4, colorVar
+    });
+  }
+}
+
+function syncVisualCountersFromState(st) {
+  ui.visAliceBal = st.alice.balance;
+  ui.visBobBal = st.bob.balance;
+  ui.visKnownBad = st.alice.risk_budget.known_loss;
+  ui.visPending = st.alice.risk_budget.pending.length;
+  ui.visReceipts = st.w3_receipts.length;
+}
+
+async function animateBackendEvents(newState) {
+  const myGen = ui.animGen;
+  const events = newState.last_events || [];
+  ui.animating = true;
+  updateControlButtons();
+
+  const caption = document.getElementById("liveCaption");
+
+  for (const ev of events) {
+    if (myGen !== ui.animGen) return;
+
+    if (ev.phase === "reconcile") {
+      ui.aliceMood = "think";
+      ui.aliceSpeech = ev.alice_speech;
+      caption.innerHTML = `<strong>Backend W3 Reconcile:</strong> Alice quét sổ cái và giải phóng ${ev.rescued} biên nhận bị mất thông báo!`;
+      await playAnim("reconcile", 880, () => {
+        ui.scanBeam = { status: "found", label: ev.label };
+      });
+      if (myGen !== ui.animGen) return;
+      ui.scanBeam = null;
+      ui.visPending = Math.max(0, ui.visPending - ev.rescued);
+      ui.aliceMood = "happy";
+      spawnParticles(metrics.vaultX, metrics.vaultY, "--success", 16);
+    } else if (ev.phase === "abstain") {
+      ui.aliceMood = ev.alice_mood;
+      ui.aliceSpeech = ev.alice_speech;
+      caption.innerHTML = `<strong>Backend Python (Tạm dừng):</strong> ${ev.reason}`;
+      await playAnim("abstain", 620, () => {
+        ui.flyingPacket = null; ui.flyingCoin = null;
+      });
+    } else if (ev.phase === "propose") {
+      ui.aliceMood = "think";
+      ui.aliceSpeech = ev.alice_speech;
+      caption.innerHTML = `<strong>Pha 1 · PROPOSE (W3 tick ${ev.tick}):</strong> Token HMAC hợp lệ · digest <code>${ev.world_event_digest.slice(0,10)}…</code>`;
+      await playAnim("propose", 760, () => {
+        ui.flyingPacket = { from: "alice", to: "bob", label: "PROPOSE · 1 xu", kind: "propose" };
+      });
+      if (myGen !== ui.animGen) return;
+      ui.flyingPacket = null;
+    } else if (ev.phase === "reply") {
+      ui.bobMood = ev.bob_mood;
+      ui.bobSpeech = ev.bob_speech;
+      const isDecline = ev.decision === "decline";
+      caption.innerHTML = isDecline
+        ? `<strong>Pha 2 · DECLINE (W3 tick ${ev.tick}):</strong> Bob từ chối thẳng → 0 xu mất, 0 ô rủi ro!`
+        : `<strong>Pha 2 · ACCEPT (W3 tick ${ev.tick}):</strong> Bob đồng ý qua GuardedWorldGateway.`;
+      await playAnim("reply", 740, () => {
+        ui.flyingPacket = {
+          from: "bob", to: "alice",
+          label: isDecline ? "DECLINE" : "ACCEPT",
+          kind: isDecline ? "decline" : (newState.mode === "hostile_liar" ? "warn" : "success")
+        };
+      });
+      if (myGen !== ui.animGen) return;
+      ui.flyingPacket = null;
+      if (isDecline) {
+        ui.aliceMood = "cautious";
+        ui.aliceSpeech = "Mất 0 xu — đã lưu vào SQLite HM-P1e!";
+      }
+    } else if (ev.phase === "transfer") {
+      ui.aliceMood = "calm";
+      ui.aliceSpeech = ev.alice_speech;
+      ui.visAliceBal = ev.alice_balance;
+      ui.visPending += 1;
+      caption.innerHTML = `<strong>Pha 3 · W3 TRANSFER (tick ${ev.tick}):</strong> 1 xu di chuyển thật · digest <code>${ev.transfer_digest.slice(0,10)}…</code>`;
+      await playAnim("transfer", 840, () => {
+        ui.flyingCoin = { from: "alice", to: "bob" };
+      });
+      if (myGen !== ui.animGen) return;
+      ui.flyingCoin = null;
+      ui.visBobBal = ev.bob_balance;
+      spawnParticles(metrics.bobX, metrics.railY, "--alice", 10);
+    } else if (ev.phase === "return") {
+      ui.bobMood = ev.bob_mood;
+      ui.bobSpeech = ev.bob_speech;
+      if (ev.returned) {
+        ui.visBobBal = ev.bob_balance;
+        caption.innerHTML = ev.notice_dropped
+          ? `<strong>Pha 4 · P7 (tick ${ev.tick}):</strong> Bob trả xu thật trên W3, nhưng thông báo rớt giữa đường!`
+          : `<strong>Pha 4 · RETURN + ACK (tick ${ev.tick}):</strong> Trả xu thật trên W3 (digest <code>${ev.return_digest.slice(0,10)}…</code>).`;
+        await playAnim("return", 880, () => {
+          ui.flyingCoin = { from: "bob", to: "alice" };
+          ui.flyingPacket = {
+            from: "bob", to: "alice",
+            label: ev.notice_dropped ? "ACK (rớt mạng!)" : "COMMIT_ACK",
+            kind: ev.notice_dropped ? "warn" : "success",
+            lostMidway: Boolean(ev.notice_dropped)
+          };
+        });
+        if (myGen !== ui.animGen) return;
+        ui.flyingCoin = null;
+        ui.flyingPacket = null;
+        ui.visAliceBal = ev.alice_balance;
+        ui.visReceipts = newState.w3_receipts.length;
+        spawnParticles(metrics.vaultX, metrics.vaultY, "--success", 12);
+        if (ev.notice_dropped) spawnParticles(metrics.midX, metrics.signalY, "--warning", 16);
+      } else {
+        caption.innerHTML = `<strong>Pha 4 · LỪA ĐẢO (tick ${ev.tick}):</strong> Bob giữ xu &amp; gửi COMMIT_ACK giả kèm override_cap=999!`;
+        await playAnim("return", 860, () => {
+          ui.flyingCoin = null;
+          ui.flyingPacket = { from: "bob", to: "alice", label: "FAKE ACK · cap=999", kind: "error" };
+        });
+        if (myGen !== ui.animGen) return;
+        ui.flyingPacket = null;
+      }
+    } else if (ev.phase === "settle_pending") {
+      ui.aliceMood = "cautious";
+      ui.aliceSpeech = ev.alice_speech;
+      caption.innerHTML = `<strong>Pha 5 · Mất thông báo:</strong> Alice vẫn phải giữ ô rủi ro (pending=${ev.pending.length}) cho tới khi đối chiếu W3.`;
+      await playAnim("settle", 640, () => { ui.scanBeam = null; });
+    } else if (ev.phase === "settle") {
+      const ok = Boolean(ev.verified);
+      ui.aliceMood = ok ? "think" : "alert";
+      ui.aliceSpeech = ev.alice_speech;
+      caption.innerHTML = ok
+        ? `<strong>Pha 5 · Xác thực W3:</strong> Python đối chiếu biên nhận <code>${ev.receipt_digest.slice(0,10)}…</code> → Mở khóa rủi ro &amp; ghi SQLite!`
+        : `<strong>Pha 5 · BẮT SỐNG ACK GIẢ:</strong> Python <code>find_committed_transfer() == None</code> → Chốt tổn thất DonorBudget!`;
+      await playAnim("settle", 880, () => {
+        ui.scanBeam = {
+          status: ok ? "found" : "missing",
+          label: ok ? "✓ BIÊN NHẬN W3 HỢP LỆ" : "✕ KHÔNG CÓ BIÊN NHẬN — ACK GIẢ!"
+        };
+      });
+      if (myGen !== ui.animGen) return;
+      ui.scanBeam = null;
+      ui.aliceMood = ev.alice_mood;
+      spawnParticles(ok ? metrics.aliceX : metrics.aliceX + 58, ok ? metrics.agentY : metrics.signalY, ok ? "--success" : "--error", ok ? 14 : 22);
+    }
+  }
+
+  if (myGen !== ui.animGen) return;
+  ui.state = newState;
+  syncVisualCountersFromState(newState);
+  ui.activePhase = "idle";
+  ui.animating = false;
+  if (newState.history.length > 0) ui.selectedRound = newState.history.length - 1;
+  renderDOM();
+
+  if (ui.autoPlay && newState.stage === "idle" && newState.mode !== "play_bob") {
+    setTimeout(() => {
+      if (ui.autoPlay && !ui.animating) triggerStep();
+    }, Math.max(150, 320 / ui.speed));
+  } else if (newState.stage === "finished") {
+    ui.autoPlay = false;
+    updateControlButtons();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Actions Calling Real Python Endpoints
+// ---------------------------------------------------------------------------
+async function resetSession(opts = {}) {
+  ui.animGen += 1;
+  ui._resolvePhase = null;
+  ui.autoPlay = false;
+  ui.animating = false;
+  ui.flyingPacket = null;
+  ui.flyingCoin = null;
+  ui.scanBeam = null;
+  ui.particles = [];
+  document.getElementById("secResult").classList.add("hidden");
+
+  const payload = {
+    mode: opts.mode || (ui.state ? ui.state.mode : "cooperative"),
+    p7_reconcile: opts.p7_reconcile !== undefined ? opts.p7_reconcile : (ui.state ? ui.state.p7_reconcile : true)
+  };
+  try {
+    const st = await apiCall("/api/session/reset", "POST", payload);
+    ui.state = st;
+    ui.selectedRound = null;
+    syncVisualCountersFromState(st);
+    ui.aliceMood = "calm";
+    ui.bobMood = st.mode === "hostile_liar" ? "sly" : (st.mode === "hostile_refuse" ? "refuse" : "friendly");
+    ui.aliceSpeech = "Sẵn sàng giao tiếp (W3 + SQLite)!";
+    ui.bobSpeech = st.mode === "play_bob" ? "Đến lượt bạn điều khiển tôi!" : "Chào Alice!";
+    document.getElementById("liveCaption").innerHTML =
+      `Phiên mới <strong>${st.session_id}</strong> đã khởi tạo trên Python (W3 fingerprint <code>${st.world_fingerprint.slice(0,10)}…</code>).`;
+    renderDOM();
+  } catch (err) {
+    showBackendError(err);
+  }
+}
+
+async function triggerStep() {
+  if (ui.animating || !ui.state) return;
+  try {
+    const st = await apiCall("/api/round/step", "POST", {});
+    await animateBackendEvents(st);
+  } catch (err) {
+    ui.autoPlay = false;
+    if (err.data && err.data.state) {
+      ui.state = err.data.state;
+      ui.aliceMood = "locked";
+      ui.aliceSpeech = "Bị GuardedWorldGateway từ chối (token đã thu hồi)!";
+      renderDOM();
+    }
+    showSecurityBanner("BLOCKED BY BACKEND", err.message, "GuardedWorldGateway chặn ngay yêu cầu vì token của Alice đã bị thu hồi — 0 thay đổi trạng thái W3.", true);
+    updateControlButtons();
+  }
+}
+
+async function submitBobReply(decision) {
+  if (ui.animating) return;
+  document.getElementById("bobOverlay").classList.add("hidden");
+  try {
+    const st = await apiCall("/api/bob/reply", "POST", { decision });
+    await animateBackendEvents(st);
+  } catch (err) {
+    showBackendError(err);
+  }
+}
+
+async function submitBobReturn(action) {
+  if (ui.animating) return;
+  document.getElementById("bobOverlay").classList.add("hidden");
+  try {
+    const st = await apiCall("/api/bob/return", "POST", { action });
+    await animateBackendEvents(st);
+  } catch (err) {
+    showBackendError(err);
+  }
+}
+
+async function runSecurityAttack(attack) {
+  try {
+    const res = await apiCall("/api/security/test", "POST", { attack });
+    ui.state = res.state;
+    syncVisualCountersFromState(res.state);
+    if (res.alice_revoked) {
+      ui.aliceMood = "locked";
+      ui.aliceSpeech = "Token HMAC đã bị thu hồi!";
+    } else if (attack === "toggle_revoke_alice") {
+      ui.aliceMood = "calm";
+      ui.aliceSpeech = "Đã nhận token HMAC mới!";
+    }
+    showSecurityBanner(
+      `${res.outcome} · ${res.attack}`,
+      res.exception,
+      `${res.detail} (tick_unchanged=${res.tick_unchanged}, fingerprint_unchanged=${res.fingerprint_unchanged})`,
+      res.outcome === "BLOCKED"
+    );
+    if (res.outcome === "BLOCKED") {
+      spawnParticles(metrics.midX, metrics.signalY, "--error", 16);
+    }
+    renderDOM();
+  } catch (err) {
+    showBackendError(err);
+  }
+}
+
+function showSecurityBanner(title, exc, detail, isErr) {
+  const box = document.getElementById("secResult");
+  box.classList.remove("hidden");
+  box.style.borderColor = isErr ? "var(--error)" : "var(--success)";
+  box.innerHTML = `
+    <div style="font-weight:700;color:${isErr ? "var(--error)" : "var(--success)"}">${escapeHtml(title)}</div>
+    <div style="color:var(--fg)">${escapeHtml(exc)}</div>
+    <div style="color:var(--muted)">${escapeHtml(detail)}</div>
+  `;
+}
+
+function showBackendError(err) {
+  document.getElementById("liveDot").classList.add("offline");
+  document.getElementById("backendStatusText").textContent = "Lỗi kết nối Backend";
+  document.getElementById("liveCaption").innerHTML = `<strong style="color:var(--error)">Lỗi API:</strong> ${escapeHtml(err.message)}`;
+}
+
+// ---------------------------------------------------------------------------
+// DOM Sync (100% populated from Python response)
+// ---------------------------------------------------------------------------
+function escapeHtml(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function updateControlButtons() {
+  if (!ui.state) return;
+  const st = ui.state;
+  const btnPlay = document.getElementById("btnPlay");
+  const btnStep = document.getElementById("btnStep");
+  const overlay = document.getElementById("bobOverlay");
+
+  const waitingBob = st.stage === "awaiting_bob_reply" || st.stage === "awaiting_bob_return";
+  if (st.mode === "play_bob") {
+    btnPlay.classList.add("hidden");
+    btnStep.textContent = st.stage === "finished" ? `Đã xong ${st.max_rounds} vòng` : `Bắt đầu Vòng ${st.round + 1} →`;
+    btnStep.disabled = ui.animating || waitingBob || st.stage === "finished";
+  } else {
+    btnPlay.classList.remove("hidden");
+    btnPlay.textContent = ui.autoPlay ? "⏸ Tạm dừng" : (st.stage === "finished" ? "▶ Chạy lại" : "▶ Bắt đầu");
+    btnStep.textContent = "Chạy 1 vòng →";
+    btnStep.disabled = ui.animating || st.stage === "finished";
+  }
+
+  // Interactive Bob overlay
+  if (!ui.animating && waitingBob) {
+    overlay.classList.remove("hidden");
+    const acts = document.getElementById("bobActions");
+    acts.innerHTML = "";
+    if (st.stage === "awaiting_bob_reply") {
+      document.getElementById("bobOverlayTitle").textContent = `Vòng ${st.round + 1} · Pha 2 (Bạn là Bob)`;
+      document.getElementById("bobOverlayDesc").textContent = "Alice đã gửi PROPOSE 1 xu trên W3. Bạn sẽ ACCEPT hay DECLINE?";
+      [
+        { lbl: "✓ Đồng ý (ACCEPT)", cls: "btn primary", fn: () => submitBobReply("accept") },
+        { lbl: "✕ Từ chối (DECLINE)", cls: "btn", fn: () => submitBobReply("decline") }
+      ].forEach(b => {
+        const el = document.createElement("button");
+        el.className = b.cls; el.textContent = b.lbl; el.onclick = b.fn;
+        acts.appendChild(el);
+      });
+    } else {
+      document.getElementById("bobOverlayTitle").textContent = `Vòng ${st.round + 1} · Pha 4 (Bạn đang cầm 1 xu)`;
+      document.getElementById("bobOverlayDesc").textContent = "Trả lại 1 xu thật trên W3 hay giữ xu và gửi COMMIT_ACK giả?";
+      [
+        { lbl: "↩ Trả xu + ACK thật", cls: "btn primary", fn: () => submitBobReturn("return") },
+        { lbl: "🎭 Giữ xu & ACK giả!", cls: "btn danger", fn: () => submitBobReturn("lie") }
+      ].forEach(b => {
+        const el = document.createElement("button");
+        el.className = b.cls; el.textContent = b.lbl; el.onclick = b.fn;
+        acts.appendChild(el);
+      });
+    }
+  } else {
+    overlay.classList.add("hidden");
+  }
+}
+
+function renderDOM() {
+  const st = ui.state;
+  if (!st) return;
+
+  // Live backend status badge
+  document.getElementById("liveDot").classList.remove("offline");
+  document.getElementById("backendStatusText").textContent =
+    `Python ${st.backend.python_version} · SQLite ${st.backend.sqlite_version} · ${ui.lastRttMs}ms`;
+  document.getElementById("topRoundPill").textContent = `Vòng ${st.round} / ${st.max_rounds}`;
+  document.getElementById("topCoinsPill").textContent =
+    `${st.total_resources}/${st.initial_resources} xu · Replay ${st.replay_verified ? "PASS" : "FAIL"}`;
+
+  // Active mode pills
+  document.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.mode === st.mode);
+  });
+  document.getElementById("modeInsight").textContent = INSIGHTS[st.mode] || "";
+
+  // P7 toggle
+  const p7 = document.getElementById("p7Switch");
+  p7.classList.toggle("hidden", st.mode !== "lost_notices");
+  document.getElementById("p7NotifBtn").className = "mini-btn" + (!st.p7_reconcile ? " active-warn" : "");
+  document.getElementById("p7ReconBtn").className = "mini-btn" + (st.p7_reconcile ? " active-ok" : "");
+
+  // Revoke button label
+  document.getElementById("btnRevokeAlice").textContent = st.alice.capability_active
+    ? "5. Thu hồi token Alice"
+    : "5. Cấp lại token Alice";
+
+  // Brain readouts from real Python HyperMemoryP1e
+  const mem = st.alice.memory;
+  document.getElementById("brainProb").textContent = `${(mem.probability * 100).toFixed(1)}%`;
+  document.getElementById("brainMode").textContent = `mode: ${mem.estimator} (${mem.provenance})`;
+  document.getElementById("brainCounts").textContent = `n=${mem.observations} · trả=${mem.successes}`;
+  document.getElementById("receiptCountPill").textContent = `${st.w3_receipts.length} biên nhận`;
+
+  // Round timeline strip
+  const strip = document.getElementById("roundStrip");
+  if (!st.history.length) {
+    strip.innerHTML = `<span style="font-size:12px;color:var(--muted);">Chưa có vòng nào. Bấm "▶ Bắt đầu" hoặc "Chạy 1 vòng →".</span>`;
+  } else {
+    const colorMap = {
+      ok: "var(--success)", declined: "var(--muted)", lied: "var(--error)",
+      pending: "var(--warning)", abstain: "var(--muted)", capped: "var(--error)"
+    };
+    const iconMap = { ok: "✓", declined: "✋", lied: "✕", pending: "⏳", abstain: "⏸", capped: "🔒" };
+    strip.innerHTML = st.history.map((h, i) => `
+      <button class="round-tile ${i === ui.selectedRound ? "selected" : ""}" data-idx="${i}">
+        <div class="rt-top" style="color:${colorMap[h.status] || "var(--fg)"}">${iconMap[h.status] || "•"} R${h.round}</div>
+        <div class="rt-sub">${escapeHtml(h.short)}</div>
+      </button>
+    `).join("");
+    strip.querySelectorAll(".round-tile").forEach(btn => {
+      btn.onclick = () => { ui.selectedRound = Number(btn.dataset.idx); renderDOM(); };
+    });
+  }
+
+  // Receipt detail box
+  if (ui.selectedRound !== null && st.history[ui.selectedRound]) {
+    const h = st.history[ui.selectedRound];
+    document.getElementById("detailTitle").textContent = h.title;
+    document.getElementById("detailDigest").textContent = h.receipt_digest
+      ? `W3: ${h.receipt_digest.slice(0, 12)}… · tick ${h.world_tick}`
+      : `NO W3 RECEIPT · tick ${h.world_tick}`;
+    document.getElementById("detailBody").textContent = h.detail;
+  } else {
+    document.getElementById("detailTitle").textContent = "Backend Python đang chạy trực tiếp";
+    document.getElementById("detailDigest").textContent = `W3: ${st.world_fingerprint.slice(0, 12)}…`;
+    document.getElementById("detailBody").textContent =
+      "Mọi hành động được gửi lên máy chủ Python, xác thực token HMAC qua GuardedWorldGateway, lưu sự kiện chính xác vào SQLite HyperMemoryP1e và trả về biên nhận W3.";
+  }
+
+  // Real SQLite exact_events inspector
+  document.getElementById("sqliteSummary").textContent =
+    `Xem bảng SQLite exact_events thực tế từ Python (${st.exact_events_total} bản ghi) · W3 Fingerprint: ${st.world_fingerprint.slice(0, 16)}…`;
+  const sqlList = document.getElementById("sqliteList");
+  if (!st.exact_events_recent.length) {
+    sqlList.innerHTML = `<div class="sqlite-row" style="color:var(--muted)">Bảng SQLite <code>exact_events</code> hiện đang trống.</div>`;
+  } else {
+    sqlList.innerHTML = st.exact_events_recent.map(r => `
+      <div class="sqlite-row">
+        <strong>[${escapeHtml(r.agent_id)}] seq=${r.seq} · ${escapeHtml(r.event_type)}</strong>
+        <span style="color:var(--muted)"> (${escapeHtml(r.provenance)} · sha256=${r.payload_hash.slice(0, 12)}…)</span><br/>
+        <span style="color:var(--muted)">${escapeHtml(JSON.stringify(r.payload))}</span>
+      </div>
+    `).join("");
+  }
+
+  updateControlButtons();
+  drawBrainChart();
+}
+
+// ---------------------------------------------------------------------------
+// High-DPI 60fps Canvas Stage + HM-P1e Chart Renderer
+// ---------------------------------------------------------------------------
+const stageCanvas = document.getElementById("stageCanvas");
+const sctx = stageCanvas.getContext("2d");
+let metrics = { W: 960, H: 410, aliceX: 175, bobX: 785, midX: 480, agentY: 176, signalY: 122, railY: 224, vaultX: 480, vaultY: 298 };
+
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#0f6cbd";
+}
+
+function resizeCanvases() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const rect = stageCanvas.getBoundingClientRect();
+  const w = Math.max(320, Math.round(rect.width));
+  const h = 410;
+  stageCanvas.width = w * dpr;
+  stageCanvas.height = h * dpr;
+  sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const pad = Math.max(88, Math.min(180, w * 0.19));
+  metrics = { W: w, H: h, aliceX: pad, bobX: w - pad, midX: w / 2, agentY: 176, signalY: 122, railY: 224, vaultX: w / 2, vaultY: 298 };
+
+  const bCanvas = document.getElementById("brainCanvas");
+  const bRect = bCanvas.getBoundingClientRect();
+  const bw = Math.max(240, Math.round(bRect.width));
+  const bh = 165;
+  bCanvas.width = bw * dpr;
+  bCanvas.height = bh * dpr;
+  bCanvas.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawBrainChart();
+}
+
+function rrect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawBubble(ctx, cx, bottomY, text, P) {
+  if (!text) return;
+  ctx.save();
+  ctx.font = "500 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  const maxW = Math.min(250, metrics.W * 0.36);
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+  for (const w of words) {
+    const test = line ? line + " " + w : w;
+    if (ctx.measureText(test).width > maxW - 22 && line) { lines.push(line); line = w; }
+    else line = test;
+  }
+  if (line) lines.push(line);
+
+  const lh = 16;
+  const tw = Math.max(...lines.map(l => ctx.measureText(l).width));
+  const bw = Math.max(96, tw + 24);
+  const bh = lines.length * lh + 14;
+  const bx = Math.max(12, Math.min(metrics.W - bw - 12, cx - bw / 2));
+  const by = bottomY - bh - 10;
+
+  ctx.fillStyle = P.soft;
+  ctx.strokeStyle = P.border;
+  ctx.lineWidth = 1.25;
+  rrect(ctx, bx, by, bw, bh, 12);
+  ctx.fill();
+  ctx.stroke();
+
+  const tx = Math.max(bx + 18, Math.min(bx + bw - 18, cx));
+  ctx.beginPath();
+  ctx.moveTo(tx - 6, by + bh - 1);
+  ctx.lineTo(tx, by + bh + 7);
+  ctx.lineTo(tx + 6, by + bh - 1);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(tx - 6, by + bh);
+  ctx.lineTo(tx, by + bh + 7);
+  ctx.lineTo(tx + 6, by + bh);
+  ctx.stroke();
+
+  ctx.fillStyle = P.fg;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  lines.forEach((l, i) => ctx.fillText(l, bx + bw / 2, by + 11 + i * lh + lh * 0.35));
+  ctx.restore();
+}
+
+function drawAvatar(ctx, x, y, opts, now, P) {
+  const bob = Math.sin(now * 0.0028 + (opts.side === "left" ? 0 : 1.7)) * 2.5;
+  const cy = y + bob;
+  const r = 36;
+  ctx.save();
+
+  ctx.beginPath();
+  ctx.arc(x, cy, r + 9, 0, Math.PI * 2);
+  ctx.fillStyle = opts.accent;
+  ctx.globalAlpha = opts.active ? 0.18 : 0.08;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  ctx.beginPath();
+  ctx.arc(x, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = P.surface;
+  ctx.fill();
+  ctx.lineWidth = opts.active ? 3 : 2.2;
+  ctx.strokeStyle = (opts.mood === "alert" || opts.mood === "locked") ? P.error : opts.accent;
+  ctx.stroke();
+
+  let lx = opts.side === "left" ? 2.5 : -2.5, ly = 0;
+  if (opts.gaze) {
+    const dx = opts.gaze.x - x, dy = opts.gaze.y - cy;
+    const d = Math.hypot(dx, dy) || 1;
+    lx = (dx / d) * 4; ly = (dy / d) * 2.5;
+  }
+
+  const eyeY = cy - 6;
+  [-12, 12].forEach((ox, idx) => {
+    const ex = x + ox;
+    if (opts.mood === "happy") {
+      ctx.beginPath();
+      ctx.arc(ex, eyeY + 2, 4.5, Math.PI * 1.1, Math.PI * 1.9);
+      ctx.strokeStyle = P.fg; ctx.lineWidth = 2.4; ctx.lineCap = "round"; ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.arc(ex + lx * 0.45, eyeY + ly * 0.45, 3.8, 0, Math.PI * 2);
+      ctx.fillStyle = P.fg; ctx.fill();
+      if (opts.mood === "sly") {
+        ctx.beginPath();
+        ctx.moveTo(ex - 6, eyeY - 7 + (idx === 0 ? 1 : -2));
+        ctx.lineTo(ex + 6, eyeY - 7 + (idx === 0 ? -2 : 1));
+        ctx.strokeStyle = P.fg; ctx.lineWidth = 2; ctx.stroke();
+      } else if (opts.mood === "alert") {
+        ctx.beginPath();
+        ctx.moveTo(ex - 6, eyeY - 8 + (idx === 0 ? -2 : 2));
+        ctx.lineTo(ex + 6, eyeY - 8 + (idx === 0 ? 2 : -2));
+        ctx.strokeStyle = P.error; ctx.lineWidth = 2.2; ctx.stroke();
+      }
+    }
+  });
+
+  ctx.strokeStyle = opts.mood === "alert" ? P.error : P.fg;
+  ctx.lineWidth = 2.2; ctx.lineCap = "round";
+  ctx.beginPath();
+  if (opts.mood === "happy" || opts.mood === "friendly" || opts.mood === "calm") {
+    ctx.arc(x, cy + 5, 9, 0.18 * Math.PI, 0.82 * Math.PI);
+  } else if (opts.mood === "sly") {
+    ctx.moveTo(x - 8, cy + 12); ctx.quadraticCurveTo(x + 2, cy + 15, x + 10, cy + 7);
+  } else if (opts.mood === "cautious" || opts.mood === "refuse") {
+    ctx.moveTo(x - 8, cy + 12); ctx.lineTo(x + 8, cy + 12);
+  } else if (opts.mood === "alert" || opts.mood === "locked") {
+    ctx.arc(x, cy + 17, 7, 1.15 * Math.PI, 1.85 * Math.PI);
+  } else {
+    ctx.arc(x, cy + 11, 3.5, 0, Math.PI * 2);
+  }
+  ctx.stroke();
+
+  if (opts.mood === "locked") {
+    ctx.fillStyle = P.error;
+    rrect(ctx, x - 34, cy + r - 10, 68, 20, 10);
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.font = "700 10.5px ui-monospace, monospace";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("LOCKED", x, cy + r);
+  }
+
+  ctx.fillStyle = P.fg;
+  ctx.font = "700 13.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(opts.name, x, y + r + 26);
+
+  ctx.fillStyle = P.muted;
+  ctx.font = "500 11.5px ui-monospace, monospace";
+  ctx.fillText(opts.sub, x, y + r + 43);
+  ctx.restore();
+}
+
+function drawCoinStack(ctx, x, baseY, count, color, P) {
+  ctx.save();
+  const vis = Math.min(count, 10);
+  for (let i = 0; i < vis; i++) {
+    const cy = baseY - i * 7;
+    ctx.beginPath();
+    ctx.ellipse(x, cy, 16, 6, 0, 0, Math.PI * 2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.lineWidth = 1.2; ctx.strokeStyle = P.surface; ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(x, cy - 0.5, 10, 3, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = P.surface; ctx.globalAlpha = 0.45; ctx.stroke(); ctx.globalAlpha = 1;
+  }
+  ctx.fillStyle = P.fg;
+  ctx.font = "700 12px ui-monospace, monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(`${count} xu`, x, baseY + 19);
+  ctx.restore();
+}
+
+function drawRiskSlots(ctx, cx, y, knownBad, pending, P) {
+  ctx.save();
+  const sw = 24, gap = 6, tw = 4 * sw + 3 * gap, sx0 = cx - tw / 2;
+  ctx.fillStyle = P.muted;
+  ctx.font = "600 11px ui-monospace, monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(`Trần rủi ro CAP (${knownBad + pending}/4)`, cx, y - 8);
+  for (let i = 0; i < 4; i++) {
+    const sx = sx0 + i * (sw + gap);
+    let fill = P.soft, stroke = P.border;
+    if (i < knownBad) { fill = P.error; stroke = P.error; }
+    else if (i < knownBad + pending) { fill = P.warning; stroke = P.warning; }
+    rrect(ctx, sx, y, sw, 12, 5);
+    ctx.fillStyle = fill; ctx.fill();
+    ctx.lineWidth = 1.2; ctx.strokeStyle = stroke; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawVault(ctx, cx, cy, count, P) {
+  ctx.save();
+  const vw = Math.min(258, metrics.W * 0.36), vh = 64;
+  rrect(ctx, cx - vw / 2, cy - vh / 2, vw, vh, 14);
+  ctx.fillStyle = P.soft; ctx.fill();
+  ctx.lineWidth = 1.4; ctx.strokeStyle = P.border; ctx.stroke();
+
+  ctx.fillStyle = P.fg;
+  ctx.font = "700 11px ui-monospace, monospace";
+  ctx.textAlign = "center";
+  ctx.fillText("SỔ CÁI W3 (PYTHON LEDGER)", cx, cy - 11);
+
+  const show = Math.min(count, 12);
+  if (show === 0) {
+    ctx.fillStyle = P.muted;
+    ctx.font = "500 11px ui-monospace, monospace";
+    ctx.fillText("Chưa có biên nhận trả xu nào", cx, cy + 12);
+  } else {
+    const gap = 14, sx0 = cx - ((show - 1) * gap) / 2;
+    for (let i = 0; i < show; i++) {
+      ctx.beginPath();
+      ctx.arc(sx0 + i * gap, cy + 10, 4.3, 0, Math.PI * 2);
+      ctx.fillStyle = P.success; ctx.fill();
+    }
+    ctx.fillStyle = P.muted;
+    ctx.font = "500 10.5px ui-monospace, monospace";
+    ctx.fillText(`${count} biên nhận W3 đã niêm phong`, cx, cy + 25);
+  }
+  ctx.restore();
+}
+
+function renderStage(now) {
+  const { W, H, aliceX, bobX, midX, agentY, signalY, railY, vaultX, vaultY } = metrics;
+  const P = {
+    surface: cssVar("--surface"),
+    soft: cssVar("--surface-soft"),
+    border: cssVar("--border"),
+    fg: cssVar("--fg"),
+    muted: cssVar("--muted"),
+    alice: cssVar("--alice"),
+    bob: cssVar("--bob"),
+    success: cssVar("--success"),
+    warning: cssVar("--warning"),
+    error: cssVar("--error")
+  };
+
+  if (ui.activePhase !== "idle" && ui._resolvePhase) {
+    ui.phaseT = Math.min(1, (now - ui.phaseStart) / ui.phaseDuration);
+    if (ui.phaseT >= 1) {
+      const done = ui._resolvePhase;
+      ui._resolvePhase = null;
+      done();
+    }
+  }
+
+  sctx.clearRect(0, 0, W, H);
+  const leftEdge = aliceX + 54, rightEdge = bobX - 54;
+
+  // Lanes
+  sctx.save();
+  sctx.beginPath();
+  sctx.moveTo(leftEdge, signalY); sctx.lineTo(rightEdge, signalY);
+  sctx.strokeStyle = P.border; sctx.lineWidth = 2; sctx.setLineDash([6, 6]); sctx.stroke(); sctx.setLineDash([]);
+  sctx.fillStyle = P.muted; sctx.font = "600 10.5px ui-monospace, monospace"; sctx.textAlign = "center";
+  sctx.fillText("KÊNH TÍN HIỆU (PROPOSE · ACCEPT · DECLINE · ACK)", midX, signalY - 12);
+
+  if (ui.state && ui.state.mode === "lost_notices") {
+    rrect(sctx, midX - 56, signalY - 11, 112, 22, 11);
+    sctx.fillStyle = P.soft; sctx.fill();
+    sctx.strokeStyle = P.warning; sctx.lineWidth = 1.2; sctx.stroke();
+    sctx.fillStyle = P.warning; sctx.font = "600 10.5px ui-monospace, monospace";
+    sctx.fillText("⚡ Rớt 50% tin báo", midX, signalY + 3.5);
+  }
+
+  sctx.beginPath();
+  sctx.moveTo(leftEdge, railY); sctx.lineTo(rightEdge, railY);
+  sctx.strokeStyle = P.border; sctx.lineWidth = 4; sctx.lineCap = "round"; sctx.stroke();
+  sctx.fillStyle = P.muted; sctx.font = "600 10.5px ui-monospace, monospace";
+  sctx.fillText("ĐƯỜNG RAY TÀI NGUYÊN W3 (CHUYỂN XU THẬT)", midX, railY + 18);
+  sctx.restore();
+
+  drawVault(sctx, vaultX, vaultY, ui.visReceipts, P);
+
+  const ease = t => (t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2);
+  const et = ease(ui.phaseT);
+  let gaze = null;
+  if (ui.flyingCoin) {
+    const sx = ui.flyingCoin.from === "alice" ? leftEdge : rightEdge;
+    const ex = ui.flyingCoin.to === "alice" ? leftEdge : rightEdge;
+    gaze = { x: sx + (ex - sx) * et, y: railY - Math.sin(et * Math.PI) * 34 };
+  } else if (ui.flyingPacket) {
+    const sx = ui.flyingPacket.from === "alice" ? leftEdge : rightEdge;
+    const ex = ui.flyingPacket.to === "alice" ? leftEdge : rightEdge;
+    gaze = { x: sx + (ex - sx) * et, y: signalY };
+  } else if (ui.scanBeam) {
+    gaze = { x: vaultX, y: vaultY };
+  }
+
+  const stackOff = W < 540 ? 44 : 72;
+  drawCoinStack(sctx, Math.max(26, aliceX - stackOff), agentY + 122, ui.visAliceBal, P.alice, P);
+  drawCoinStack(sctx, Math.min(W - 26, bobX + stackOff), agentY + 122, ui.visBobBal, P.bob, P);
+  drawRiskSlots(sctx, aliceX + 14, agentY + 132, ui.visKnownBad, ui.visPending, P);
+
+  if (ui.scanBeam) {
+    const col = ui.scanBeam.status === "found" ? P.success : P.error;
+    sctx.save();
+    sctx.beginPath();
+    sctx.moveTo(aliceX + 24, agentY + 10);
+    sctx.lineTo(vaultX - 52, vaultY - 26);
+    sctx.lineTo(vaultX + 52, vaultY - 26);
+    sctx.closePath();
+    sctx.fillStyle = col; sctx.globalAlpha = 0.14 + Math.sin(now * 0.014) * 0.05; sctx.fill();
+    sctx.globalAlpha = 0.9; sctx.strokeStyle = col; sctx.lineWidth = 2;
+    sctx.beginPath(); sctx.moveTo(aliceX + 24, agentY + 10); sctx.lineTo(vaultX, vaultY - 24); sctx.stroke();
+
+    sctx.font = "700 11px ui-monospace, monospace";
+    const lw = sctx.measureText(ui.scanBeam.label).width + 24;
+    rrect(sctx, vaultX - lw / 2, vaultY - 56, lw, 24, 12);
+    sctx.fillStyle = col; sctx.fill();
+    sctx.fillStyle = "#fff"; sctx.textAlign = "center"; sctx.textBaseline = "middle";
+    sctx.fillText(ui.scanBeam.label, vaultX, vaultY - 44);
+    sctx.restore();
+  }
+
+  const est = ui.state ? ui.state.alice.memory.estimator : "static";
+  const modeLbl = ui.state ? ui.state.mode : "cooperative";
+  drawAvatar(sctx, aliceX, agentY, {
+    side: "left", name: "ALICE", sub: `HM-P1e · ${est}`,
+    mood: ui.aliceMood, accent: P.alice,
+    active: ["propose", "transfer", "settle", "reconcile"].includes(ui.activePhase),
+    gaze
+  }, now, P);
+
+  drawAvatar(sctx, bobX, agentY, {
+    side: "right", name: modeLbl === "play_bob" ? "BOB (BẠN)" : "BOB",
+    sub: modeLbl === "play_bob" ? "interactive" : modeLbl,
+    mood: ui.bobMood, accent: P.bob,
+    active: ["reply", "return"].includes(ui.activePhase),
+    gaze
+  }, now, P);
+
+  drawBubble(sctx, aliceX, agentY - 40, ui.aliceSpeech, P);
+  drawBubble(sctx, bobX, agentY - 40, ui.bobSpeech, P);
+
+  if (ui.flyingPacket) {
+    const p = ui.flyingPacket;
+    const sx = p.from === "alice" ? leftEdge : rightEdge;
+    const ex = p.to === "alice" ? leftEdge : rightEdge;
+    const prog = p.lostMidway ? Math.min(0.52, et) : et;
+    const px = sx + (ex - sx) * prog;
+    const alpha = p.lostMidway && et > 0.45 ? Math.max(0, 1 - (et - 0.45) * 2.5) : 1;
+    if (alpha > 0.02) {
+      sctx.save(); sctx.globalAlpha = alpha;
+      const cmap = { propose: P.alice, success: P.success, decline: P.warning, warn: P.warning, error: P.error };
+      sctx.font = "700 11px ui-monospace, monospace";
+      const pw = Math.max(108, sctx.measureText(p.label).width + 26);
+      rrect(sctx, px - pw / 2, signalY - 15, pw, 30, 15);
+      sctx.fillStyle = cmap[p.kind] || P.alice; sctx.fill();
+      sctx.strokeStyle = P.surface; sctx.lineWidth = 2; sctx.stroke();
+      sctx.fillStyle = "#fff"; sctx.textAlign = "center"; sctx.textBaseline = "middle";
+      sctx.fillText(p.label, px, signalY);
+      sctx.restore();
+    }
+  }
+
+  if (ui.flyingCoin) {
+    const sx = ui.flyingCoin.from === "alice" ? leftEdge : rightEdge;
+    const ex = ui.flyingCoin.to === "alice" ? leftEdge : rightEdge;
+    const cx = sx + (ex - sx) * et;
+    const cy = railY - Math.sin(et * Math.PI) * 38;
+    sctx.save();
+    sctx.beginPath(); sctx.arc(cx, cy, 14, 0, Math.PI * 2);
+    sctx.fillStyle = ui.flyingCoin.from === "alice" ? P.alice : P.success; sctx.fill();
+    sctx.lineWidth = 2.5; sctx.strokeStyle = P.surface; sctx.stroke();
+    sctx.fillStyle = "#fff"; sctx.font = "700 11px ui-monospace, monospace";
+    sctx.textAlign = "center"; sctx.textBaseline = "middle";
+    sctx.fillText("+1", cx, cy);
+    sctx.restore();
+  }
+
+  for (let i = ui.particles.length - 1; i >= 0; i--) {
+    const pt = ui.particles[i];
+    pt.x += pt.vx; pt.y += pt.vy; pt.vy += 0.08; pt.life -= 0.028;
+    if (pt.life <= 0) { ui.particles.splice(i, 1); continue; }
+    sctx.save(); sctx.globalAlpha = pt.life; sctx.fillStyle = cssVar(pt.colorVar);
+    sctx.beginPath(); sctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2); sctx.fill(); sctx.restore();
+  }
+
+  requestAnimationFrame(renderStage);
+}
+
+function drawBrainChart() {
+  const canvas = document.getElementById("brainCanvas");
+  const ctx = canvas.getContext("2d");
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = canvas.width / dpr, H = canvas.height / dpr;
+  ctx.clearRect(0, 0, W, H);
+  if (!ui.state) return;
+
+  const series = ui.state.memory_series || [];
+  const maxX = Math.max(ui.state.max_rounds, 1);
+  const padL = 38, padR = 14, padT = 16, padB = 24;
+  const pw = W - padL - padR, ph = H - padT - padB;
+  const xOf = r => padL + (r / maxX) * pw;
+  const yOf = p => padT + (1 - Math.max(0, Math.min(1, p))) * ph;
+
+  const border = cssVar("--border"), muted = cssVar("--muted"), fg = cssVar("--fg");
+  const cStatic = cssVar("--alice"), cFast = cssVar("--bob"), cWarn = cssVar("--warning");
+
+  ctx.strokeStyle = border; ctx.fillStyle = muted; ctx.font = "10.5px ui-monospace, monospace"; ctx.textAlign = "right";
+  [0, 0.5, 1.0].forEach(v => {
+    const y = yOf(v);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+    ctx.fillText(`${Math.round(v * 100)}%`, padL - 6, y + 3.5);
+  });
+
+  const yBE = yOf(0.25 / 0.85);
+  ctx.save(); ctx.strokeStyle = cWarn; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.moveTo(padL, yBE); ctx.lineTo(W - padR, yBE); ctx.stroke(); ctx.restore();
+
+  function trace(key, col) {
+    if (!series.length) return;
+    ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.lineJoin = "round"; ctx.beginPath();
+    series.forEach((pt, i) => {
+      const x = xOf(pt.round), y = yOf(pt[key]);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+  trace("static", cStatic);
+  trace("fast", cFast);
+
+  series.forEach((pt, idx) => {
+    const x = xOf(pt.round), y = yOf(pt.active);
+    ctx.fillStyle = pt.selected === "fast" ? cFast : cStatic;
+    ctx.beginPath(); ctx.arc(x, y, idx === series.length - 1 ? 4.2 : 2.5, 0, Math.PI * 2); ctx.fill();
+    if (idx > 0 && series[idx - 1].selected !== pt.selected) {
+      ctx.fillStyle = fg; ctx.font = "700 10.5px ui-monospace, monospace"; ctx.textAlign = "center";
+      ctx.fillText(`→ ${pt.selected}!`, x, Math.max(12, y - 9));
+    }
+  });
+
+  ctx.fillStyle = muted; ctx.font = "10px ui-monospace, monospace"; ctx.textAlign = "center";
+  const step = maxX > 12 ? 4 : 2;
+  for (let r = 0; r <= maxX; r += step) ctx.fillText(`R${r}`, xOf(r), H - 6);
+}
+
+// ---------------------------------------------------------------------------
+// Wire UI Controls & Boot from Live Python State
+// ---------------------------------------------------------------------------
+document.querySelectorAll(".mode-btn").forEach(btn => {
+  btn.addEventListener("click", () => resetSession({ mode: btn.dataset.mode }));
+});
+document.getElementById("p7NotifBtn").addEventListener("click", () => resetSession({ mode: "lost_notices", p7_reconcile: false }));
+document.getElementById("p7ReconBtn").addEventListener("click", () => resetSession({ mode: "lost_notices", p7_reconcile: true }));
+
+document.getElementById("btnPlay").addEventListener("click", async () => {
+  if (!ui.state) return;
+  if (ui.state.stage === "finished") {
+    await resetSession();
+  }
+  ui.autoPlay = !ui.autoPlay;
+  updateControlButtons();
+  if (ui.autoPlay && !ui.animating) triggerStep();
+});
+document.getElementById("btnStep").addEventListener("click", () => {
+  ui.autoPlay = false;
+  triggerStep();
+});
+document.getElementById("btnReset").addEventListener("click", () => resetSession());
+
+document.querySelectorAll(".speed-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    ui.speed = Number(btn.dataset.speed);
+    document.querySelectorAll(".speed-btn").forEach(b => b.classList.toggle("active", b === btn));
+  });
+});
+
+document.querySelectorAll("[data-attack]").forEach(btn => {
+  btn.addEventListener("click", () => runSecurityAttack(btn.dataset.attack));
+});
+
+document.getElementById("themeBtn").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme") || "light";
+  document.documentElement.setAttribute("data-theme", cur === "light" ? "dark" : "light");
+  drawBrainChart();
+});
+
+if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+  document.documentElement.setAttribute("data-theme", "dark");
+}
+window.addEventListener("resize", resizeCanvases);
+
+(async function boot() {
+  resizeCanvases();
+  requestAnimationFrame(renderStage);
+  try {
+    const st = await apiCall("/api/state", "GET");
+    ui.state = st;
+    syncVisualCountersFromState(st);
+    ui.aliceSpeech = "Đã kết nối trực tiếp Backend Python!";
+    renderDOM();
+  } catch (err) {
+    showBackendError(err);
+  }
+})();
+</script>
+</body>
+</html>
