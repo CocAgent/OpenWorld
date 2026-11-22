@@ -1,197 +1,367 @@
-# OpenWorld
+<div align="center">
 
-**Bộ công cụ nghiên cứu cục bộ cho các agent có trí nhớ, biết thích nghi và hợp tác.**
+# 🌍 OpenWorld
 
-OpenWorld nghiên cứu cách xây dựng những agent AI có danh tính lâu dài, lưu được bằng chứng về hoạt động của mình, học từ tương tác và hợp tác trong giới hạn tài nguyên rõ ràng. Mục tiêu dài hạn là một hệ sinh thái agent mở. Hiện tại, dự án là **bộ công cụ thử nghiệm bằng Python, chạy trên CPU**, gồm thế giới mô phỏng và các thí nghiệm có thể chạy lại để kiểm chứng.
+**Bộ công cụ nghiên cứu cục bộ cho các AI agent có danh tính bền vững, trí nhớ phân tách chứng cứ, học thích nghi và hợp tác có kiểm soát.**
 
-Mỗi agent có danh tính, lịch sử, trạng thái và quyền truy cập riêng. Nhiều agent có thể dùng chung một mô hình AI; không cần tạo một mô hình nền tảng riêng cho từng agent.
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
+[![Runtime: CPU-Only](https://img.shields.io/badge/Runtime-CPU--only%20%7C%20Zero%20API-2E7D32)](#bat-dau-trong-60-giay)
+[![Status: Research Prototype](https://img.shields.io/badge/Tr%E1%BA%A1ng%20th%C3%A1i-B%E1%BA%A3n%20th%E1%BB%AD%20nghi%E1%BB%87m%20nghi%C3%AAn%20c%E1%BB%A9u-D97706)](#kiem-chung-va-gioi-han-hien-tai)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
-**Trạng thái:** bản thử nghiệm nghiên cứu, chưa sẵn sàng vận hành thực tế. Các thí nghiệm đi kèm không cần GPU, khóa API mô hình hay dịch vụ trả phí.
+[Bắt đầu nhanh](#bat-dau-trong-60-giay) ·
+[Bộ thí nghiệm trực tiếp](#bo-thi-nghiem-chay-truc-tiep) ·
+[Kiến trúc cốt lõi](#kien-truc-cot-loi) ·
+[Nghiên cứu P1–P7](#nghien-cuu-va-bang-chung-p1p7) ·
+[Lộ trình R0–R6](#lo-trinh-phat-trien) ·
+[Giới hạn & Kiểm chứng](#kiem-chung-va-gioi-han-hien-tai)
 
-## Bắt đầu nhanh
+</div>
 
-Yêu cầu **Python 3.11 trở lên**. Các bài kiểm tra và ví dụ mặc định sử dụng thư viện chuẩn của Python. Phần thử nghiệm PostgreSQL tùy chọn có yêu cầu cài đặt riêng.
+---
+
+> [!NOTE]
+> **Trạng thái hiện tại:** Đây là **bộ công cụ thử nghiệm nghiên cứu bằng Python thuần, chạy trên CPU**, chưa sẵn sàng vận hành thực tế (production). Toàn bộ ví dụ và thí nghiệm mặc định sử dụng thư viện chuẩn của Python + SQLite cục bộ — **không cần GPU, không cần API key mô hình, không gọi dịch vụ trả phí**.
+
+---
+
+## 🎯 OpenWorld giải quyết bài toán gì?
+
+Phần lớn hệ thống agent hiện nay gộp chung danh tính, ngữ cảnh hội thoại và lời khẳng định do mô hình tự suy ra thành một khối duy nhất — khiến agent dễ quên bằng chứng thật, tin nhầm lời nói của đối tác, vượt ngưỡng rủi ro hoặc rò rỉ quyền truy cập.
+
+**OpenWorld** tách bài toán này thành ba nguyên lý bất biến:
+
+| Trụ cột | Nguyên lý thiết kế | Ý nghĩa thực tế |
+|---|---|---|
+| 🪪 **Danh tính tách khỏi mô hình** | `Identity ≠ Model Weights ≠ Permissions` | Nhiều agent có thể **dùng chung một mô hình / chính sách** nhưng vẫn giữ lịch sử, trạng thái, bộ nhớ và quyền truy cập hoàn toàn độc lập. |
+| 🧾 **Chứng cứ thật tách khỏi dự đoán** | `Exact Ledger` vs `Predictive State (INFERRED)` | Mọi sự kiện quan trọng được lưu chính xác trong sổ cái. Nội dung suy luận hoặc mô phỏng (`INFERRED` / `SIMULATED`) **không bao giờ được nâng cấp thành sự thật đã kiểm chứng (`VERIFIED`)**. |
+| 🛡️ **Hợp tác trong rào chắn rõ ràng** | `Capability Gateway` + `Hard Risk Cap` | Mọi tương tác phải có quyền có phạm vi, thu hồi được, kiểm soát trần rủi ro cứng và **từ chối mặc định giao tiếp khác chủ sở hữu** khi chưa có đồng thuận song phương. |
+
+```mermaid
+flowchart LR
+  Owner["Chủ sở hữu (Owner)"] --> Guard["Capability Gateway (Quyền có phạm vi · Thu hồi)"]
+  Guard --> Kernel["SuperKernel (Vòng đời · Ngân sách rủi ro · Lịch chạy)"]
+  Kernel --> Memory["HyperMemory (HM-P1e)"]
+  Memory --> Ledger["Exact Event Ledger (Bằng chứng chính xác · SQLite)"]
+  Memory --> Pred["Predictive State (static / fast / slow · INFERRED)"]
+  Kernel --> Policy["Shared Policy / Model Pool (Nhiều agent dùng chung)"]
+  Policy --> World["W3 World Runtime (Đồ thị thưa · Replay · Bảo toàn)"]
+```
+
+---
+
+<a id="bat-dau-trong-60-giay"></a>
+## ⚡ Bắt đầu trong 60 giây
+
+Yêu cầu **Python 3.11 trở lên** (không cần `pip install` cho các thí nghiệm mặc định; phần thử nghiệm PostgreSQL tùy chọn có hướng dẫn riêng). Chạy mọi lệnh từ thư mục gốc của kho mã:
 
 ```bash
 git clone https://github.com/iamphan04/OpenWorld.git
 cd OpenWorld
 
-# Chạy một thế giới nhỏ có thể phát lại để kiểm chứng.
+# 1. Chạy một thế giới thưa 30 agent có thể phát lại xác định để kiểm chứng
 python examples/world/demo.py --agents 30 --ticks 20
 
-# Kiểm tra cấu trúc dự án và chạy bộ kiểm thử.
+# 2. Kiểm tra cấu trúc kho mã và chạy bộ kiểm thử nhanh
 python scripts/check_repository.py
-python -m unittest discover -s tests -v
+python -m unittest discover -s tests -p "test_communicating_agent.py" -v
 ```
 
-Ví dụ trao đổi giữa ba nhóm agent thuộc cùng một chủ sở hữu:
+> [!TIP]
+> Để chạy toàn bộ bộ kiểm thử tích hợp của kho mã (bao gồm các thí nghiệm chuỗi P1–P7, kéo dài vài phút trên CPU):
+> ```bash
+> python -m unittest discover -s tests -v
+> ```
 
-```bash
-python examples/populations/local_three_groups.py
+---
+
+<a id="bo-thi-nghiem-chay-truc-tiep"></a>
+## 🧪 Bộ thí nghiệm chạy trực tiếp (từ cơ bản đến nâng cao)
+
+Tất cả ví dụ dưới đây đều chạy bằng chính sách mã nguồn xác định trên CPU, cùng một chủ sở hữu mô phỏng, không gọi LLM và không nối mạng.
+
+| Cấp độ | Chương trình | Bạn sẽ quan sát được gì? | Tài liệu thiết kế |
+|---|---|---|---|
+| **1. Thế giới thưa** | [`examples/world/demo.py`](examples/world/demo.py) | 30 agent gửi tín hiệu trên đồ thị thưa, phát lại xác định (`verify_replay`) & đo bộ nhớ/CPU. | [W3 Fixture](docs/world/W3-EXPERIMENTAL-FIXTURE.md) |
+| **2. Liên nhóm** | [`examples/populations/local_three_groups.py`](examples/populations/local_three_groups.py) | 30 agent chia 3 nhóm (guild) trao đổi theo hợp đồng liên nhóm có hạn mức/tick & bảo toàn tài nguyên (`150/150`). | [Population Links P0](docs/world/W3-POPULATION-LINKS-P0.md) |
+| **3. Biên nhận P7** | [`examples/two_agents.py`](examples/two_agents.py) | 2 agent A & B trong môi trường mất/trễ thông báo: đối chiếu biên nhận thật giúp mở khóa hợp tác mà không phá trần rủi ro 4 đơn vị. | [Two-Agent Receipts](docs/experiments/TWO-AGENT-RECEIPT-SIMULATION.md) |
+| **4. Bền vững qua restart** | [`examples/persistent_agents.py`](examples/persistent_agents.py)<br>[`examples/durable_two_agents.py`](examples/durable_two_agents.py) | Lưu toàn bộ nhật ký vòng chạy + trí nhớ `HyperMemoryP1e` xuống 1 file SQLite; tắt chương trình và chạy tiếp, tự khôi phục nếu ngắt giữa chừng. | [Persistent Sim](docs/experiments/PERSISTENT-AGENT-SIMULATION.md)<br>[Durable Receipts](docs/experiments/DURABLE-TWO-AGENT-RECEIPTS.md) |
+| **5. Giao tiếp đa agent (R2/R3)** | [`examples/communicating_agent.py`](examples/communicating_agent.py) | 3 agent (`Alice ↔ Bob`, `Alice ↔ Carol`) thương lượng 5 pha có cấp quyền, **bắt sống đối tác nói dối `COMMIT_ACK` giả**, thích nghi chuyển pha và cách ly tin đồn `INFERRED`. | [Communicating Agent](docs/experiments/COMMUNICATING-AGENT-DEMO.md) |
+
+---
+
+### 💬 Thí nghiệm nổi bật: Giao tiếp đa agent có cấp quyền & chống lừa đảo (R2/R3)
+
+[`examples/communicating_agent.py`](examples/communicating_agent.py) triển khai mô hình agent giao tiếp hoàn chỉnh kết hợp **W3 `GuardedWorldGateway` + `CapabilityAuthority` + `HyperMemoryP1e` + `DonorBudget` (`CAP = 4`)** trên đồ thị thưa gồm 3 agent cùng chủ sở hữu:
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant A as Alice (Negotiator · Adaptive)
+  participant H as BoundedCommunicationHub (W3 + HMAC)
+  participant B as Bob (Responder)
+  participant C as Carol (Observer · Isolated)
+
+  A->>H: Pha 1 · PROPOSE (token write_agent)
+  H->>B: Neo W3 signal + chuyển vào inbox Bob
+  B->>H: Pha 2 · ACCEPT hoặc DECLINE
+  H->>A: Chuyển phản hồi đã xác thực
+  A->>H: Pha 3 · W3 transfer(1) (nếu ACCEPT & exposure < 4)
+  B->>H: Pha 4 · W3 return(1) + COMMIT_ACK (hoặc giả mạo ở hostile_liar)
+  A->>H: Pha 5 · Đối chiếu sổ cái W3 thật (không tin text ACK) → cập nhật HM-P1e
+  A->>C: Gửi INFORM gắn nhãn INFERRED (Carol giữ exact_events = 0)
 ```
 
-Chạy các lệnh từ thư mục gốc của dự án. Những ví dụ này dùng agent và sự kiện mô phỏng, không gọi mô hình ngôn ngữ và không kết nối với thế giới của chủ sở hữu khác.
-
-## Chạy mô phỏng đúng hai agent bằng Python
-
-[Chương trình hai agent](examples/two_agents.py) tạo A và B, chạy từng lượt và in diễn biến trực tiếp trong terminal:
-
-- **A** quyết định có gửi một đơn vị tài nguyên hay không, theo dõi hạn mức và xử lý phản hồi.
-- **B** nhận tài nguyên rồi quyết định trả lại hoặc giữ, tùy kịch bản.
-- Thế giới W3 ghi lại các lần chuyển. Thông báo cho A có thể bị chậm hoặc mất; biên nhận chính xác vẫn nằm trong sổ sự kiện.
+**Chạy thử 4 kịch bản đối chiếu:**
 
 ```bash
-git switch research/p7-budget-feedback-20261104
+# 1. Hợp tác trung thực: 6/6 trao đổi thành công, bảo toàn 14/14, replay=PASS
+python examples/communicating_agent.py --scenario cooperative --rounds 6
 
-# B luôn trả lại; so sánh cả ba cách xử lý mất thông báo.
+# 2. Từ chối trung thực (DECLINE): thương lượng trước khi chuyển giúp mất 0 tài nguyên
+python examples/communicating_agent.py --scenario hostile_refuse --rounds 6
+
+# 3. Đối tác lừa đảo (hostile_liar): Bob gửi COMMIT_ACK giả + tiêm override_cap=999
+#    → Alice bắt sống 100% qua sổ cái W3 và khóa cứng ở mức mất 4/4
+python examples/communicating_agent.py --scenario hostile_liar --rounds 10
+
+# 4. Phục hồi chuyển pha (recovery): thăm dò 0 rủi ro; vòng 13 HM-P1e tự chuyển static → fast
+python examples/communicating_agent.py --scenario recovery --rounds 20 --recover-at 10 --probe-interval 2
+```
+
+| Kịch bản | Cơ chế kiểm chứng | Tổn thất thực tế | Điểm đáng chú ý |
+|---|---|---:|---|
+| `cooperative` (6 vòng) | Thương lượng + xác thực biên nhận W3 | **0 / 4** | `p_inferred` tăng lên `0.8750`; Carol nhận 6 ghi chú `INFERRED` nhưng `exact_events = 0`. |
+| `hostile_refuse` (6 vòng) | `PROPOSE` → `DECLINE` | **0 / 4** | Hỏi trước bằng tín hiệu không tốn ngân sách rủi ro. |
+| `hostile_liar` (10 vòng) | `ACCEPT` + `COMMIT_ACK` giả + payload injection | **4 / 4** | Bắt sống `4/4` `FAKE_ACK_CAUGHT`; vô hiệu hóa `override_cap=999`; dừng cứng tại `CAP = 4`. |
+| `recovery` (20 vòng, `recover_at=10`) | Thăm dò định kỳ + thích nghi `HM-P1e` | **0 / 4** | Vòng 13 bộ ước lượng tự chuyển `static → fast` (`0.2222 → 0.5560`) và nối lại hợp tác. |
+
+> [!TIP]
+> Bộ kiểm thử đối kháng [`tests/test_communicating_agent.py`](tests/test_communicating_agent.py) (16 test) xác nhận cơ chế **fail-closed** (0 thay đổi trạng thái) khi: gửi khác chủ sở hữu, gửi ngoài cạnh đồ thị (`Bob → Carol`), thu hồi token `read_world`/`write_agent`, dùng nhầm token giữa các agent, giả mạo nhãn `VERIFIED`/`OBSERVED_RECORDED`, phát lại trùng `message_id`, payload quá 1024 bytes / `NaN`, hoặc vượt quota mỗi tick.
+
+---
+
+### 🧾 Thí nghiệm hai agent & đối chiếu biên nhận P7
+
+[`examples/two_agents.py`](examples/two_agents.py) mô phỏng A gửi tài nguyên cho B trong kênh phản hồi bị trễ hoặc mất thông báo, so sánh 3 chiến lược xử lý hạn mức rủi ro:
+
+```bash
+# B luôn trả lại; so sánh cả 3 cách xử lý mất thông báo (notifications / reconcile / unsafe_timeout)
 python examples/two_agents.py
 
-# B giữ tài nguyên; chỉ in kết quả tổng hợp.
+# B giữ tài nguyên; chỉ in bảng tổng hợp
 python examples/two_agents.py --scenario hostile --summary-only
 
-# B giữ tài nguyên 10 lượt đầu rồi bắt đầu hợp tác.
+# B giữ tài nguyên 10 lượt đầu rồi mới hợp tác
 python examples/two_agents.py --scenario recovery --summary-only
 
-# Chỉ chạy A có đối chiếu biên nhận, đồng thời lưu sổ sự kiện và diễn biến.
+# Chỉ chạy chế độ đối chiếu biên nhận và xuất toàn bộ sổ sự kiện ra JSON
 python examples/two_agents.py --mode reconcile --out two-agents.json
 ```
 
-Với cấu hình mặc định, A chỉ chờ thông báo gửi được **8 lần**, còn A đối chiếu biên nhận gửi đủ **20 lần**, khi B luôn trả tài nguyên. Khi B luôn giữ tài nguyên, hai cách an toàn dừng ở mức mất **4 đơn vị**; cách tự mở khóa theo thời gian mất **6 đơn vị**.
+- Khi B hợp tác nhưng thông báo bị mất: A chỉ chờ thông báo bị kẹt ở **8 lần gửi**, còn A đối chiếu biên nhận gửi đủ **20 lần**.
+- Khi B luôn giữ tài nguyên: hai chế độ an toàn dừng ở mức mất **4 đơn vị**; chế độ đối chứng không an toàn (`unsafe_timeout`) phá trần và mất **6 đơn vị**.
 
-Đây là hai agent có chính sách viết bằng mã, chạy trên CPU và không gọi mô hình ngôn ngữ. Xem [thiết kế và cách chạy](docs/experiments/TWO-AGENT-RECEIPT-SIMULATION.md) hoặc chạy `python examples/two_agents.py --help` để xem tham số.
+---
 
-## Persistent simulation and agent memory
+### 💾 Mô phỏng bền vững qua restart & trí nhớ SQLite
 
-The [persistent two-agent example](examples/persistent_agents.py) saves its
-simulation journal, exact memory events and predictive state in one local
-SQLite file. Alice and Bob take turns acting. Running the command again resumes
-the existing world and each agent's own memory.
+Hai ví dụ bền vững lưu toàn bộ **nhật ký sự kiện (authoritative journal)** và **trí nhớ dự đoán `HyperMemoryP1e`** trong cùng một tệp SQLite cục bộ (`WAL`, `synchronous=FULL`). Nhật ký là nguồn chân lý gốc; `HyperMemory` được ghi ở giao dịch thứ hai và tự động kiểm tra + phát lại để khôi phục nếu tiến trình bị ngắt giữa hai giao dịch.
+
+<details>
+<summary><strong>1. Hai agent luân phiên với chuỗi phản hồi phòng thí nghiệm cố định (<code>examples/persistent_agents.py</code>)</strong></summary>
+
+Alice và Bob luân phiên hành động với phản hồi cố định `0, 1, 1` (chưa phải phản hồi độc lập từ đối tác). Chạy lại cùng lệnh sẽ tiếp tục đúng tick trước đó:
 
 ```bash
-# First run: ticks 0-2; the file remains after Python exits.
+# Lần chạy 1: ticks 0–2 (tệp SQLite được giữ lại sau khi thoát Python)
 python examples/persistent_agents.py --db data/openworld.sqlite3 --steps 3
 
-# Second run: ticks 3-5, continuing from the same file.
+# Lần chạy 2: ticks 3–5, tiếp tục từ trạng thái và trí nhớ đã lưu
 python examples/persistent_agents.py --db data/openworld.sqlite3 --steps 3
 
-# Inspect saved state or include the exact simulation history.
+# Xem trạng thái hiện tại hoặc toàn bộ lịch sử sự kiện chính xác
 python examples/persistent_agents.py --db data/openworld.sqlite3 --status
 python examples/persistent_agents.py --db data/openworld.sqlite3 --status --history
 ```
 
-The journal is authoritative; HyperMemory is a recoverable projection written
-in a separate transaction. Startup verifies the exact journal and existing
-memory, then replays any committed records whose memory update was interrupted.
-Feedback is the fixed lab sequence `0, 1, 1`, not an independent partner response
-or an LLM output. See [design, restart behavior and limitations](docs/experiments/PERSISTENT-AGENT-SIMULATION.md).
+Chi tiết cơ chế khởi động lại và giới hạn: [PERSISTENT-AGENT-SIMULATION.md](docs/experiments/PERSISTENT-AGENT-SIMULATION.md).
 
-The next integration, [durable two-agent receipts](examples/durable_two_agents.py),
-uses B's actual scripted return/keep decisions. It persists complete rounds,
-risk reservations, receipts, delayed notifications and each agent's own memory.
-A's saved return estimate can gate its next gift; the hard risk cap still applies.
+</details>
+
+<details>
+<summary><strong>2. Hai agent bền vững với biên nhận, đặt chỗ rủi ro & phản hồi thực từ B (<code>examples/durable_two_agents.py</code>)</strong></summary>
+
+Kết nối phản hồi thực từ quyết định trả/giữ của B, lưu bền vững trọn vẹn từng vòng (2 tick W3/vòng), các khoản đặt chỗ rủi ro, biên nhận, hàng đợi thông báo trễ và trí nhớ riêng của cả A lẫn B:
 
 ```bash
+# Chạy 3 vòng đầu, thoát, rồi chạy tiếp 3 vòng sau trên cùng tệp cơ sở dữ liệu
 python examples/durable_two_agents.py --db data/pair.sqlite3 --rounds 3
 python examples/durable_two_agents.py --db data/pair.sqlite3 --rounds 3
 python examples/durable_two_agents.py --db data/pair.sqlite3 --status --history
 ```
 
-This bounded same-owner simulation commits the round journal before its
-recoverable memory projection. See [failure boundaries, controls and verification](docs/experiments/DURABLE-TWO-AGENT-RECEIPTS.md).
+Chi tiết ranh giới lỗi, kiểm thử ngắt tiến trình và xác minh: [DURABLE-TWO-AGENT-RECEIPTS.md](docs/experiments/DURABLE-TWO-AGENT-RECEIPTS.md).
 
-## Dự án đã có những gì?
+</details>
+
+<details>
+<summary><strong>3. Ví dụ liên kết quần thể 3 nhóm (<code>examples/populations/local_three_groups.py</code>)</strong></summary>
+
+30 agent chia thành 3 nhóm (`guild-0`, `guild-1`, `guild-2`) thuộc cùng một chủ sở hữu, trao đổi qua `PopulationRouter` với hợp đồng có hướng và hạn mức chuyển mỗi tick:
+
+```bash
+python examples/populations/local_three_groups.py
+```
+
+</details>
+
+---
+
+<a id="kien-truc-cot-loi"></a>
+## 🏗️ Kiến trúc cốt lõi & Bản đồ thành phần
+
+OpenWorld mô hình hóa mỗi agent tại thời điểm `t` như một hệ thống ngẫu nhiên có kiểm soát:
+
+```text
+Agent_i(t) = (Identity_i, Genome_i, Epigenome_i(t), PredictiveState_i(t),
+              ExactLedger_i, Relationships_i(t), PolicyRef_i(t))
+
+X[t+1] ~ K_theta( . | X[t], A[t], E[t] )      # Chuyển trạng thái thế giới W3
+Z[t+1] = F_phi( Z[t], O[t+1], A[t] )          # Cập nhật trí nhớ dự đoán (tách khỏi sổ cái chính xác)
+A[t]   ~ pi_psi( . | Z[t], G[t], C[t] )       # Chính sách hành động dưới mục tiêu G và ràng buộc C
+```
 
 | Thành phần | Phần đã triển khai để nghiên cứu | Mục tiêu dài hạn |
 |---|---|---|
-| HyperMemory | Lưu sự kiện chính xác, bộ dự đoán gọn, cập nhật theo dữ liệu mới và thí nghiệm SQLite | Bộ nhớ phù hợp với từng nhiệm vụ, đo được chất lượng và chi phí |
-| MathKernel | Các mô hình chuyển trạng thái ngẫu nhiên hữu hạn, cập nhật xác suất và biểu diễn quần thể | Mô hình toán học có thể kiểm chứng cho quyết định của agent |
-| World Runtime | Tương tác trên đồ thị thưa, chuyển tài nguyên, phát lại xác định và lưu mốc trạng thái | Môi trường tồn tại lâu dài với cơ chế điều phối đáng tin cậy |
-| Quyền truy cập và giao thức | Các bản triển khai tham chiếu về quyền có phạm vi, thu hồi quyền, giao dịch và khôi phục | Danh tính, sự đồng ý và khả năng liên thông được thẩm định |
-| Đánh giá | Chuỗi nghiên cứu học và hợp tác P1–P7; bộ đo W5 về lưu trữ, bộ nhớ và phục hồi | Bằng chứng có thể tái lập trước khi mở rộng dự án |
+| **HyperMemory (W1)** | Lưu sự kiện chính xác (`exact_events`), bộ dự đoán gọn `HM-P1e` (`static`/`fast`/`slow`), bộ kết hợp trọng số mũ (`EnsembleHyperMemory`) và thí nghiệm SQLite | Bộ nhớ thích ứng theo nhiệm vụ, đo minh bạch chất lượng dự đoán lẫn chi phí CPU/đĩa/WAL |
+| **MathKernel (W2)** | Hạt nhân chuyển trạng thái ngẫu nhiên hữu hạn (`FiniteKernel`, `ControlledKernel`), cập nhật Bayes và biểu diễn quần thể (`population_repr`) | Mô hình toán học kiểm chứng được cho quyết định và tính đủ dự đoán |
+| **World Runtime (W3)** | Đồ thị tương tác thưa, chuyển tài nguyên bảo toàn, phát lại xác định (`verify_replay`), liên kết quần thể, mô phỏng bền vững & giao tiếp 5 pha | Môi trường tồn tại lâu dài với điều phối tin cậy |
+| **Quyền & Giao thức (W4)** | Quyền HMAC có phạm vi (`CapabilityAuthority`), thu hồi bền vững (`SQLiteRevocationStore`), phiên chứng thực (`DurableCapabilityAuthority`), giao dịch đồng thuận thử nghiệm (`AtomicWorldLedger`) | Danh tính, đồng thuận song phương khác chủ sở hữu (Issue #35) và khả năng liên thông MCP/A2A đã thẩm định |
+| **Đánh giá (W5)** | Chuỗi thí nghiệm có thể tái lập **P1–P7**; bộ đo lưu trữ SQLite/PostgreSQL, trí nhớ và phục hồi sự cố | Bằng chứng độc lập, có đối chứng bất lợi trước mỗi bước mở rộng |
+| **SuperKernel (W0)** | Hợp đồng sự kiện, phân loại nguồn gốc (`Provenance`), định tuyến bộ nhớ (`route_memory_event`) | Bộ nhân quản trị vòng đời, lịch thực thi, nhóm mô hình dùng chung và ngân sách tài nguyên |
 
-**SuperKernel** là kiến trúc tổng thể để quản lý vòng đời agent, chính sách hành động, công cụ, ngân sách và lịch thực thi. Bộ nhân hoàn chỉnh cho vận hành thực tế, hệ thống phục vụ mô hình dùng chung, xã hội agent tự vận hành và mạng thế giới liên thông vẫn là mục tiêu tương lai. Xem [kiến trúc](docs/ARCHITECTURE.md) và [lộ trình](docs/ROADMAP.md).
+Xem chi tiết tại [ARCHITECTURE.md](docs/ARCHITECTURE.md), [DECISIONS.md](docs/DECISIONS.md) và [WORKSTREAMS.md](docs/WORKSTREAMS.md).
 
-## Nghiên cứu mới nhất: kiểm tra bằng chứng trước khi mở lại hạn mức
+---
 
-Hãy hình dung agent A gửi một đơn vị tài nguyên cho B. B đã trả lại, nhưng thông báo cho A bị mất. A vẫn coi lần chuyển đó là chưa được xác nhận, tiếp tục giữ một phần hạn mức rủi ro và cuối cùng có thể ngừng hợp tác dù B vẫn trả đầy đủ.
+<a id="nghien-cuu-va-bang-chung-p1p7"></a>
+## 📊 Nghiên cứu & Chuỗi bằng chứng P1–P7
 
-**P7 kiểm tra xem đối chiếu biên nhận trả lại đã được ghi nhận chính xác có giúp agent tiếp tục hợp tác hay không.** Thí nghiệm so sánh ba cách: chỉ chờ thông báo, định kỳ kiểm tra biên nhận và tự giải phóng hạn mức sau thời gian chờ. Cách cuối được đưa vào làm đối chứng không an toàn: chờ đủ lâu không chứng minh rằng tài nguyên đã được trả lại.
+### Điểm nhấn mới nhất (P7): Đối chiếu biên nhận thật trước khi mở lại hạn mức
 
-[Báo cáo đo ngày 04/11/2026](docs/evaluation/P7-HOLDOUT-RESULTS-20261104.md) ghi lại **960 trường hợp trên 10 seed mới**. Seed là giá trị khởi tạo giúp tái lập một thế giới mô phỏng. Ma trận thử nghiệm gồm bốn chính sách hành động, bốn kiểu đối tác, hai kênh phản hồi và ba cách xử lý biên nhận.
+Hãy hình dung **A** gửi 1 đơn vị tài nguyên cho **B**. B đã trả lại, nhưng thông báo gửi về cho A bị mất. A vẫn giữ khoản đặt chỗ rủi ro vì chưa có xác nhận và dần bị khóa cứng dù B hoàn toàn hợp tác.
 
-| Phát hiện | Kết quả đo được |
+**P7** kiểm chứng xem việc định kỳ đối chiếu biên nhận trả lại đã ghi nhận chính xác trong sổ sự kiện W3 có tháo gỡ tình trạng khóa cứng hay không — so sánh giữa **chỉ chờ thông báo**, **đối chiếu biên nhận chính xác** và **đối chứng không an toàn (tự mở khóa theo thời gian chờ)**.
+
+[Báo cáo holdout ngày 04/11/2026](docs/evaluation/P7-HOLDOUT-RESULTS-20261104.md) đo **960 trường hợp trên 10 seed mới** (4 chính sách × 4 kiểu đối tác × 2 kênh phản hồi × 3 cơ chế biên nhận):
+
+| Phát hiện chính | Kết quả đo được (mô phỏng một chủ sở hữu) |
 |---|---|
-| Đối tác hợp tác nhưng thông báo chậm hoặc bị mất | Đối chiếu biên nhận nâng điểm thưởng trung bình mỗi quyết định của bên gửi từ **0,5421 lên 0,6000** |
-| Chỉ chờ thông báo hoặc đối chiếu biên nhận chính xác | **640/640 trường hợp** giữ đúng giới hạn rủi ro bốn đơn vị cho mỗi bên gửi |
-| Tự giải phóng hạn mức khi hết thời gian chờ | **90/320 trường hợp** vượt giới hạn rủi ro thực tế, cao nhất tám đơn vị |
-| Ngân sách đã bị tiêu hết bởi tổn thất được xác nhận | Đối chiếu biên nhận không khôi phục được ngân sách đó |
-| Đối tác lúc hợp tác, lúc từ chối | Thưởng trung bình tăng, nhưng mỗi chính sách có chuyển tài nguyên vẫn bị giảm thưởng ở **3/10 seed** |
+| Đối tác hợp tác nhưng thông báo chậm/mất | Đối chiếu biên nhận nâng thưởng trung bình mỗi quyết định từ **0,5421 → 0,6000** |
+| Chỉ chờ thông báo hoặc đối chiếu biên nhận thật | **640/640 trường hợp** giữ nghiêm ngặt trần rủi ro **4 đơn vị** |
+| Tự mở khóa theo thời gian chờ (`unsafe_timeout`) | **90/320 trường hợp** vượt trần rủi ro thực tế (cao nhất **8 đơn vị**) |
+| Ngân sách đã cạn do tổn thất được xác nhận | Đối chiếu biên nhận **không** hồi phục ngân sách đã mất |
+| Đối tác lúc hợp tác, lúc từ chối | Thưởng trung bình tăng, nhưng mỗi chính sách có chuyển tài nguyên vẫn giảm thưởng ở **3/10 seed** |
 
-Đây là điểm thưởng được thiết kế cho mô phỏng một chủ sở hữu. Các lần chuyển tài nguyên W3 hoàn tất ngay; chỉ thông báo bị chậm hoặc mất. Kết quả xác nhận lợi ích của việc đối chiếu bằng chứng trong phạm vi thí nghiệm này, chưa chứng minh một chính sách hợp tác tốt cho mọi tình huống hay mức an toàn khi vận hành thực tế.
-
-Chạy lại nghiên cứu P7 trên nhánh hiện tại:
+<details>
+<summary><strong>Chạy lại toàn bộ benchmark P7 cục bộ</strong></summary>
 
 ```bash
-# P7 hiện được công bố trên nhánh nghiên cứu này.
-git switch research/p7-budget-feedback-20261104
-
 python -m unittest discover -s tests -p test_p7_receipt_reconciliation.py -v
 python benchmarks/p7_receipt_reconciliation.py --split development --out p7-development.json
 python benchmarks/p7_receipt_reconciliation.py --split holdout --out p7-holdout.json
 ```
 
-Xem [thiết kế đã cố định trước khi thử nghiệm](docs/evaluation/P7-RECEIPT-RECONCILIATION-PROTOCOL.md), [toàn bộ dữ liệu kiểm tra bằng seed mới](research/runs/2026-11-04/p7-holdout.json) và [hồ sơ kiểm chứng](research/runs/2026-11-04/validation.json). Báo cáo chỉ rõ commit mã nguồn được dùng để đo; các commit cập nhật tài liệu sau đó được ghi riêng.
+Tài liệu & dữ liệu thô: [Giao thức cố định trước khi đo](docs/evaluation/P7-RECEIPT-RECONCILIATION-PROTOCOL.md) · [Dữ liệu holdout JSON](research/runs/2026-11-04/p7-holdout.json) · [Hồ sơ kiểm chứng](research/runs/2026-11-04/validation.json).
 
-## Tiến trình nghiên cứu
+</details>
 
-Mỗi nghiên cứu trả lời một câu hỏi có phạm vi cụ thể. Kết quả mô phỏng không chứng minh trí thông minh trong thế giới thực, sự xuất hiện của xã hội agent hay khả năng triển khai ở quy mô lớn.
+### Tiến trình nghiên cứu tổng hợp
 
-| Nghiên cứu | Câu hỏi và bằng chứng |
-|---|---|
-| W5 — biểu diễn quần thể | Giá trị trung bình, biểu đồ tần suất hay bản tóm tắt phân phối giữ được thông tin hữu ích đến đâu? [Nghiên cứu cơ sở](docs/evaluation/W5-POPULATION-REPRESENTATION-BASELINES.md) |
-| P1 | Ba mươi agent mô phỏng có thể học từ phần thưởng của hành động đã chọn không? [Nghiên cứu](docs/evaluation/P1-THIRTY-AGENT-ONLINE-LEARNING.md) |
-| P2 | Hợp tác có trạng thái thay đổi việc học trong thế giới có thể phát lại như thế nào? [Nghiên cứu](docs/evaluation/P2-STATEFUL-COOPERATION-EXPERIMENT.md) |
-| P3 | Điều gì xảy ra khi bên gửi và bên nhận học chính sách riêng? [Nghiên cứu](docs/evaluation/P3-MUTUAL-LEARNING-W3.md) |
-| P4 | Cách biểu diễn nào giúp học từ ít mẫu hơn khi đối tác thay đổi? [Kết quả](docs/evaluation/P4-FIVE-SEED-RESULTS-REPORT.md) |
-| P5 | Không hành động và thăm dò có lợi ích, tổn thất như thế nào? [Kết quả](docs/evaluation/P5-FIVE-SEED-RESULTS-REPORT.md) |
-| P6 | Giới hạn rủi ro cứng hoạt động ra sao khi phản hồi bị thiếu? [Kết quả 840 trường hợp](docs/evaluation/P6-TEN-SEED-RESULTS-REPORT.md) |
-| P7 | Biên nhận chính xác có giảm tình trạng khóa hạn mức do mất thông báo không? [Kết quả 960 trường hợp](docs/evaluation/P7-HOLDOUT-RESULTS-20261104.md) |
+Mỗi nghiên cứu trả lời một câu hỏi hẹp có thể kiểm chứng lại. Kết quả mô phỏng **không** chứng minh trí thông minh ngoài đời thực hay năng lực triển khai quy mô lớn.
 
-[Bản đồ tài liệu nghiên cứu gốc](docs/research/RELATED-RESEARCH-AND-PROJECTS.md) liên kết các công trình trước với câu hỏi có thể kiểm chứng trong OpenWorld. Các đề xuất khác gồm [biểu diễn quần thể và bộ gen agent](docs/research/POPULATION-REPRESENTATION-AND-AGENT-DNA.md), [ghép các thành phần thế giới](docs/experiments/COMPOSABLE-WORLD-FIXTURE.md) và [nền tảng toán học](docs/math/RFC-007-OPENWORLD-MATHEMATICAL-FOUNDATIONS.md). Phạm vi đề xuất được phân biệt với phần đã triển khai và đo đạc.
+| Nghiên cứu | Câu hỏi nghiên cứu cốt lõi | Bằng chứng & Báo cáo |
+|---|---|---|
+| **W5 — Quần thể** | Trung bình, histogram hay tóm tắt phân phối giữ được bao nhiêu thông tin hữu ích? | [W5 Population Baselines](docs/evaluation/W5-POPULATION-REPRESENTATION-BASELINES.md) |
+| **P1** | 30 agent mô phỏng có học được từ phần thưởng hành động đã chọn không? | [P1 Online Learning](docs/evaluation/P1-THIRTY-AGENT-ONLINE-LEARNING.md) |
+| **P2** | Hợp tác có trạng thái làm thay đổi việc học trong thế giới phát lại ra sao? | [P2 Stateful Cooperation](docs/evaluation/P2-STATEFUL-COOPERATION-EXPERIMENT.md) |
+| **P3** | Điều gì xảy ra khi cả bên gửi và bên nhận cùng học chính sách riêng? | [P3 Mutual Learning W3](docs/evaluation/P3-MUTUAL-LEARNING-W3.md) |
+| **P4** | Biểu diễn nào học tốt hơn từ ít mẫu khi đối tác thay đổi? | [P4 Five-Seed Results](docs/evaluation/P4-FIVE-SEED-RESULTS-REPORT.md) |
+| **P5** | Không hành động và thăm dò mang lại lợi ích và tổn thất thế nào? | [P5 Five-Seed Results](docs/evaluation/P5-FIVE-SEED-RESULTS-REPORT.md) |
+| **P6** | Giới hạn rủi ro cứng hoạt động ra sao khi phản hồi bị thiếu/che khuất? | [P6 Ten-Seed Results (840 cases)](docs/evaluation/P6-TEN-SEED-RESULTS-REPORT.md) |
+| **P7** | Biên nhận chính xác có gỡ khóa hạn mức do mất thông báo mà vẫn an toàn không? | [P7 Holdout Results (960 cases)](docs/evaluation/P7-HOLDOUT-RESULTS-20261104.md) |
 
-## Kiểm chứng và giới hạn hiện tại
+Tài liệu nghiên cứu bổ sung: [Bản đồ công trình liên quan](docs/research/RELATED-RESEARCH-AND-PROJECTS.md) · [Biểu diễn quần thể & Agent DNA](docs/research/POPULATION-REPRESENTATION-AND-AGENT-DNA.md) · [Ghép thành phần thế giới](docs/experiments/COMPOSABLE-WORLD-FIXTURE.md) · [Nền tảng toán học RFC-007](docs/math/RFC-007-OPENWORLD-MATHEMATICAL-FOUNDATIONS.md).
 
-Đợt kiểm chứng trên **Windows ngày 04/11/2026** đã chạy **462 bài kiểm tra, không có lỗi ngoài dự kiến**, với sáu bài được bỏ qua và hai lỗi bảo mật đã biết được giữ làm đối chứng. Môi trường sử dụng Python 3.14.7 và SQLite 3.53.4. Chi tiết nằm trong [nhật ký đầy đủ](research/runs/2026-11-04/final-tests.log) và [báo cáo đo](docs/evaluation/P7-HOLDOUT-RESULTS-20261104.md).
+---
 
-- Hai lỗi đã biết liên quan đến quyền truy cập và tính nguyên tử: phục hồi bản sao lưu quyền cũ có thể làm quyền đã thu hồi hoạt động trở lại; việc sử dụng quyền và tác động tiếp theo lên thế giới chưa được gộp thành một giao dịch duy nhất cùng thành công hoặc cùng thất bại.
-- Một bài kiểm tra PostgreSQL thực và năm bài kiểm tra trình chạy Bash đã được bỏ qua. Đợt kiểm chứng này chưa xác nhận PostgreSQL thực hoạt động tương đương SQLite.
-- Bằng chứng lịch sử chính xác được tách khỏi dự đoán và phát lại mô phỏng. Nội dung được sinh ra không chứng minh rằng một sự kiện ngoài đời đã xảy ra.
-- Truy cập dữ liệu của chủ sở hữu khác và hành động tác động ra bên ngoài cần được cho phép rõ ràng. Các ví dụ cùng một chủ sở hữu chưa chứng minh được sự đồng ý độc lập của hai bên.
-- Số lượng agent được đăng ký không đo được số lượt suy luận mô hình đồng thời. Dự án chưa chứng minh năng lực hàng tỷ agent, nén bộ nhớ cho mọi loại dữ liệu hay trí thông minh tổng quát.
-- Các bản lưu thử nghiệm cũ chưa được đưa vào kho mã, chờ rà soát quyền sử dụng, bí mật, bảo mật và khả năng tái lập.
+<a id="lo-trinh-phat-trien"></a>
+## 🗺️ Lộ trình phát triển (R0 → R6)
 
-## Hướng nghiên cứu tiếp theo
+| Giai đoạn | Trọng tâm | Trạng thái hiện tại |
+|---|---|---|
+| **R0 — Nền tảng công khai** | Monorepo sạch, hợp đồng giao diện, kiểm thử cục bộ | ✅ Đã thiết lập |
+| **R1 — Trí nhớ thích nghi HM-P1e** | Chỉ chọn thích nghi khi lợi ích vượt chi phí; đo cả WAL/CPU/RAM | 🔬 Đã triển khai nghiên cứu & đo đạc cục bộ |
+| **R2 — Agent cá nhân đáng tin cậy** | Danh tính bền vững, trí nhớ có nguồn gốc, quyền thu hồi được, cô lập giữa người dùng | 🚧 Một phần cục bộ (`persistent_agents`, `durable_two_agents`; chưa hoàn tất cổng cô lập đa người dùng) |
+| **R3 — Agent xã hội & liên thông** | Đồ thị sự kiện thưa, giao tiếp có giới hạn, chia sẻ tri thức có cấp quyền; MCP/A2A sau thẩm định mối đe dọa | 🚧 Lát cắt nghiên cứu cùng chủ sở hữu (`population_links`, `communicating_agent`); đồng thuận song phương khác chủ sở hữu (Issue #35) chưa mở |
+| **R4 — Đánh giá phân tán** | Phân mảnh, sao lưu, lập lịch có ngân sách tài nguyên & đo tổng chi phí | 📋 Đề xuất dài hạn |
+| **R5–R6 — Thế giới & Quần thể phân tầng** | Thế giới mô phỏng ngoại tuyến, tiến hóa chính sách ngoại tuyến, liên bang hóa | 📋 Đề xuất nghiên cứu tùy chọn (không phải cam kết sản phẩm) |
 
-1. Lưu bền vững ngân sách và biên nhận; kiểm tra khởi động lại, thông báo trùng và lỗi xảy ra giữa lúc chấp nhận chuyển tài nguyên với lúc ghi khoản giữ hạn mức.
-2. So sánh cách giữ lại một phần hạn mức để thăm dò muộn, trong cùng giới hạn tổng và khi chưa biết lúc nào đối tác sẽ hợp tác trở lại.
-3. Đo lợi ích của bộ nhớ đối với quyết định, đồng thời đo khả năng truy xuất lịch sử chính xác, CPU, dung lượng đĩa và chi phí nhật ký SQLite WAL.
-4. Đánh giá các đối tác mới có khả năng thích nghi trước khi mở rộng sang thế giới phân tán hoặc liên thông.
+**4 ưu tiên nghiên cứu tiếp theo:**
+1. Mở rộng lưu bền vững ngân sách rủi ro, biên nhận và hội thoại đa vòng qua restart, kiểm tra lỗi ngắt giữa nhận chuyển và cập nhật hạn mức.
+2. So sánh chiến lược giữ lại một phần hạn mức cho thăm dò muộn dưới cùng giới hạn tổng khi thời điểm đối tác phục hồi không biết trước.
+3. Đo giá trị thực tế của bộ nhớ lên chất lượng quyết định song song với khả năng truy xuất lịch sử chính xác, CPU, đĩa và chi phí SQLite WAL.
+4. Đánh giá đối tác thích nghi mới và hoàn thiện ranh giới bảo mật (nhân chứng bền vững độc lập + giao dịch nguyên tử quyền/hiệu ứng) trước khi mở rộng sang đa chủ sở hữu hoặc phân tán.
 
-Đây là các nghiên cứu được đề xuất. Thay đổi phần thực thi dùng chung cần được rà soát kiến trúc và khả năng tương thích. Xem [tổng hợp trạng thái hiện tại](docs/project/RESEARCH-SNAPSHOT-20261104.md) và [trạng thái nghiên cứu](research/RESEARCH-STATUS.md).
+Xem đầy đủ tại [ROADMAP.md](docs/ROADMAP.md), [RESEARCH-SNAPSHOT-20261104.md](docs/project/RESEARCH-SNAPSHOT-20261104.md) và [RESEARCH-STATUS.md](research/RESEARCH-STATUS.md).
 
-## Cấu trúc kho mã
+---
 
-- [`src/openworld_superkernel/`](src/openworld_superkernel/): các bản triển khai tham chiếu.
-- [`benchmarks/`](benchmarks/): thí nghiệm mô phỏng có thể chạy lại.
-- [`tests/`](tests/): kiểm tra tính bất biến, tình huống lỗi và tích hợp.
-- [`examples/`](examples/): ví dụ chạy trên máy cục bộ.
-- [`docs/`](docs/): kiến trúc, giao thức, quyết định và báo cáo thí nghiệm.
-- [`research/`](research/): trạng thái nghiên cứu và bằng chứng từ các lần chạy.
+<a id="kiem-chung-va-gioi-han-hien-tai"></a>
+## 🛡️ Kiểm chứng, Ranh giới An toàn & Giới hạn Trung thực
 
-Đây là kho [iamphan04/OpenWorld](https://github.com/iamphan04/OpenWorld), được tách nhánh từ [CocAgent/OpenWorld](https://github.com/CocAgent/OpenWorld). Các liên kết issue và pull request cũ trỏ về lịch sử của kho gốc. Khi tiếp tục công việc, đọc [trạng thái mới nhất](docs/project/RESEARCH-SNAPSHOT-20261104.md), [bối cảnh dự án](docs/project/PROJECT-CONTINUITY.md), [sổ quyết định](docs/project/DECISION-LEDGER.md), [sổ nguồn tài liệu](docs/project/SESSION-SOURCE-REGISTER.md) và [tài liệu bàn giao](docs/project/EXECUTION-HANDOFF.md).
+> [!IMPORTANT]
+> **Bằng chứng kiểm thử cục bộ gần nhất:**
+> - **Mốc Windows `04/11/2026`** (Python 3.14.7, SQLite 3.53.4): **462 bài kiểm tra**, không lỗi ngoài dự kiến, 6 bài bỏ qua (1 PostgreSQL thực + 5 trình chạy Bash), **2 lỗi bảo mật đã biết được giữ lại làm đối chứng**. Xem [nhật ký đầy đủ](research/runs/2026-11-04/final-tests.log).
+> - **Mốc Linux trên nhánh hiện tại** (Python 3.12.16): **500 bài kiểm tra nền trên `main` PASS** (`skipped=1` PostgreSQL thực, giữ nguyên `expected failures=2`) + **16/16 bài kiểm tra mới** trong [`tests/test_communicating_agent.py`](tests/test_communicating_agent.py) PASS.
 
-## Đóng góp và giấy phép
+> [!WARNING]
+> **Các giới hạn bắt buộc phải biết rõ (không suy diễn quá phạm vi đo đạc):**
+> 1. **Hai lỗ hổng đối chứng vẫn đang mở:** (a) khôi phục bản sao lưu quyền cũ có thể làm quyền đã thu hồi hoạt động lại; (b) tiêu thụ quyền truy cập và tác động lên thế giới bên ngoài chưa nằm trong một giao dịch nguyên tử duy nhất.
+> 2. **PostgreSQL thực chưa được chứng nhận tương đương SQLite** trong đợt kiểm chứng mặc định.
+> 3. **Nội dung suy luận/mô phỏng không phải bằng chứng thực tế:** Mọi bản ghi sinh ra từ mô phỏng (`SIMULATED`) hoặc dự đoán (`INFERRED`) không chứng minh một sự kiện ngoài đời đã xảy ra.
+> 4. **Cùng một chủ sở hữu ≠ Đồng thuận song phương:** Các ví dụ hiện tại chạy trong cùng một chủ sở hữu tin cậy; mọi truy cập/giao tiếp khác chủ sở hữu vẫn bị chặn mặc định.
+> 5. **Không có tuyên bố quy mô hàng tỷ agent hay AGI:** Số lượng danh tính agent được đăng ký không tương đương số lượt suy luận mô hình đồng thời, cũng không chứng minh khả năng nén bộ nhớ phổ quát hay trí thông minh tổng quát.
+> 6. **Kho lưu trữ thử nghiệm cũ chưa được nhập công khai**, chờ rà soát bản quyền, bí mật, an toàn và khả năng tái lập.
 
-README này được viết bằng **tiếng Việt**. Mã nguồn, chú thích, tài liệu khác, issue và pull request tiếp tục sử dụng tiếng Anh theo quy ước đóng góp hiện tại. Đóng góp nghiên cứu cần nêu giả định, phương pháp đối chiếu, seed, kết quả bất lợi, cách kiểm chứng cục bộ và cách hoàn tác. Xem [hướng dẫn đóng góp](CONTRIBUTING.md), [các nhóm công việc](docs/WORKSTREAMS.md) và [bảo mật](SECURITY.md).
+---
 
-Mã nguồn và tài liệu mới do OpenWorld tạo ra được cấp phép theo [Apache-2.0](LICENSE). Các dự án bên thứ ba được dẫn chiếu và tài liệu lịch sử giữ nguyên quyền và yêu cầu rà soát tương ứng.
+## 📁 Cấu trúc kho mã & Tài liệu tiếp nối
+
+```text
+OpenWorld/
+├── src/openworld_superkernel/   # Các module lõi tham chiếu (HyperMemory, MathKernel, W3 World/Guard, Capabilities)
+├── examples/                    # Ví dụ chạy cục bộ (world, populations, two_agents, persistent, durable, communicating)
+├── benchmarks/                  # Thí nghiệm mô phỏng tái lập được (W5, P1–P7)
+├── tests/                       # Kiểm thử bất biến, phục hồi lỗi, bảo mật và tích hợp
+├── scripts/                     # Công cụ kiểm tra kho mã và xác minh thực nghiệm
+├── docs/                        # Kiến trúc, lộ trình, giao thức, quyết định (ADR) và báo cáo đánh giá
+└── research/                    # Trạng thái nghiên cứu và nhật ký bằng chứng theo ngày
+```
+
+Đây là kho **[iamphan04/OpenWorld](https://github.com/iamphan04/OpenWorld)**, được tách nhánh từ [CocAgent/OpenWorld](https://github.com/CocAgent/OpenWorld). Khi bắt đầu phiên làm việc hoặc đóng góp mới, vui lòng đọc trước bộ tài liệu tiếp nối:
+
+- [Trạng thái nghiên cứu mới nhất (2026-11-04)](docs/project/RESEARCH-SNAPSHOT-20261104.md)
+- [Bối cảnh dự án (Project Continuity)](docs/project/PROJECT-CONTINUITY.md)
+- [Sổ quyết định (Decision Ledger)](docs/project/DECISION-LEDGER.md)
+- [Sổ nguồn tài liệu (Session Source Register)](docs/project/SESSION-SOURCE-REGISTER.md)
+- [Tài liệu bàn giao thực thi (Execution Handoff)](docs/project/EXECUTION-HANDOFF.md)
+
+---
+
+## 🤝 Đóng góp & Giấy phép
+
+- **Quy ước ngôn ngữ:** `README.md` này được viết bằng **tiếng Việt** để dễ tiếp cận. Mã nguồn, chú thích, tài liệu kỹ thuật khác, commit message, issue và pull request tiếp tục sử dụng **tiếng Anh** theo [ADR-001](docs/DECISIONS.md) và [AGENTS.md](AGENTS.md).
+- **Yêu cầu khi đóng góp nghiên cứu:** Sử dụng nhánh tính năng riêng, nêu rõ giả định, đối chứng, seed, kết quả bất lợi, nhật ký kiểm thử cục bộ và phương án hoàn tác. Xem [CONTRIBUTING.md](CONTRIBUTING.md), [WORKSTREAMS.md](docs/WORKSTREAMS.md) và [SECURITY.md](SECURITY.md).
+- **Giấy phép:** Mã nguồn và tài liệu mới do OpenWorld tạo ra được cấp phép theo [Apache-2.0](LICENSE). Các dự án bên thứ ba được dẫn chiếu giữ nguyên giấy phép gốc tương ứng.
