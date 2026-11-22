@@ -10,7 +10,8 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
 [Bắt đầu nhanh](#bat-dau-trong-60-giay) ·
-[Bộ thí nghiệm trực tiếp](#bo-thi-nghiem-chay-truc-tiep) ·
+[Giao diện 2 Agent trực tiếp](#giao-dien-mo-phong-truc-tiep) ·
+[Bộ thí nghiệm CLI](#bo-thi-nghiem-chay-truc-tiep) ·
 [Kiến trúc cốt lõi](#kien-truc-cot-loi) ·
 [Nghiên cứu P1–P7](#nghien-cuu-va-bang-chung-p1p7) ·
 [Lộ trình R0–R6](#lo-trinh-phat-trien) ·
@@ -21,7 +22,7 @@
 ---
 
 > [!NOTE]
-> **Trạng thái hiện tại:** Đây là **bộ công cụ thử nghiệm nghiên cứu bằng Python thuần, chạy trên CPU**, chưa sẵn sàng vận hành thực tế (production). Toàn bộ ví dụ và thí nghiệm mặc định sử dụng thư viện chuẩn của Python + SQLite cục bộ — **không cần GPU, không cần API key mô hình, không gọi dịch vụ trả phí**.
+> **Trạng thái hiện tại:** Đây là **bộ công cụ thử nghiệm nghiên cứu bằng Python thuần, chạy trên CPU**, chưa sẵn sàng vận hành thực tế (production). Toàn bộ ví dụ, giao diện cục bộ và thí nghiệm mặc định sử dụng thư viện chuẩn của Python + SQLite cục bộ — **không cần GPU, không cần API key mô hình, không gọi dịch vụ trả phí**.
 
 ---
 
@@ -53,18 +54,21 @@ flowchart LR
 <a id="bat-dau-trong-60-giay"></a>
 ## ⚡ Bắt đầu trong 60 giây
 
-Yêu cầu **Python 3.11 trở lên** (không cần `pip install` cho các thí nghiệm mặc định; phần thử nghiệm PostgreSQL tùy chọn có hướng dẫn riêng). Chạy mọi lệnh từ thư mục gốc của kho mã:
+Yêu cầu **Python 3.11 trở lên** (không cần `pip install` cho các thí nghiệm và giao diện mặc định; phần thử nghiệm PostgreSQL tùy chọn có hướng dẫn riêng). Chạy mọi lệnh từ thư mục gốc của kho mã:
 
 ```bash
 git clone https://github.com/iamphan04/OpenWorld.git
 cd OpenWorld
 
-# 1. Chạy một thế giới thưa 30 agent có thể phát lại xác định để kiểm chứng
+# 1. Mở giao diện mô phỏng 2 agent kết nối trực tiếp backend Python (không cần cài thư viện ngoài)
+python examples/two_agents_server.py --port 8765
+
+# 2. Hoặc chạy nhanh một thế giới thưa 30 agent trên terminal
 python examples/world/demo.py --agents 30 --ticks 20
 
-# 2. Kiểm tra cấu trúc kho mã và chạy bộ kiểm thử nhanh
+# 3. Kiểm tra cấu trúc kho mã và chạy bộ kiểm thử giao tiếp + backend HTTP
 python scripts/check_repository.py
-python -m unittest discover -s tests -p "test_communicating_agent.py" -v
+python -m unittest tests/test_communicating_agent.py tests/test_two_agents_server.py -v
 ```
 
 > [!TIP]
@@ -75,10 +79,56 @@ python -m unittest discover -s tests -p "test_communicating_agent.py" -v
 
 ---
 
+<a id="giao-dien-mo-phong-truc-tiep"></a>
+## 🖥️ Giao diện Mô phỏng 2 Agent Trực tiếp (HTML + Backend Python thật)
+
+[`examples/two_agents_server.py`](examples/two_agents_server.py) khởi chạy một máy chủ HTTP loopback cục bộ (`127.0.0.1`) kết nối giao diện Canvas 60fps [`examples/web/two_agents_ui.html`](examples/web/two_agents_ui.html) thẳng tới lõi Python OpenWorld — **trình duyệt không tự tính giả lập**, mọi bước đi đều chạy qua `GuardedWorldGateway`, `CapabilityAuthority`, `DonorBudget` (`CAP = 4`), SQLite `HyperMemoryP1e` và `verify_replay()`.
+
+```mermaid
+flowchart LR
+  UI["Trình duyệt Canvas 60fps (examples/web/two_agents_ui.html)"] -- "HTTP JSON /api/*" --> Srv["Python HTTPServer 127.0.0.1 (examples/two_agents_server.py)"]
+  Srv --> Hub["BoundedCommunicationHub + CapabilityAuthority (HMAC)"]
+  Hub --> W3["W3 GuardedWorldGateway + verify_replay()"]
+  Srv --> HM["SQLite HyperMemoryP1e (exact_events + static/fast/slow)"]
+  Srv --> Risk["DonorBudget (Trần rủi ro cứng CAP = 4)"]
+```
+
+```bash
+# Chạy máy chủ cục bộ (chỉ nhận kết nối từ 127.0.0.1) rồi mở http://127.0.0.1:8765 trên trình duyệt
+python examples/two_agents_server.py --port 8765
+```
+
+| Chế độ tương tác | Bạn nhìn thấy trực tiếp điều gì trên sân khấu? |
+|---|---|
+| 🤝 **Hợp tác** | Đồng xu vật lý bay qua đường ray W3, sổ cái đóng dấu biên nhận thật, đường cong `HyperMemoryP1e` tăng dần. |
+| ✋ **Từ chối thẳng** | Bob trả lời `DECLINE` ở kênh tín hiệu — 0 xu rời khỏi chồng xu của Alice, 0 ô rủi ro bị chiếm. |
+| 🎭 **Kẻ lừa đảo (`ACK giả`)** | Bob giữ xu và gửi `COMMIT_ACK` giả kèm `override_cap=999` → tia quét sổ cái W3 của Alice đập tan ACK giả và khóa cứng tại `4/4`. |
+| 📡 **Mất thông báo (P7)** | Bật/tắt trực tiếp giữa **Chỉ chờ thông báo** (Alice kẹt cứng 4 ô vàng) và **Đối chiếu biên nhận W3** (tia quét giải cứu mỗi 3 vòng). |
+| 🌱 **Phục hồi (`HM-P1e`)** | 8 vòng đầu từ chối không lỗ; khi Bob hợp tác trở lại, bộ não SQLite `HM-P1e` tự chuyển `static → fast` ngay trên biểu đồ. |
+| 🎮 **Bạn đóng vai Bob** | Tự tay bấm `ACCEPT`/`DECLINE` và `Trả xu`/`Giữ xu & gửi ACK giả` gửi thẳng vào Python backend để kiểm chứng phản ứng của Alice. |
+
+<details>
+<summary><strong>Xem danh sách API HTTP của máy chủ cục bộ & kiểm thử bảo mật trực tiếp</strong></summary>
+
+| Endpoint | Chức năng trên backend Python |
+|---|---|
+| `GET /` · `GET /api/health` | Phục vụ giao diện HTML ngoại tuyến và kiểm tra trạng thái sống |
+| `GET /api/state` | Trả ảnh chụp trạng thái thật: số dư W3, `world_fingerprint`, `verify_replay`, SQLite `exact_events`, dự đoán `HM-P1e` |
+| `POST /api/session/reset` | Tạo mới `World`, khóa HMAC `CapabilityAuthority`, `DonorBudget` và SQLite `HyperMemoryP1e` |
+| `POST /api/round/step` | Chạy 1 vòng trên Python (hoặc Pha 1 `PROPOSE` rồi chờ người dùng ở chế độ `play_bob`) |
+| `POST /api/bob/reply` · `POST /api/bob/return` | Nhận quyết định trực tiếp của người dùng đóng vai Bob |
+| `POST /api/security/test` | Bắn tấn công thật (`cross_owner`, `wrong_token`, `spoof_verified`, `replay_id`, `toggle_revoke_alice`) vào lõi Python để kiểm chứng ngoại lệ `PermissionError`/`ValueError` và trạng thái W3 bất biến |
+
+Xem chi tiết thiết kế, giới hạn loopback và cách hoàn tác tại [TWO-AGENT-LIVE-UI.md](docs/experiments/TWO-AGENT-LIVE-UI.md).
+
+</details>
+
+---
+
 <a id="bo-thi-nghiem-chay-truc-tiep"></a>
 ## 🧪 Bộ thí nghiệm chạy trực tiếp (từ cơ bản đến nâng cao)
 
-Tất cả ví dụ dưới đây đều chạy bằng chính sách mã nguồn xác định trên CPU, cùng một chủ sở hữu mô phỏng, không gọi LLM và không nối mạng.
+Tất cả ví dụ dưới đây đều chạy bằng chính sách mã nguồn xác định trên CPU, cùng một chủ sở hữu mô phỏng, không gọi LLM và không nối ra internet công cộng.
 
 | Cấp độ | Chương trình | Bạn sẽ quan sát được gì? | Tài liệu thiết kế |
 |---|---|---|---|
@@ -86,7 +136,8 @@ Tất cả ví dụ dưới đây đều chạy bằng chính sách mã nguồn 
 | **2. Liên nhóm** | [`examples/populations/local_three_groups.py`](examples/populations/local_three_groups.py) | 30 agent chia 3 nhóm (guild) trao đổi theo hợp đồng liên nhóm có hạn mức/tick & bảo toàn tài nguyên (`150/150`). | [Population Links P0](docs/world/W3-POPULATION-LINKS-P0.md) |
 | **3. Biên nhận P7** | [`examples/two_agents.py`](examples/two_agents.py) | 2 agent A & B trong môi trường mất/trễ thông báo: đối chiếu biên nhận thật giúp mở khóa hợp tác mà không phá trần rủi ro 4 đơn vị. | [Two-Agent Receipts](docs/experiments/TWO-AGENT-RECEIPT-SIMULATION.md) |
 | **4. Bền vững qua restart** | [`examples/persistent_agents.py`](examples/persistent_agents.py)<br>[`examples/durable_two_agents.py`](examples/durable_two_agents.py) | Lưu toàn bộ nhật ký vòng chạy + trí nhớ `HyperMemoryP1e` xuống 1 file SQLite; tắt chương trình và chạy tiếp, tự khôi phục nếu ngắt giữa chừng. | [Persistent Sim](docs/experiments/PERSISTENT-AGENT-SIMULATION.md)<br>[Durable Receipts](docs/experiments/DURABLE-TWO-AGENT-RECEIPTS.md) |
-| **5. Giao tiếp đa agent (R2/R3)** | [`examples/communicating_agent.py`](examples/communicating_agent.py) | 3 agent (`Alice ↔ Bob`, `Alice ↔ Carol`) thương lượng 5 pha có cấp quyền, **bắt sống đối tác nói dối `COMMIT_ACK` giả**, thích nghi chuyển pha và cách ly tin đồn `INFERRED`. | [Communicating Agent](docs/experiments/COMMUNICATING-AGENT-DEMO.md) |
+| **5. Giao tiếp đa agent CLI (R2/R3)** | [`examples/communicating_agent.py`](examples/communicating_agent.py) | 3 agent (`Alice ↔ Bob`, `Alice ↔ Carol`) thương lượng 5 pha có cấp quyền, **bắt sống đối tác nói dối `COMMIT_ACK` giả**, thích nghi chuyển pha và cách ly tin đồn `INFERRED`. | [Communicating Agent](docs/experiments/COMMUNICATING-AGENT-DEMO.md) |
+| **6. Sân khấu 2 Agent Live UI** | [`examples/two_agents_server.py`](examples/two_agents_server.py)<br>[`examples/web/two_agents_ui.html`](examples/web/two_agents_ui.html) | Giao diện Canvas 60fps kết nối trực tiếp API Python, có chế độ tự đóng vai Bob, đối chiếu P7 trực quan, soi SQLite `exact_events` và nút kiểm thử bảo mật thật. | [Two-Agent Live UI](docs/experiments/TWO-AGENT-LIVE-UI.md) |
 
 ---
 
@@ -324,14 +375,14 @@ Xem đầy đủ tại [ROADMAP.md](docs/ROADMAP.md), [RESEARCH-SNAPSHOT-2026110
 > [!IMPORTANT]
 > **Bằng chứng kiểm thử cục bộ gần nhất:**
 > - **Mốc Windows `04/11/2026`** (Python 3.14.7, SQLite 3.53.4): **462 bài kiểm tra**, không lỗi ngoài dự kiến, 6 bài bỏ qua (1 PostgreSQL thực + 5 trình chạy Bash), **2 lỗi bảo mật đã biết được giữ lại làm đối chứng**. Xem [nhật ký đầy đủ](research/runs/2026-11-04/final-tests.log).
-> - **Mốc Linux trên nhánh hiện tại** (Python 3.12.16): **500 bài kiểm tra nền trên `main` PASS** (`skipped=1` PostgreSQL thực, giữ nguyên `expected failures=2`) + **16/16 bài kiểm tra mới** trong [`tests/test_communicating_agent.py`](tests/test_communicating_agent.py) PASS.
+> - **Mốc Linux trên nhánh hiện tại** (Python 3.12.16): **500 bài kiểm tra nền trên `main` PASS** (`skipped=1` PostgreSQL thực, giữ nguyên `expected failures=2`) + **16/16 test** [`tests/test_communicating_agent.py`](tests/test_communicating_agent.py) PASS + **7/7 test HTTP tích hợp** [`tests/test_two_agents_server.py`](tests/test_two_agents_server.py) PASS.
 
 > [!WARNING]
 > **Các giới hạn bắt buộc phải biết rõ (không suy diễn quá phạm vi đo đạc):**
 > 1. **Hai lỗ hổng đối chứng vẫn đang mở:** (a) khôi phục bản sao lưu quyền cũ có thể làm quyền đã thu hồi hoạt động lại; (b) tiêu thụ quyền truy cập và tác động lên thế giới bên ngoài chưa nằm trong một giao dịch nguyên tử duy nhất.
 > 2. **PostgreSQL thực chưa được chứng nhận tương đương SQLite** trong đợt kiểm chứng mặc định.
 > 3. **Nội dung suy luận/mô phỏng không phải bằng chứng thực tế:** Mọi bản ghi sinh ra từ mô phỏng (`SIMULATED`) hoặc dự đoán (`INFERRED`) không chứng minh một sự kiện ngoài đời đã xảy ra.
-> 4. **Cùng một chủ sở hữu ≠ Đồng thuận song phương:** Các ví dụ hiện tại chạy trong cùng một chủ sở hữu tin cậy; mọi truy cập/giao tiếp khác chủ sở hữu vẫn bị chặn mặc định.
+> 4. **Cùng một chủ sở hữu ≠ Đồng thuận song phương:** Các ví dụ hiện tại (kể cả máy chủ giao diện cục bộ `127.0.0.1` trong `two_agents_server.py`) chạy trong cùng một chủ sở hữu tin cậy; không mở ra mạng công cộng và mọi giao tiếp khác chủ sở hữu vẫn bị chặn mặc định.
 > 5. **Không có tuyên bố quy mô hàng tỷ agent hay AGI:** Số lượng danh tính agent được đăng ký không tương đương số lượt suy luận mô hình đồng thời, cũng không chứng minh khả năng nén bộ nhớ phổ quát hay trí thông minh tổng quát.
 > 6. **Kho lưu trữ thử nghiệm cũ chưa được nhập công khai**, chờ rà soát bản quyền, bí mật, an toàn và khả năng tái lập.
 
@@ -342,9 +393,10 @@ Xem đầy đủ tại [ROADMAP.md](docs/ROADMAP.md), [RESEARCH-SNAPSHOT-2026110
 ```text
 OpenWorld/
 ├── src/openworld_superkernel/   # Các module lõi tham chiếu (HyperMemory, MathKernel, W3 World/Guard, Capabilities)
-├── examples/                    # Ví dụ chạy cục bộ (world, populations, two_agents, persistent, durable, communicating)
+├── examples/                    # Ví dụ chạy cục bộ (world, populations, two_agents, persistent, durable, communicating, two_agents_server)
+│   └── web/                     # Giao diện HTML/Canvas 60fps kết nối API Python cục bộ (two_agents_ui.html)
 ├── benchmarks/                  # Thí nghiệm mô phỏng tái lập được (W5, P1–P7)
-├── tests/                       # Kiểm thử bất biến, phục hồi lỗi, bảo mật và tích hợp
+├── tests/                       # Kiểm thử bất biến, phục hồi lỗi, bảo mật, HTTP API và tích hợp
 ├── scripts/                     # Công cụ kiểm tra kho mã và xác minh thực nghiệm
 ├── docs/                        # Kiến trúc, lộ trình, giao thức, quyết định (ADR) và báo cáo đánh giá
 └── research/                    # Trạng thái nghiên cứu và nhật ký bằng chứng theo ngày
